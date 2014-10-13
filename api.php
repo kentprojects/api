@@ -9,7 +9,11 @@ define("PROJECT", "kentprojects-api");
 require_once __DIR__."functions.php";
 
 /** @noinspection PhpParamsInspection */
-$request = Request::factory(Request::stringToMethod($_SERVER["REQUEST_METHOD"]), empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"]);
+$request = Request::factory(
+	Request::stringToMethod($_SERVER["REQUEST_METHOD"]),
+	empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"]
+);
+
 if (!($request instanceof Request_Internal))
 {
 	exit(
@@ -35,5 +39,4 @@ $request->setPostData($_POST);
 /**
  * Execute the request and send the response.
  */
-$response = $request->execute();
-$response->send();
+$request->execute()->send();

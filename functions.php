@@ -21,6 +21,7 @@ spl_autoload_register(
 	 */
 	function($class) {
 		$file = str_replace("_", "/", strtolower($class)).".php";
+		$filename = null;
 
 		/**
 		 * If the word "Exception" exists in this class, handle it.
@@ -48,7 +49,6 @@ spl_autoload_register(
 		 */
 		else
 		{
-			$filename = null;
 			$folders = array(
 				APPLICATION_PATH."/classes",
 				APPLICATION_PATH."/system",
@@ -63,11 +63,11 @@ spl_autoload_register(
 					break;
 				}
 			}
+		}
 
-			if (empty($filename))
-			{
-				trigger_error("Class {$class} not found.", E_USER_ERROR);
-			}
+		if (empty($filename))
+		{
+			trigger_error("Class {$class} not found.", E_USER_ERROR);
 		}
 
 		/** @noinspection PhpIncludeInspection */
