@@ -11,6 +11,8 @@
  */
 define("APPLICATION_PATH", __DIR__);
 
+require_once __DIR__."/exceptions.php";
+
 /**
  * Register the autoloader so we can call on classes when we feel like it!
  */
@@ -24,16 +26,9 @@ spl_autoload_register(
 		$filename = null;
 
 		/**
-		 * If the word "Exception" exists in this class, handle it.
-		 */
-		if (strpos($class, "Exception") !== false)
-		{
-			$filename = APPLICATION_PATH."/exceptions/".$file;
-		}
-		/**
 		 * If the word "Controller_" exists in this class, handle it.
 		 */
-		elseif (strpos($class, "Controller_") === 0)
+		if (strpos($class, "Controller_") === 0)
 		{
 			$filename = APPLICATION_PATH."/controllers/".str_replace("controller/", "", $file);
 		}

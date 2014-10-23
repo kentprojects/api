@@ -1,6 +1,5 @@
 <?php if (!defined("PROJECT")) exit("Direct script access is forbidden.");
 /**
- * @category: API
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com

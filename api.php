@@ -1,7 +1,6 @@
 <?php
 /**
- * @category: API
- * @author: KentProjects <developer@kentprojects.com>
+ * @author: James Dryden <james.dryden@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */

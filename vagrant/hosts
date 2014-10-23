@@ -1,0 +1,9 @@
+#
+# @author: James Dryden <james.dryden@kentprojects.com>
+# @license: Copyright KentProjects
+# @link: http://kentprojects.com
+#
+# Hosts file for the Vagrant
+#
+
+127.0.0.1       cache.kentprojects.local database.kentprojects.local
