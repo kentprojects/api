@@ -23,7 +23,10 @@ apt-get autoremove -y
 
 ln -s /vagrant /srv/kentprojects
 
-cat /srv/kentprojects/vagrant/hosts >> /etc/hosts
 mysql -u root -ppassword < /srv/kentprojects/vagrant/database.setup.sql
 php /srv/kentprojects/database/update.php
 mysql -u root -ppassword < /srv/kentprojects/vagrant/database.sample.sql
+
+rm /etc/apache2/sites-enabled/*
+ln -s /srv/kentprojects/vagrant/apache.conf /etc/apache2/sites-enabled/10-KentProjects.conf
+service apache2 restart
