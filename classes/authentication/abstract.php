@@ -36,8 +36,6 @@ abstract class Authentication_Abstract
 	{
 		$this->request = $request;
 		$this->response = $response;
-
-		$this->auth = new Auth($request, $response);
 	}
 
 	/**
