@@ -51,7 +51,7 @@ class Authentication_Internal extends Authentication_Abstract
 			throw new HTTPStatusException(400, "Missing state code.");
 		}
 
-		if (!array_key_exists($this->fakecodes, $this->request->query("auth")))
+		if (!array_key_exists($this->request->query("auth"), $this->fakecodes))
 		{
 			throw new HTTPStatusException(400, "Invalid state code.");
 		}

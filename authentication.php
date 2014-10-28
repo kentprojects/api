@@ -14,7 +14,7 @@ require_once __DIR__."/functions.php";
 /** @noinspection PhpParamsInspection */
 $request = Request::factory(
 	Request::stringToMethod($_SERVER["REQUEST_METHOD"]),
-	empty($_SERVER["REQUEST_URI"]) ? "/" : $_SERVER["REQUEST_URI"]
+	empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"]
 );
 
 if (!($request instanceof Request_Internal))
@@ -36,7 +36,8 @@ $response = new Response;
 
 try
 {
-	$url = explode("/", str_replace("/auth", "", $request->getUrl()));
+	$url = explode("/", $_SERVER["PATH_INFO"]);
+	array_shift($url);
 
 	$provider = array_shift($url);
 	if (empty($provider))
