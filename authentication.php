@@ -9,7 +9,6 @@
  * However, it requires direct access to the API and the Database, so the source files for it are included here.
  */
 define("PROJECT", "kentprojects-authentication");
-die("I would like to authentication please.");
 require_once __DIR__."/functions.php";
 
 /** @noinspection PhpParamsInspection */
