@@ -21,6 +21,5 @@ class Authentication_Internal extends Authentication_Abstract
 	public function action()
 	{
 		// TODO: Implement action() method.
-		// TODO: I WILL DO IT SHORTLY
 	}
 }
