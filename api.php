@@ -5,7 +5,8 @@
  * @link: http://kentprojects.com
  */
 define("PROJECT", "kentprojects-api");
-require_once __DIR__."functions.php";
+die("Here is the API.");
+require_once __DIR__."/functions.php";
 
 /** @noinspection PhpParamsInspection */
 $request = Request::factory(
