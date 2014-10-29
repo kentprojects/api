@@ -11,19 +11,17 @@
 define("PROJECT", "kentprojects-authentication");
 require_once __DIR__."/functions.php";
 
+$_SERVER["PATH_INFO"] = empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"];
+
 /** @noinspection PhpParamsInspection */
-$request = Request::factory(
-	Request::stringToMethod($_SERVER["REQUEST_METHOD"]),
-	empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"]
-);
+$request = Request::factory(Request::stringToMethod($_SERVER["REQUEST_METHOD"]), $_SERVER["PATH_INFO"]);
 
 if (!($request instanceof Request_Internal))
 {
 	exit(
 		(string) new RequestException(sprintf(
 			"Request %s:%s did not return an internal request.",
-			strtoupper($_SERVER["REQUEST_METHOD"]),
-			empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"]
+			strtoupper($_SERVER["REQUEST_METHOD"]), $_SERVER["PATH_INFO"]
 		))
 	);
 }
