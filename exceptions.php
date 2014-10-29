@@ -5,6 +5,8 @@
  * @link: http://kentprojects.com
  */
 
+final class FormException extends Exception {}
+
 final class HttpRedirectException extends Exception
 {
 	protected $location;
@@ -85,7 +87,7 @@ final class PHPException extends Exception
 	 */
 	public function __construct($error_no, $error_string, $error_file, $error_line, $error_context, Exception $previous = null)
 	{
-		parent::__construct('PHPException: '.$errstr, $errno, $previous);
+		parent::__construct('PHPException: '.$error_string, $error_no, $previous);
 		$this->file = $errfile;
 		$this->line = $errline;
 	}
