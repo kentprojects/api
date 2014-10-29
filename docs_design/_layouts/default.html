@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link href="includes/css/flat-ui-pro.min.css" rel="stylesheet">
+        <link href="includes/css/style.css" rel="stylesheet">
+    </head>
+    <body>
+
+    <div class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a href="{{ "/" | prepend:site.baseurl }}" class="navbar-brand">{{ site.title }}</a>
+            </div>
+            <ul class="navbar-nav nav">
+                {% include nav.html %}
+            </ul>
+        </div>
+    </div>
+    <div class="container">
+        <div class="col-sm-4">
+            {% include sidebar.html %}
+        </div>
+        <div class="col-sm-8">
+            {{ content }}
+        </div>
+    </div>
+    <div class="row footer">
+        <div class="col-sm-12 text-center">
+            {% include footer.html %}
+        </div>
+    </div>
+    </body>
+</html>
