@@ -59,10 +59,7 @@ final class Auth
 
 			// Ensure all keys and values are sorted & strings.
 			ksort($query);
-			foreach ($query as $key => &$value)
-			{
-				$value = (string)$value;
-			}
+			array_walk($query, function(&$v) { $v = (string) $v; });
 
 			$local = md5(config("checksum", "salt") . $this->application->getSecret() . json_encode($query));
 

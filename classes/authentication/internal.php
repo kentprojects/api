@@ -37,11 +37,13 @@ class Authentication_Internal extends Authentication_Abstract
 			"username" => "student3"
 		),
 	);
+	protected $success = "/success.html";
 
 	/**
 	 * The main action this authentication provider uses.
 	 *
 	 * @throws HTTPStatusException
+	 * @throws HttpRedirectException
 	 * @return void
 	 */
 	public function action()
@@ -51,13 +53,18 @@ class Authentication_Internal extends Authentication_Abstract
 			throw new HTTPStatusException(400, "Missing state code.");
 		}
 
+		$url = parse_url($_SERVER["HTTP_REFERER"]);
+		print_r($url);
+
 		if (!array_key_exists($this->request->query("auth"), $this->fakecodes))
 		{
 			throw new HTTPStatusException(400, "Invalid state code.");
 		}
 
 		$authUser = $this->fakecodes[$this->request->query("auth")];
+		print_r($authUser);
+		exit(1);
 
-		print_r($authUser); exit(1);
+		throw new HttpRedirectException(302, "");
 	}
 }
