@@ -54,7 +54,6 @@ class Authentication_Internal extends Authentication_Abstract
 		}
 
 		$url = parse_url($_SERVER["HTTP_REFERER"]);
-		print_r($url);
 
 		if (!array_key_exists($this->request->query("auth"), $this->fakecodes))
 		{
@@ -62,9 +61,9 @@ class Authentication_Internal extends Authentication_Abstract
 		}
 
 		$authUser = $this->fakecodes[$this->request->query("auth")];
-		print_r($authUser);
-		exit(1);
 
-		throw new HttpRedirectException(302, "");
+		// print_r($url); print_r($authUser); exit(1);
+
+		throw new HttpRedirectException(302, $url["scheme"]."://".$url["host"].$this->success);
 	}
 }
