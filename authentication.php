@@ -60,6 +60,8 @@ try
 
 	$provider = new $provider($request, $response);
 	$provider->$action();
+
+	$response->send();
 }
 catch (HttpRedirectException $e)
 {
