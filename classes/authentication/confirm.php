@@ -27,5 +27,10 @@ class Authentication_Confirm extends Authentication_Abstract
 		// Validate the auth code
 
 		// Return the user data?
+		$this->response->body(json_encode(array(
+			"id" => 1,
+			"name" => "Bob Whent",
+			"email" => "bew@kent.ac.uk"
+		)));
 	}
 }
