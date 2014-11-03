@@ -64,6 +64,6 @@ class Authentication_Internal extends Authentication_Abstract
 
 		// print_r($url); print_r($authUser); exit(1);
 
-        throw new HttpRedirectException(302, $url["scheme"]."://".$url["host"].!empty($url["port"]) ? ":".$url["port"] : "".$this->success."#".md5(uniqid()));
+        throw new HttpRedirectException(302, $url["scheme"]."://".$url["host"].(!empty($url["port"])?":".$url["port"]:"").$this->success."#".md5(uniqid()));
 	}
 }
