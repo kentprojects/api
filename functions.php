@@ -6,6 +6,8 @@
  * @link: http://kentprojects.com
  */
 
+$_SERVER["PATH_INFO"] = empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"];
+
 /**
  * Define the relevant paths.
  */
@@ -104,6 +106,29 @@ function coalesce($a, $b)
 		if (!empty($a))
 			return $a;
 	return null;
+}
+
+/**
+ * @param string|null $section
+ * @param string|null $key
+ * @throws InvalidArgumentException
+ * @return array|string
+ */
+function config($section = null, $key = null)
+{
+	if (empty($GLOBALS["config.ini"]))
+	{
+		$GLOBALS["config.ini"] = parse_ini_file(__DIR__."/config.ini", true);
+	}
+	switch(func_num_args())
+	{
+		case 2:
+			return $GLOBALS["config.ini"][$section][$key];
+		case 1:
+			return $GLOBALS["config.ini"][$section];
+		default:
+			throw new InvalidArgumentException("Invalid number of arguments for function config.");
+	}
 }
 
 /**

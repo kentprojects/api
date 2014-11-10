@@ -6,37 +6,30 @@
  *
  * This script is the main entry point for authentication with the API.
  * In the production environment, this script will be exposed as a separate domain in order to minimise direct API exposure.
- * However, it requires direct access to the API and the Database, so the source files for it are included here.
+ * However, it requires direct access to the API and the Database, so the source files for it based included here.
  */
 define("PROJECT", "kentprojects-authentication");
 require_once __DIR__."/functions.php";
 
-$_SERVER["PATH_INFO"] = empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"];
-
-/** @noinspection PhpParamsInspection */
+/**
+ * Build the main Request & the Response to be used by the API.
+ *
+ * @noinspection PhpParamsInspection */
 $request = Request::factory(Request::stringToMethod($_SERVER["REQUEST_METHOD"]), $_SERVER["PATH_INFO"]);
-
 if (!($request instanceof Request_Internal))
 {
-	exit(
-		(string) new RequestException(sprintf(
-			"Request %s:%s did not return an internal request.",
-			strtoupper($_SERVER["REQUEST_METHOD"]), $_SERVER["PATH_INFO"]
-		))
-	);
+	exit((string) new RequestException(sprintf("Request %s:%s did not return an internal request.", strtoupper($_SERVER["REQUEST_METHOD"]), $_SERVER["PATH_INFO"])));
 }
-
 $request->setHeaders(apache_request_headers());
 $request->setQueryData($_GET);
 $request->setPostData($_POST);
-
 $response = new Response;
 
 try
 {
 	$url = explode("/", $_SERVER["PATH_INFO"]);
 	array_shift($url);
-
+	
 	$provider = array_shift($url);
 	if (empty($provider))
 	{
@@ -47,7 +40,7 @@ try
 	{
 		throw new InvalidArgumentException("Provider ".ucfirst($provider)." doesn't exist.");
 	}
-
+	
 	$action = array_shift($url);
 	if (empty($action))
 	{
@@ -57,14 +50,17 @@ try
 	{
 		throw new InvalidArgumentException("Action ".$action." doesn't exist for ".$provider);
 	}
-
+	
 	$provider = new $provider($request, $response);
 	$provider->$action();
-
+	
 	$response->send();
 }
 catch (HttpRedirectException $e)
 {
+	/**
+	 * Handle the Redirect Exception and send the user off to the new location.
+	 */
 	$response = new Response;
 	$response->header("Location", $e->getLocation());
 	$response->status($e->getCode());
@@ -72,6 +68,9 @@ catch (HttpRedirectException $e)
 }
 catch (Exception $e)
 {
+	/**
+	 * An uncaught exception means something bad happened.
+	 */
 	$response = new Response;
 	$response->body((string)$e);
 	$response->headers(array(

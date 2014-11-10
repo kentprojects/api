@@ -9,10 +9,7 @@ die("Here is the API.");
 require_once __DIR__."/functions.php";
 
 /** @noinspection PhpParamsInspection */
-$request = Request::factory(
-	Request::stringToMethod($_SERVER["REQUEST_METHOD"]),
-	empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"]
-);
+$request = Request::factory(Request::stringToMethod($_SERVER["REQUEST_METHOD"]), $_SERVER["PATH_INFO"]);
 
 if (!($request instanceof Request_Internal))
 {
