@@ -5,6 +5,36 @@
  * @link: http://kentprojects.com
  */
 
+final class DatabaseException extends Exception
+{
+	protected $query;
+	protected $types;
+	protected $params;
+
+	public function __construct($errormessage, $errorno, $query = null, $types = null, $params = null)
+	{
+		parent::__construct($errormessage, $errorno);
+		$this->query = $query;
+		$this->types = $types;
+		$this->params = $params;
+	}
+
+	public function getParams()
+	{
+		return $this->params;
+	}
+
+	public function getQuery()
+	{
+		return $this->query;
+	}
+
+	public function getTypes()
+	{
+		return $this->types;
+	}
+}
+
 final class FormException extends Exception {}
 
 final class HttpRedirectException extends Exception
