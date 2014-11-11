@@ -1,4 +1,8 @@
-<?php if (!defined("PROJECT")) exit("Direct script access is forbidden.");
+<?php if (!defined("PROJECT"))
+{
+	exit("Direct script access is forbidden.");
+}
+
 /**
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
@@ -10,38 +14,12 @@ final class Model_User extends Model_Abstract
 	 * @var array
 	 */
 	protected static $roles = array("staff", "student");
-	
-	/**
-	 * Get the relevant User by their email.
-	 *
-	 * @param string $email
-	 * @return User|null
-	 */
-	public static function getByEmail($email)
-	{
-		$statement = Database::prepare(
-			"SELECT
-				`user_id` AS 'id',
-				`email`,
-				`first_name`,
-				`last_name`,
-				`role`,
-				`created`,
-				`lastlogin`,
-				`updated`,
-				`status`
-			 FROM `User`
-			 WHERE `email` = ?",
-			"s", __CLASS__
-		);
-		return $statement->execute($email)->singleton();
-	}
-	
+
 	/**
 	 * Get the relevant User by it's ID.
 	 *
 	 * @param int $id
-	 * @return User|null
+	 * @return Model_User|null
 	 */
 	public static function getById($id)
 	{
@@ -62,7 +40,7 @@ final class Model_User extends Model_Abstract
 		);
 		return $statement->execute($id)->singleton();
 	}
-	
+
 	/**
 	 * @var int
 	 */
@@ -99,7 +77,7 @@ final class Model_User extends Model_Abstract
 	 * @var int
 	 */
 	protected $status;
-	
+
 	/**
 	 * @return int
 	 */
@@ -107,7 +85,7 @@ final class Model_User extends Model_Abstract
 	{
 		return $this->id;
 	}
-	
+
 	/**
 	 * @return array
 	 */
@@ -126,7 +104,7 @@ final class Model_User extends Model_Abstract
 			)
 		);
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -142,7 +120,7 @@ final class Model_User extends Model_Abstract
 			{
 				// Throw an error. A substantial one.
 			}
-			
+
 			/** @var _Database_State $result */
 			$result = Database::prepare(
 				"INSERT INTO `User` (`email`, `first_name`, `last_name`, `role`, `created`)
@@ -169,22 +147,22 @@ final class Model_User extends Model_Abstract
 		}
 		parent::save();
 	}
-	
+
 	public function setEmail($email)
 	{
 		$this->email = $email;
 	}
-	
+
 	public function setFirstName($firstname)
 	{
 		$this->first_name = $firstname;
 	}
-	
+
 	public function setLastName($lastname)
 	{
 		$this->last_name = $lastname;
 	}
-	
+
 	public function setRole($role)
 	{
 		$role = strtolower(trim($role));
