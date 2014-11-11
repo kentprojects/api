@@ -21,6 +21,11 @@ $files = array_merge(
 	glob(__DIR__ . "/alterations/*.sql")
 );
 
+if (in_array("--sample", $argv))
+{
+	$files = array_merge($files, glob(__DIR__ . "/sample/*.sql"));
+}
+
 /**
  * Build the mysql command that will be run.
  * @var string
