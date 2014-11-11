@@ -6,7 +6,7 @@
 @import url('bootstrap.css');
 
 body {
-    background: #fff url('http://dev.kentprojects.com/includes/img/kenteye.jpg') no-repeat center;
+	background: #fff url('http://dev.kentprojects.com/includes/img/kenteye.jpg') no-repeat top center;
 	background-size: cover;
 	padding-top: 20px;
 	padding-bottom: 40px;
@@ -31,6 +31,17 @@ ul.pretty-parameters input {
 	display: inline-block;
 	margin: 0 3px 5px 0;
 	width: 40%;
+}
+
+ul.pretty-body {
+	display: none;
+}
+
+ul.pretty-body textarea {
+	border: 0;
+	display: inline-block;
+	margin: 0 3px 5px 0;
+	width: 100%;
 }
 
 hr {
