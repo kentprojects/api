@@ -5,6 +5,9 @@
  * @link: http://kentprojects.com
  */
 
+/**
+ * Class DatabaseException
+ */
 final class DatabaseException extends Exception
 {
 	protected $query;
@@ -35,8 +38,14 @@ final class DatabaseException extends Exception
 	}
 }
 
+/**
+ * Class FormException
+ */
 final class FormException extends Exception {}
 
+/**
+ * Class HttpRedirectException
+ */
 final class HttpRedirectException extends Exception
 {
 	protected $location;
@@ -60,12 +69,25 @@ final class HttpRedirectException extends Exception
 	}
 }
 
+/**
+ * Class HttpStatusException
+ */
 class HttpStatusException extends Exception
 {
 	/**
-	 * The status message that is associated with the status code
+	 * @var string
 	 */
-	protected $statusmessage;
+	protected $data = array();
+	/**
+	 * @var string
+	 */
+	protected $name;
+	/**
+	 * The status message that is associated with the status code.
+	 *
+	 * @var string
+	 */
+	protected $status_message;
 
 	/**
 	 * @param int $code
@@ -74,9 +96,10 @@ class HttpStatusException extends Exception
 	 */
 	public function __construct($code, $message = null, Exception $previous = null)
 	{
-		$this->statusmessage = getHttpStatusForCode($code);
+		$this->name = __CLASS__;
+		$this->status_message = getHttpStatusForCode($code);
 
-		if (empty($this->statusmessage))
+		if (empty($this->status_message))
 			trigger_error(
 				"Bad status code used in HttpStatusException (" . $code . ") for: " . $message .
 				(!empty($previous) ? " with exception " . (string)$previous : ""),
@@ -84,27 +107,71 @@ class HttpStatusException extends Exception
 			);
 
 		if (empty($message))
-			$message = $this->statusmessage;
+			$message = $this->status_message;
 
 		parent::__construct($message, $code, $previous);
 	}
 
-	public function getStatusMessage()
-	{
-		return $this->statusmessage;
-	}
-
+	/**
+	 * @return string
+	 */
 	public function __toString()
 	{
 		return sprintf(
 			"HTTP %d (%s): %s",
-			$this->getCode(), $this->statusmessage,
+			$this->getCode(), $this->status_message,
 			$this->getMessage()
 		);
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getData()
+	{
+		return $this->data;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return $this->name;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getStatusMessage()
+	{
+		return $this->status_message;
+	}
+
+	/**
+	 * @param array $data
+	 * @return $this
+	 */
+	public function setData(array $data)
+	{
+		$this->data = $data;
+		return $this;
+	}
+
+	/**
+	 * @param string $name
+	 * @return $this
+	 */
+	public function setName($name)
+	{
+		$this->name = $name;
+		return $this;
+	}
 }
 
-
+/**
+ * Class PHPException
+ */
 final class PHPException extends Exception
 {
 	/**
@@ -123,4 +190,7 @@ final class PHPException extends Exception
 	}
 }
 
+/**
+ * Class RequestException
+ */
 final class RequestException extends Exception {}

@@ -73,6 +73,59 @@ final class Controller_Year extends Controller
 			throw new HttpStatusException(404, "Year not found.");
 		}
 
+		if (($this->request->getMethod() === Request::POST) || ($this->request->getMethod() === Request::DELETE))
+		{
+			/**
+			 * Adding / removing staff to a year!
+			 */
+			if (is_array($_POST) || empty($_POST))
+			{
+				throw new InvalidArgumentException("POST is an ARRAY/EMPTY not a STRING.");
+			}
+
+			if ($this->auth->getUser() === null)
+			{
+				throw new HttpStatusException(401, "You must be a user to do this.");
+			}
+
+			$user = $this->auth->getUser();
+			if (!$user->isConvener())
+			{
+				throw new HttpStatusException(401, "You must be a convener to do this.");
+			}
+
+			$_POST = json_decode($_POST);
+			$failed = array();
+			$staff = array();
+
+			foreach ($_POST as $user_id)
+			{
+				$user = Model_Staff::getById($user_id);
+				if (!empty($user))
+				{
+					$staff[] = $user;
+				}
+				else
+				{
+					$failed[] = $user_id;
+				}
+			}
+
+			if (count($failed) > 0)
+			{
+				throw (new HttpStatusException(400, "Failed to find a valid staff account for the following IDs:"))
+					->setName("InvalidStaffIDs")
+					->setData($failed);
+			}
+
+			$method = ($this->request->getMethod() === Request::POST) ? "addStaff" : "removeStaff";
+
+			foreach ($staff as $user)
+			{
+				$year->$method($user);
+			}
+		}
+
 		$this->response->status(200);
 		$this->response->body($year->getStaff());
 	}
