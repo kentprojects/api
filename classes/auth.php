@@ -1,4 +1,4 @@
-<?php if (!defined("PROJECT")) exit("Direct script access is forbidden.");
+<?php
 /**
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
@@ -7,7 +7,7 @@
 final class Auth
 {
 	const NONE = "auth:none";
-	const APP  = "auth:app";
+	const APP = "auth:app";
 	const USER = "auth:user";
 
 	protected $level;
@@ -59,7 +59,10 @@ final class Auth
 
 			// Ensure all keys and values are sorted & strings.
 			ksort($query);
-			array_walk($query, function(&$v) { $v = (string) $v; });
+			array_walk($query, function (&$v)
+			{
+				$v = (string)$v;
+			});
 
 			$local = md5(config("checksum", "salt") . $this->application->getSecret() . json_encode($query));
 

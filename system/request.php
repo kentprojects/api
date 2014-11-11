@@ -1,4 +1,4 @@
-<?php if (!defined("PROJECT")) exit("Direct script access is forbidden.");
+<?php
 /**
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects

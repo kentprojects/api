@@ -8,7 +8,6 @@
  * In the production environment, this script will be exposed as a separate domain in order to minimise direct API exposure.
  * However, it requires direct access to the API and the Database, so the source files for it based included here.
  */
-define("PROJECT", "kentprojects-authentication");
 require_once __DIR__."/functions.php";
 
 /**
