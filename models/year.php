@@ -44,6 +44,25 @@ class Model_Year extends Model_Abstract
 	}
 
 	/**
+	 * @return Model_User[]
+	 */
+	public function getStaff()
+	{
+		$users = array();
+		$statement = Database::prepare("SELECT `user_id` FROM `User_Year_Map` WHERE `year` = ?", "i");
+		$user_ids = $statement->execute($this->id)->singlevals();
+		foreach ($user_ids as $user_id)
+		{
+			$user = Model_Staff::getById($user_id);
+			if (!empty($user))
+			{
+				$users[] = $user;
+			}
+		}
+		return $users;
+	}
+
+	/**
 	 * Rather than return an array (which will become an object), return an int.
 	 *
 	 * @return int
