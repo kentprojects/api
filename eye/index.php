@@ -22,7 +22,7 @@
 			<li class="active"><a href="http://api.dev.kentprojects.com">Developer API</a></li>
 			<li><a href="http://api.kentprojects.com">Live API</a></li>
 		</ul>
-		<h3>Kent AP Eye</h3>
+		<h3 class="custom-h3">Kent AP Eye</h3>
 	</div>
 
 	<hr/>

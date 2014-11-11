@@ -12,6 +12,10 @@ body {
 	padding-bottom: 40px;
 }
 
+h3.custom-h3 {
+    color: #fff;
+}
+
 input.pretty-url {
 	display: block;
 	margin: 0 auto 0 auto;
