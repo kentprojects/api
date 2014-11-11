@@ -25,7 +25,7 @@ final class Response
 	 * The status code to be sent.
 	 * @var int
 	 */
-	protected $status;
+	protected $status = 500;
 
 	/**
 	 * Build a new Response, based off the incoming request.
@@ -51,7 +51,7 @@ final class Response
 	{
 		if (func_num_args() > 0)
 		{
-			$this->body = (string) $body;
+			$this->body = $body;
 			return $this;
 		}
 		else

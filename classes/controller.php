@@ -7,10 +7,6 @@
 abstract class Controller
 {
 	/**
-	 * @var Model_Application
-	 */
-	protected $application;
-	/**
 	 * @var Auth
 	 */
 	protected $auth;
@@ -30,24 +26,35 @@ abstract class Controller
 	/**
 	 * @param Request_Internal $request
 	 * @param Response $response
-	 * @throws HTTPStatusException
+	 * @throws HttpStatusException
 	 */
 	public function __construct(Request_Internal &$request, Response &$response)
 	{
 		$this->request = $request;
 		$this->response = $response;
+
+		$this->auth = new Auth($request, $response, $this->authentication);
 	}
-	
+
 	/**
-	 *
+	 * To be run BEFORE the main action.
 	 */
 	public function before()
 	{
-		
+
 	}
-	
+
+	/**
+	 * To be run AFTER the main action.
+	 */
 	public function after()
 	{
-		
+		$this->response->header("Content-Type", "application/json");
+		$this->response->body(
+			json_encode(
+				$this->response->body(),
+				JSON_PRETTY_PRINT
+			)
+		);
 	}
 }

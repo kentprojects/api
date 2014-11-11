@@ -38,8 +38,8 @@ abstract class Request
 	}
 
 	/**
-	 * @param $method A $string relevant constant representing the type of request.
-	 * @param $url A $string URL to run the request to.
+	 * @param string $method A string relevant constant representing the type of request.
+	 * @param string $url A URL to run the request to.
 	 * @throws Exception
 	 * @return Request_Internal | Request_External
 	 */
@@ -282,6 +282,7 @@ class Request_External extends Request
 		 * Initialise the curl handle and set some values.
 		 */
 		$ch = curl_init($url);
+		$fh = null;
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->getCurlHeaders());
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
@@ -367,9 +368,10 @@ class Request_Internal extends Request
 			/**
 			 * This prevents idiots running something akin to: $this->request->execute();
 			 */
-			throw new RequestException(
-				"You cannot execute this internal request within it's own execute process: ", $this->__toString()
-			);
+			throw new RequestException(sprintf(
+				"You cannot execute this internal request within it's own execute process: %s:%s ",
+				strtoupper($_SERVER["REQUEST_METHOD"]), $_SERVER["PATH_INFO"]
+			));
 		}
 		$this->run = true;
 
@@ -395,12 +397,12 @@ class Request_Internal extends Request
 				throw new RequestException("Method $controller::$action was not found.");
 			}
 
-			// print_r($this); var_dump($controller, $action);
-			// die;
+			// print_r($this); var_dump($controller, $action); exit();
 
 			$response = new Response($this);
 
 			// Run the Controller and the relevant Action
+			/** @var Controller $controller */
 			$controller = new $controller($this, $response);
 			$controller->before();
 			$controller->$action();
@@ -429,6 +431,8 @@ class Request_Internal extends Request
 			{
 				/**
 				 * Some clever way to handle errors, because the frontend is gonna handle exceptions prettier than the API will.
+				 *
+				 * @var Controller_Error $controller
 				 */
 				$controller = new Controller_Error($this, $response);
 				$controller->before();

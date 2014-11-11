@@ -13,7 +13,7 @@ $_SERVER["PATH_INFO"] = empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO
  */
 define("APPLICATION_PATH", __DIR__);
 
-require_once __DIR__."/exceptions.php";
+require_once __DIR__ . "/exceptions.php";
 
 /**
  * Register the autoloader so we can call on classes when we feel like it!
@@ -62,7 +62,7 @@ spl_autoload_register(
 			}
 		}
 
-		if (empty($filename))
+		if (empty($filename) || !file_exists($filename))
 		{
 			trigger_error("Class {$class} not found.", E_USER_ERROR);
 		}
@@ -78,17 +78,9 @@ spl_autoload_register(
  * Wraps it up into a lovely catchable Exception
  */
 set_error_handler(
-	/**
-	 * @param int $errno
-	 * @param string $errstr
-	 * @param string $errfile
-	 * @param string $errline
-	 * @param string $errcontext
-	 * @return void
-	 * @throws PHPException
-	 */
-	function($errno, $errstr, $errfile, $errline, $errcontext) {
-		throw new PHPException($errno, $errstr, $errfile, $errline, $errcontext);
+	function ($error_no, $error_string, $error_file, $error_line, $error_context)
+	{
+		throw new PHPException($error_no, $error_string, $error_file, $error_line, $error_context);
 	}
 );
 
