@@ -7,6 +7,19 @@
 class Model_Year extends Model_Abstract
 {
 	/**
+	 * @return Model_Year[]
+	 */
+	public static function getAll()
+	{
+		$years = array();
+		foreach (Database::prepare("SELECT `year` AS 'id' FROM `Year`")->execute()->singlevals() as $year)
+		{
+			$years[] = static::getById($year);
+		}
+		return $years;
+	}
+
+	/**
 	 * @param int $id
 	 * @return Model_Year
 	 */
@@ -73,7 +86,13 @@ class Model_Year extends Model_Abstract
 	 */
 	public function jsonSerialize()
 	{
-		return $this->getId();
+		return array_merge(
+			parent::jsonSerialize(),
+			array(
+				"projects" => 0,
+				"users" => 0
+			)
+		);
 	}
 
 	/**

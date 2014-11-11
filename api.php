@@ -4,7 +4,6 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-die("Here is the API.");
 require_once __DIR__."/functions.php";
 
 /** @noinspection PhpParamsInspection */

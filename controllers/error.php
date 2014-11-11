@@ -31,7 +31,6 @@ final class Controller_Error extends Controller
 			case "HttpStatusException":
 				/** @var HttpStatusException $e */
 				$error["status"] = $status = $e->getCode();
-				$error["status_message"] = $e->getStatusMessage();
 				break;
 		}
 		/** @var Exception $e */
