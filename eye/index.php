@@ -45,6 +45,10 @@
 		<div class="row-fluid">
 			<div class="span6">
 				<ul class="unstyled pretty-parameters"></ul>
+				<div class="pretty-body">
+					<pre id="pretty-editor"></pre>
+				</div>
+				<textarea id="pretty-field" name="params-body" placeholder="Body"></textarea>
 			</div>
 			<div class="offset2 span4">
 				<select class="pretty-key" name="key">
@@ -71,6 +75,7 @@
 
 </div>
 <script id="js-jquery" src="js/jquery.min.js"></script>
+<script id="js-pretty" src="js/ace/ace.js"></script>
 <script id="js-pretty" src="js/pretty.js"></script>
 </body>
 </html>

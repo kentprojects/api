@@ -6,20 +6,19 @@
 
 var defaults = {
 	deletelink: '&nbsp;<a href="#" onclick="$.deleterow(this); return false;">Delete</a>',
-	param: '<li><input name="params-keys[]" onfocus="$.addrow(this);" placeholder="Parameter" type="text"/><input name="params-values[]" placeholder="Value" type="text"/></li>',
+	inputparam: '<li><input name="params-keys[]" onfocus="$.addrow(this);" placeholder="Parameter" type="text"/><input name="params-values[]" placeholder="Value" type="text"/></li>'
 };
 
 $(document).ready(function ()
 {
-
 	/**
-	 *    Extending jQuery to handling the awesomeness of our form!
+	 * Extending jQuery to handling the awesomeness of our form!
 	 */
-	$.addrow = function (i)
+	$.addrow = function (a)
 	{
-		$(i).parent().append(defaults.deletelink);
-		$('ul.pretty-parameters').append(defaults.param);
-		$(i).removeAttr('onfocus');
+		$(a).parent().append(defaults.deletelink);
+		$('ul.pretty-parameters').append(defaults.inputparam);
+		$(a).removeAttr('onfocus');
 	};
 	$.deleterow = function (a)
 	{
@@ -27,15 +26,21 @@ $(document).ready(function ()
 	};
 	$.fn.extend({
 
-		reset: function ()
+		inputreset: function ()
 		{
-			$(this).html(defaults.param);
+			$(this).html(defaults.inputparam);
+			return $(this);
+		},
+
+		textreset: function ()
+		{
+			$(this).html(defaults.textparam);
 			return $(this);
 		}
 
 	});
 
-	$('ul.pretty-parameters').append(defaults.param);
+	$('ul.pretty-parameters').append(defaults.inputparam);
 
 	$('ul.api-selector a').click(function (e)
 	{
@@ -43,6 +48,7 @@ $(document).ready(function ()
 		$('input[name="url"]').val($(this).attr('href'));
 		$('select[name="method"]').val('GET');
 		$('ul.pretty-parameters').reset().show();
+		$('ul.pretty-body').inputreset().hide();
 		$('ul.api-selector li.active').removeClass('active');
 		$('div.results').slideUp(function ()
 		{
@@ -53,20 +59,16 @@ $(document).ready(function ()
 
 	$('select.pretty-method').change(function ()
 	{
-		console.log($(this).val());
 		switch ($(this).val())
 		{
-
 			case 'GET':
+				$('div.pretty-body').hide();
+				break;
 			case 'POST':
 			case 'PUT':
-				$('ul.pretty-parameters').reset().show();
-				break;
-
 			case 'DELETE':
-				$('ul.pretty-parameters').reset().hide();
+				$('div.pretty-body').show();
 				break;
-
 		}
 	});
 
@@ -81,7 +83,7 @@ $(document).ready(function ()
 				{
 					$('div.results').html(html).slideDown(function ()
 					{
-						window.location.hash = $('form').serialize();
+						// window.location.hash = $('form').serialize();
 					});
 				});
 			},
@@ -116,3 +118,11 @@ function keyDownHandler(e)
 }
 
 document.addEventListener('keydown', keyDownHandler, false);
+
+var editor = ace.edit("pretty-editor");
+editor.setTheme("ace/theme/github");
+editor.getSession().setMode("ace/mode/json");
+editor.on("change", function (e)
+{
+	document.getElementById("pretty-field").value = editor.getSession().getValue();
+});

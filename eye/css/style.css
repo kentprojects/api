@@ -37,15 +37,25 @@ ul.pretty-parameters input {
 	width: 40%;
 }
 
-ul.pretty-body {
+div.pretty-body {
 	display: none;
+	height: 200px;
+	margin-bottom: 20px;
+	position: relative;
+	width: 85%;
 }
 
-ul.pretty-body textarea {
-	border: 0;
-	display: inline-block;
-	margin: 0 3px 5px 0;
-	width: 100%;
+div.pretty-body pre {
+	margin: 0;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+textarea#pretty-field {
+	display: none;
 }
 
 hr {

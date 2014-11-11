@@ -159,7 +159,7 @@ echo <<<EOT
 
 	<hr/>
 
-	<p><a href="{$request->url}" target="_blank">{$request->url}</a></p>
+	<p><pre><a href="{$request->url}" target="_blank">{$request->url}</a></pre></p>
 	<pre>{$response["body"]}</pre>
 	<pre>{$response["info"]}</pre>
 
