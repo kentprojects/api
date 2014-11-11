@@ -34,9 +34,9 @@ class Model_Year extends Model_Abstract
 		$statement = Database::prepare(
 			"INSERT INTO `User_Year_Map` (`user_id`, `year`)
 			VALUES (?, ?)",
-			"ii");
+			"ii"
+		);
 		return $statement->execute($user->getId(), $this->id)->affected_rows == 1;
-
 	}
 
 	/**
@@ -82,11 +82,13 @@ class Model_Year extends Model_Abstract
 	 */
 	public function removeStaff(Model_User $user)
 	{
-		/**
-		 * When you run an INSERT, UPDATE or DELETE, you will get a _Database_State back instead of a _Database_Result.
-		 * You can use this to determine if the query was successful or not.
-		 * Also, $user->isStaff() is valid. Just sayin'.
-		 * Also also, delete this.
-		 */
+		if (!$user->isStaff())
+		{
+			throw new InvalidArgumentException("This user is not a member of staff");
+		}
+		$statement = Database::prepare(
+			"DELETE FROM `User_Year_Map` WHERE `user_id` = ? AND `year` = ?", "ii"
+		);
+		return $statement->execute($user->getId(), $this->id)->affected_rows == 1;
 	}
 }
