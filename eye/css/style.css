@@ -1,0 +1,37 @@
+/**
+ * @author: KentProjects <developer@kentprojects.com>
+ * @license: Copyright KentProjects
+ * @link: http://kentprojects.com
+ */
+@import url('bootstrap.css');
+
+body {
+	background: #fff url('http://dev.kentprojects.com/includes/img/kenteye.jpg') no-repeat top left;
+	padding-top: 20px;
+	padding-bottom: 40px;
+}
+
+input.pretty-url {
+	display: block;
+	margin: 0 auto 0 auto;
+	width: 100%;
+}
+
+select.pretty-method {
+	width: 100%;
+}
+
+ul.pretty-parameters {
+
+}
+
+ul.pretty-parameters input {
+	border: 0;
+	display: inline-block;
+	margin: 0 3px 5px 0;
+	width: 40%;
+}
+
+hr {
+	border-color: transparent;
+}
