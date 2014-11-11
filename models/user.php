@@ -83,6 +83,22 @@ final class Model_User extends Model_Abstract
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isStaff()
+	{
+		return $this->role === "student";
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isStudent()
+	{
+		return $this->role === "student";
+	}
+
+	/**
 	 * @return array
 	 */
 	public function jsonSerialize()

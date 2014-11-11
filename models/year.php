@@ -22,6 +22,20 @@ class Model_Year extends Model_Abstract
 	protected $id;
 
 	/**
+	 * @param Model_User $user
+	 * @return bool
+	 */
+	public function addStaff(Model_User $user)
+	{
+		/**
+		 * When you run an INSERT, UPDATE or DELETE, you will get a _Database_State back instead of a _Database_Result.
+		 * You can use this to determine if the query was successful or not.
+		 * Also, $user->isStaff() is valid. Just sayin'.
+		 * Also also, delete this.
+		 */
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getId()
@@ -37,5 +51,19 @@ class Model_Year extends Model_Abstract
 	public function jsonSerialize()
 	{
 		return $this->getId();
+	}
+
+	/**
+	 * @param Model_User $user
+	 * @return bool
+	 */
+	public function removeStaff(Model_User $user)
+	{
+		/**
+		 * When you run an INSERT, UPDATE or DELETE, you will get a _Database_State back instead of a _Database_Result.
+		 * You can use this to determine if the query was successful or not.
+		 * Also, $user->isStaff() is valid. Just sayin'.
+		 * Also also, delete this.
+		 */
 	}
 }
