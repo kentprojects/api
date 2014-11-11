@@ -30,7 +30,7 @@ abstract class Authentication_Abstract
 	/**
 	 * @param Request_Internal $request
 	 * @param Response $response
-	 * @throws HTTPStatusException
+	 * @throws HttpStatusException
 	 */
 	public function __construct(Request_Internal &$request, Response &$response)
 	{

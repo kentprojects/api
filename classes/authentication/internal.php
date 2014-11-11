@@ -42,7 +42,7 @@ class Authentication_Internal extends Authentication_Abstract
 	/**
 	 * The main action this authentication provider uses.
 	 *
-	 * @throws HTTPStatusException
+	 * @throws HttpStatusException
 	 * @throws HttpRedirectException
 	 * @return void
 	 */
@@ -50,14 +50,14 @@ class Authentication_Internal extends Authentication_Abstract
 	{
 		if ($this->request->query("auth") === null)
 		{
-			throw new HTTPStatusException(400, "Missing state code.");
+			throw new HttpStatusException(400, "Missing state code.");
 		}
 		
 		$url = parse_url($_SERVER["HTTP_REFERER"]);
 		
 		if (!array_key_exists($this->request->query("auth"), $this->fakecodes))
 		{
-			throw new HTTPStatusException(400, "Invalid state code.");
+			throw new HttpStatusException(400, "Invalid state code.");
 		}
 		
 		$authUser = $this->fakecodes[$this->request->query("auth")];

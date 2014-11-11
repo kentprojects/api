@@ -60,7 +60,7 @@ final class HttpRedirectException extends Exception
 	}
 }
 
-class HTTPStatusException extends Exception
+class HttpStatusException extends Exception
 {
 	/**
 	 * The status message that is associated with the status code
@@ -72,13 +72,13 @@ class HTTPStatusException extends Exception
 	 * @param string $message
 	 * @param Exception $previous
 	 */
-	public function __construct($code, $message, Exception $previous = null)
+	public function __construct($code, $message = null, Exception $previous = null)
 	{
 		$this->statusmessage = getHttpStatusForCode($code);
 
 		if (empty($this->statusmessage))
 			trigger_error(
-				"Bad status code used in HTTPStatusException (" . $code . ") for: " . $message .
+				"Bad status code used in HttpStatusException (" . $code . ") for: " . $message .
 				(!empty($previous) ? " with exception " . (string)$previous : ""),
 				E_USER_WARNING
 			);
@@ -118,8 +118,8 @@ final class PHPException extends Exception
 	public function __construct($error_no, $error_string, $error_file, $error_line, $error_context, Exception $previous = null)
 	{
 		parent::__construct('PHPException: '.$error_string, $error_no, $previous);
-		$this->file = $errfile;
-		$this->line = $errline;
+		$this->file = $error_file;
+		$this->line = $error_line;
 	}
 }
 

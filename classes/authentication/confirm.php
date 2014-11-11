@@ -14,20 +14,20 @@ class Authentication_Confirm extends Authentication_Abstract
 	/**
 	 * The main action this authentication provider uses.
 	 *
-	 * @throws HTTPStatusException
+	 * @throws HttpStatusException
 	 * @return void
 	 */
 	public function action()
 	{
 		if ($this->request->query("auth") === null)
 		{
-			throw new HTTPStatusException(400, "Missing state code.");
+			throw new HttpStatusException(400, "Missing state code.");
 		}
 		
 		$user = $this->validateCode();
 		if (empty($user))
 		{
-			throw new HTTPStatusException(400, "Invalid authentication token.");
+			throw new HttpStatusException(400, "Invalid authentication token.");
 		}
 		
 		$this->clearCode();
