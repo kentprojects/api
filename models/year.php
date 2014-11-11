@@ -7,6 +7,17 @@
 class Model_Year extends Model_Abstract
 {
 	/**
+	 * @return Model_Year
+	 */
+	public static function create()
+	{
+		$result = Database::prepare("INSERT INTO `Year` (`year`) VALUES (DEFAULT(`year`))")->execute();
+		$year = new Model_Year;
+		$year->id = $result->insert_id;
+		return $year;
+	}
+
+	/**
 	 * @return Model_Year[]
 	 */
 	public static function getAll()

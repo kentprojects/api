@@ -85,6 +85,15 @@ final class Model_User extends Model_Abstract
 	/**
 	 * @return bool
 	 */
+	public function isConvener()
+	{
+		$convenerState = $this->metadata->convener;
+		return !empty($convenerState);
+	}
+
+	/**
+	 * @return bool
+	 */
 	public function isStaff()
 	{
 		return $this->role === "student";

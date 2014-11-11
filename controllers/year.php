@@ -14,7 +14,25 @@ final class Controller_Year extends Controller
 	{
 		if ($this->request->getMethod() === Request::POST)
 		{
-			$this->createYear();
+			/**
+			 * Used to create a new year!
+			 * Happy new year! ^_^
+			 */
+
+			if ($this->auth->getUser() === null)
+			{
+				throw new HttpStatusException(401, "You must be a user to do this.");
+			}
+
+			$user = $this->auth->getUser();
+			if (!$user->isConvener())
+			{
+				throw new HttpStatusException(401, "You must be a convener to do this.");
+			}
+
+			$year = Model_Year::create();
+			$this->response->status(201);
+			$this->response->body($year);
 			return;
 		}
 
@@ -57,14 +75,5 @@ final class Controller_Year extends Controller
 
 		$this->response->status(200);
 		$this->response->body($year->getStaff());
-	}
-
-	/**
-	 * A standalone method to "create" a new year.
-	 * Happy new year! ^_^
-	 */
-	protected function createYear()
-	{
-
 	}
 }
