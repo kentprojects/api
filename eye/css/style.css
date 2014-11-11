@@ -6,7 +6,7 @@
 @import url('bootstrap.css');
 
 body {
-	background: #fff url('http://dev.kentprojects.com/includes/img/kenteye.jpg') no-repeat top left;
+    background: #fff url('http://dev.kentprojects.com/includes/img/kenteye.jpg') no-repeat center;
 	background-size: cover;
 	padding-top: 20px;
 	padding-bottom: 40px;
