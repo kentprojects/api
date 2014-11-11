@@ -385,9 +385,9 @@ class Request_Internal extends Request
 			{
 				throw new RequestException("$controller was not found.");
 			}
-			if (!is_subclass_of($controller, "Controller_Abstract"))
+			if (!is_subclass_of($controller, "Controller"))
 			{
-				throw new RequestException("$controller does not extend Controller_Abstract.");
+				throw new RequestException("$controller does not extend Controller.");
 			}
 
 			// Check the action is valid.
