@@ -20,7 +20,8 @@ $applications = parse_ini_file(__DIR__ . "/../applications.ini", true);
 
 	<div class="masthead">
 		<ul class="nav nav-pills pull-right api-selector">
-			<li class="active"><a href="http://api.dev.kentprojects.com">Developer API</a></li>
+			<li class="active"><a href="http://localhost">Local API</a></li>
+			<li><a href="http://api.dev.kentprojects.com">Developer API</a></li>
 			<li><a href="http://api.kentprojects.com">Live API</a></li>
 		</ul>
 		<h3 class="custom-h3">Kent AP Eye</h3>
@@ -32,7 +33,7 @@ $applications = parse_ini_file(__DIR__ . "/../applications.ini", true);
 		<div class="row-fluid">
 			<div class="span8">
 				<input class="pretty-url" name="url" placeholder="Enter A URL" type="text"
-					   value="http://api.dev.kentprojects.com"/>
+					   value="http://localhost"/>
 			</div>
 			<div class="span2">
 				<select class="pretty-method" name="method">
