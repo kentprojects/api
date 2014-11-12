@@ -242,9 +242,9 @@ abstract class Request
 	 * @param string|array
 	 * @return $this
 	 */
-	public function setPostData($postdata)
+	public function setPostData($postData)
 	{
-		$this->post = $postdata;
+		$this->post = !empty($postData) ? $postData : array();
 		return $this;
 	}
 
@@ -252,9 +252,9 @@ abstract class Request
 	 * @param array
 	 * @return $this
 	 */
-	public function setQueryData(array $querydata)
+	public function setQueryData(array $queryData)
 	{
-		$this->query = array_merge($this->query, $querydata);
+		$this->query = array_merge($this->query, $queryData);
 		return $this;
 	}
 }

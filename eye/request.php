@@ -4,6 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
+/** @noinspection PhpUndefinedClassInspection */
 class Request
 {
 	public static $expires = 600;
@@ -18,21 +19,36 @@ class Request
 	{
 		unset($params["sig"]);
 		ksort($params);
-		array_walk($params, function (&$v, $k)
+		array_walk($params, function (&$v)
 		{
 			$v = (string)$v;
 		});
 		$params["signature"] = md5(static::$secret . serialize($params));
 	}
 
+	public $body = "";
+	public $headers = array(
+		"Accept" => "application/json",
+		"Content-Type" => "application/json"
+	);
 	public $method = "GET";
 	public $params = array();
 	public $url;
+
+	public function getHeaders()
+	{
+		$headers = array();
+		foreach ($this->headers as $header => $value)
+		{
+			$headers[] = "{$header}: {$value}";
+		}
+		return $headers;
+	}
 }
 
-$request = new Request();
-$signrequest = true;
-$urlparams = array();
+$request = new Request;
+$signRequest = true;
+$urlParams = array();
 
 if (!empty($_POST["method"]))
 {
@@ -57,46 +73,60 @@ if (!empty($_POST["key"]))
 	/**
 	 * Grab the correct keys from the application.ini file.
 	 */
+	$applications = parse_ini_file(__DIR__ . "/../applications.ini", true);
+	if (empty($applications[$_POST["key"]]))
+	{
+		echo '<div class="alert alert-danger">',
+		'<strong>There was an error with your API key</strong><br/>',
+		'The API key was not found in the list of active applications.',
+		'</div>';
+	}
+	else
+	{
+		$request::$key = $applications[$_POST["key"]]["key"];
+		$request::$secret = $applications[$_POST["key"]]["secret"];
+	}
 }
-elseif (strpos($request->url, "?") > 1)
+if (!empty($_POST["params-body"]))
 {
-	parse_str(substr(strstr($request->url, "?"), 1), $urlparams);
+	$request->body = json_decode($_POST["params-body"]);
+	if (json_last_error_msg() !== "No error")
+	{
+		echo '<div class="alert alert-danger">',
+		'<strong>There was an error with your JSON input</strong><br/>',
+		json_last_error_msg(),
+		'</div>';
+	}
+}
+if (strpos($request->url, "?") > 1)
+{
+	parse_str(substr(strstr($request->url, "?"), 1), $urlParams);
 	$request->url = strstr($request->url, "?", true);
 }
 
-switch ($request->method)
+$urlParams = array_merge($urlParams, $request->params);
+if (!empty($request->body))
 {
-
-	case "GET":
-		$urlparams = array_merge($urlparams, $request->params);
-		break;
-
-	case "POST":
-	case "PUT":
-		if (!empty($request->params))
-		{
-			$request->params = http_build_query($request->params, "", "&");
-		}
-		else
-		{
-			$request->params = "";
-		}
-		break;
-
+	$request->body = json_encode($request->body);
+	$request->headers["Content-Length"] = strlen($request->body);
+}
+else
+{
+	$request->body = "";
 }
 
-if ($signrequest)
+if ($signRequest)
 {
-	$urlparams = array_merge($urlparams, array(
+	$urlParams = array_merge($urlParams, array(
 		"key" => Request::$key,
 		"expires" => time() + Request::$expires
 	));
-	Request::checksum($urlparams);
+	Request::checksum($urlParams);
 }
 
-if (!empty($urlparams))
+if (!empty($urlParams))
 {
-	$request->url = sprintf("%s?%s", $request->url, http_build_query($urlparams, "", "&"));
+	$request->url = sprintf("%s?%s", $request->url, http_build_query($urlParams, "", "&"));
 }
 
 // Initiate the CURL object.
@@ -105,33 +135,29 @@ $fh = null;
 
 switch ($request->method)
 {
-
-	case "GET":
-		// Do nothing.
-		break;
-
 	case "POST":
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $request->params);
+	case "DELETE":
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $request->method);
+		if (!empty($request->body))
+		{
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $request->body);
+		}
 		break;
 
 	case "PUT":
-		$length = strlen($request->params);
-		$fh = fopen("php://memory", "rw");
-		fwrite($fh, $request->params);
-		rewind($fh);
-		curl_setopt($ch, CURLOPT_INFILE, $fh);
-		curl_setopt($ch, CURLOPT_INFILESIZE, $length);
 		curl_setopt($ch, CURLOPT_PUT, true);
+		if (!empty($request->body))
+		{
+			$fh = fopen("php://memory", "rw");
+			fwrite($fh, $request->body);
+			rewind($fh);
+			curl_setopt($ch, CURLOPT_INFILE, $fh);
+			curl_setopt($ch, CURLOPT_INFILESIZE, $request->headers["Content-Length"]);
+		}
 		break;
-
-	case "DELETE":
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
-		break;
-
 }
 
-curl_setopt($ch, CURLOPT_HTTPHEADER, array("Accept: application/json"));
+curl_setopt($ch, CURLOPT_HTTPHEADER, $request->getHeaders());
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 curl_setopt($ch, CURLOPT_URL, $request->url);
@@ -164,4 +190,3 @@ echo <<<EOT
 	<pre>{$response["info"]}</pre>
 
 EOT;
-?>

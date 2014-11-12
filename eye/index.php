@@ -4,6 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
+$applications = parse_ini_file(__DIR__ . "/../applications.ini", true);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -52,9 +53,12 @@
 			</div>
 			<div class="offset2 span4">
 				<select class="pretty-key" name="key">
-					<option value="developer-key" selected="selected">Developer Key</option>
-					<option value="frontend-key">Frontend Key</option>
-					<option value="none">None</option>
+					<?php foreach ($applications as $name => $data)
+					{
+						?>
+						<option value="<?php echo $name; ?>"><?php echo ucfirst($name); ?> Key</option>
+					<?php } ?>
+					<option value="">None</option>
 				</select>
 			</div>
 		</div>

@@ -6,7 +6,7 @@
 
 var defaults = {
 	deletelink: '&nbsp;<a href="#" onclick="$.deleterow(this); return false;">Delete</a>',
-	inputparam: '<li><input name="params-keys[]" onfocus="$.addrow(this);" placeholder="Parameter" type="text"/><input name="params-values[]" placeholder="Value" type="text"/></li>'
+	inputparam: '<li><input name="params-keys[]" onfocus="$.addrow(this);" placeholder="URL Parameter" type="text"/><input name="params-values[]" placeholder="Value" type="text"/></li>'
 };
 
 $(document).ready(function ()
@@ -25,19 +25,11 @@ $(document).ready(function ()
 		$(a).parent().html('');
 	};
 	$.fn.extend({
-
 		inputreset: function ()
 		{
 			$(this).html(defaults.inputparam);
 			return $(this);
-		},
-
-		textreset: function ()
-		{
-			$(this).html(defaults.textparam);
-			return $(this);
 		}
-
 	});
 
 	$('ul.pretty-parameters').append(defaults.inputparam);
