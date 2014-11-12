@@ -12,6 +12,11 @@ final class Controller_Year extends Controller
 	 */
 	public function action_index()
 	{
+		if (!in_array($this->request->getMethod(), array(Request::GET, Request::POST)))
+		{
+			throw new HttpStatusException(501);
+		}
+
 		if ($this->request->getMethod() === Request::POST)
 		{
 			/**
@@ -36,11 +41,6 @@ final class Controller_Year extends Controller
 			return;
 		}
 
-		if ($this->request->getMethod() !== Request::GET)
-		{
-			throw new HttpStatusException(501);
-		}
-
 		if ($this->request->param("id") === null)
 		{
 			throw new HttpStatusException(400, "No year provided.");
@@ -62,6 +62,11 @@ final class Controller_Year extends Controller
 	 */
 	public function action_staff()
 	{
+		if (!in_array($this->request->getMethod(), array(Request::GET, Request::POST, Request::DELETE)))
+		{
+			throw new HttpStatusException(501);
+		}
+
 		if ($this->request->param("id") === null)
 		{
 			throw new HttpStatusException(400, "No year provided.");
