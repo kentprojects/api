@@ -87,8 +87,17 @@ final class Model_User extends Model_Abstract
 	 */
 	public function isConvener()
 	{
-		$convenerState = $this->metadata->convener;
-		return !empty($convenerState);
+		$state = $this->metadata->convenerstate;
+		return !empty($state);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isSecondMarker()
+	{
+		$state = $this->metadata->secondmarkerstate;
+		return !empty($state);
 	}
 
 	/**
@@ -105,6 +114,15 @@ final class Model_User extends Model_Abstract
 	public function isStudent()
 	{
 		return $this->role === "student";
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isSupervisor()
+	{
+		$state = $this->metadata->supervisorstate;
+		return !empty($state);
 	}
 
 	/**
