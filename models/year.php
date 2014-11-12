@@ -46,6 +46,16 @@ class Model_Year extends Model_Abstract
 	protected $id;
 
 	/**
+	 * If someone forces the year to be a string, at least it'll become the YEAR, and not fail.
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return $this->getId();
+	}
+
+	/**
 	 * @param Model_User $user
 	 * @return bool
 	 */

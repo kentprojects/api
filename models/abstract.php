@@ -81,6 +81,7 @@ abstract class Model_Abstract implements JsonSerializable
 	/**
 	 * Save the Model.
 	 *
+	 * @throws InvalidArgumentException
 	 * @return void
 	 */
 	public function save()

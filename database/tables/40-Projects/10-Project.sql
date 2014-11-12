@@ -18,5 +18,6 @@ CREATE TABLE IF NOT EXISTS `Project` (
 	FOREIGN KEY (`group_id`) REFERENCES `Group` (`group_id`) ON UPDATE CASCADE ON DELETE CASCADE,
 	FOREIGN KEY (`creator_id`) REFERENCES `User` (`user_id`) ON UPDATE CASCADE ON DELETE CASCADE,
 	UNIQUE KEY `project_group` (`group_id`),
+	UNIQUE KEY `project_slug` (`year`, `slug`),
 	INDEX `project_status` (`status`)
 ) ENGINE = InnoDB CHARACTER SET utf8;

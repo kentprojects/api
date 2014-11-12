@@ -145,6 +145,7 @@ final class Model_User extends Model_Abstract
 	}
 
 	/**
+	 * @throws InvalidArgumentException
 	 * @return void
 	 */
 	public function save()
@@ -153,11 +154,11 @@ final class Model_User extends Model_Abstract
 		{
 			if (empty($this->email))
 			{
-				// Throw an error. A big one.
+				throw new InvalidArgumentException("No email provided for the student.");
 			}
 			if (empty($this->role))
 			{
-				// Throw an error. A substantial one.
+				throw new InvalidArgumentException("No role provided for the student.");
 			}
 
 			/** @var _Database_State $result */

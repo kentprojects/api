@@ -6,12 +6,11 @@
  * @link: http://kentprojects.com
  */
 
-$_SERVER["PATH_INFO"] = empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"];
-
-/**
- * Define the relevant paths.
- */
 define("APPLICATION_PATH", __DIR__);
+date_default_timezone_set("Etc/UTC");
+setlocale(LC_ALL, "en_GB.UTF8");
+
+$_SERVER["PATH_INFO"] = empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"];
 
 require_once __DIR__ . "/exceptions.php";
 
@@ -19,12 +18,13 @@ require_once __DIR__ . "/exceptions.php";
  * Register the autoloader so we can call on classes when we feel like it!
  */
 spl_autoload_register(
-	/**
-	 * @param string $class
-	 * @return string The filename where the class exists.
-	 */
-	function($class) {
-		$file = str_replace("_", "/", strtolower($class)).".php";
+/**
+ * @param string $class
+ * @return string The filename where the class exists.
+ */
+	function ($class)
+	{
+		$file = str_replace("_", "/", strtolower($class)) . ".php";
 		$filename = null;
 
 		/**
@@ -32,14 +32,14 @@ spl_autoload_register(
 		 */
 		if (strpos($class, "Controller_") === 0)
 		{
-			$filename = APPLICATION_PATH."/controllers/".str_replace("controller/", "", $file);
+			$filename = APPLICATION_PATH . "/controllers/" . str_replace("controller/", "", $file);
 		}
 		/**
 		 * If the word "Model_" exists in this class, handle it.
 		 */
 		elseif (strpos($class, "Model_") === 0)
 		{
-			$filename = APPLICATION_PATH."/models/".str_replace("model/", "", $file);
+			$filename = APPLICATION_PATH . "/models/" . str_replace("model/", "", $file);
 		}
 		/**
 		 * Else this is a generic class in a folder, so go find it!
@@ -47,16 +47,16 @@ spl_autoload_register(
 		else
 		{
 			$folders = array(
-				APPLICATION_PATH."/classes",
-				APPLICATION_PATH."/system",
-				APPLICATION_PATH."/vendor"
+				APPLICATION_PATH . "/classes",
+				APPLICATION_PATH . "/system",
+				APPLICATION_PATH . "/vendor"
 			);
 
-			foreach($folders as $folder)
+			foreach ($folders as $folder)
 			{
-				if (file_exists($folder."/".$file))
+				if (file_exists($folder . "/" . $file))
 				{
-					$filename = $folder."/".$file;
+					$filename = $folder . "/" . $file;
 					break;
 				}
 			}
@@ -95,8 +95,12 @@ set_error_handler(
 function coalesce($a, $b)
 {
 	foreach (func_get_args() as $a)
+	{
 		if (!empty($a))
+		{
 			return $a;
+		}
+	}
 	return null;
 }
 
@@ -110,9 +114,9 @@ function config($section = null, $key = null)
 {
 	if (empty($GLOBALS["config.ini"]))
 	{
-		$GLOBALS["config.ini"] = parse_ini_file(__DIR__."/config.ini", true);
+		$GLOBALS["config.ini"] = parse_ini_file(__DIR__ . "/config.ini", true);
 	}
-	switch(func_num_args())
+	switch (func_num_args())
 	{
 		case 2:
 			return $GLOBALS["config.ini"][$section][$key];
@@ -228,4 +232,28 @@ function getHttpStatusForCode($code)
 		749 => "Reserved for Chuck Norris"
 	);
 	return (isset($codes[$code])) ? $codes[$code] : "";
+}
+
+/**
+ * Creates a slug of a string.
+ * http://cubiq.org/the-perfect-php-clean-url-generator
+ *
+ * @param $str
+ * @param array $replace
+ * @param string $delimiter
+ * @return string
+ */
+function slugify($str, $replace = array(), $delimiter = '-')
+{
+	if (!empty($replace))
+	{
+		$str = str_replace((array)$replace, ' ', $str);
+	}
+
+	$clean = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
+	$clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
+	$clean = strtolower(trim($clean, '-'));
+	$clean = preg_replace("/[\/_|+ -]+/", $delimiter, $clean);
+
+	return (string)$clean;
 }
