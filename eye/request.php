@@ -5,7 +5,7 @@
  * @link: http://kentprojects.com
  */
 /** @noinspection PhpUndefinedClassInspection */
-class Request
+class EyeRequest
 {
 	public static $expires = 600;
 	public static $key;
@@ -46,7 +46,7 @@ class Request
 	}
 }
 
-$request = new Request;
+$request = new EyeRequest;
 $signRequest = true;
 $urlParams = array();
 
