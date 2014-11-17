@@ -33,6 +33,18 @@ class Model_Project extends Model_Abstract
 	}
 
 	/**
+	 * @param Model_Year $year
+	 * @param string $slug
+	 * @return boolean
+	 */
+	public static function validate(Model_Year $year, $slug)
+	{
+		$statement = Database::prepare("SELECT `project_id` FROM `Project` WHERE `year` = ? AND `slug` = ?", "is");
+		$project_id = $statement->execute($year->getId(), $slug)->singleval();
+		return $project_id === null;
+	}
+
+	/**
 	 * @var int
 	 */
 	protected $id;
@@ -68,6 +80,19 @@ class Model_Project extends Model_Abstract
 	 * @var int
 	 */
 	protected $status;
+
+	public function __construct(Model_Year $year, $name, $slug, Model_User $creator)
+	{
+		if ($this->getId() !== null)
+		{
+			return;
+		}
+
+		$this->year = $year;
+		$this->name = $name;
+		$this->slug = $slug;
+		$this->creator = $creator;
+	}
 
 	/**
 	 * @return string
