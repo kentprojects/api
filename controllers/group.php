@@ -31,7 +31,7 @@ final class Controller_Group extends Controller
 			$creator = Model_User::getById($params["creator"]);
 			if (empty($creator))
 			{
-				throw new HttpStatusException(400, "Invalid user id entered for the project's creator.");
+				throw new HttpStatusException(400, "Invalid user id entered for the group's creator.");
 			}
 
 			$group = new Model_Group($year, $params["name"], $creator);
