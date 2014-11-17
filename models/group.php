@@ -62,8 +62,12 @@ class Model_Group extends Model_Abstract
 	/**
 	 * The reason for the @noinspection lines is because when the Database builds the model, the other 'Model' values
 	 * are actually ids, and the models need fetching.
+	 *
+	 * @param Model_Year $year
+	 * @param string $name
+	 * @param Model_User $creator
 	 */
-	public function __construct()
+	public function __construct(Model_Year $year, $name, Model_User $creator)
 	{
 		if ($this->getId() !== null)
 		{
@@ -71,7 +75,12 @@ class Model_Group extends Model_Abstract
 			$this->year = Model_Year::getById($this->year);
 			/** @noinspection PhpParamsInspection */
 			$this->creator = Model_User::getById($this->creator);
+			return;
 		}
+
+		$this->year = $year;
+		$this->name = $name;
+		$this->creator = $creator;
 	}
 
 	/**

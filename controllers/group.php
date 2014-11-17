@@ -12,17 +12,33 @@ final class Controller_Group extends Controller
 	 */
 	public function action_index()
 	{
-		if (!in_array($this->request->getMethod(), array(Request::GET, Request::POST)))
-		{
-			throw new HttpStatusException(501);
-		}
+		$this->validateMethods(Request::GET, Request::POST);
 
 		if ($this->request->getMethod() === Request::POST)
 		{
-			/**
-			 * Used to create a new groups!
-			 */
+			$params = $this->validateParams(array(
+				"year" => $this->request->post("year", false),
+				"name" => $this->request->post("name", false),
+				"creator" => $this->request->post("creator", false)
+			));
+
+			$year = Model_Year::getById($params["year"]);
+			if (empty($year))
+			{
+				throw new HttpStatusException(400, "Invalid year entered.");
+			}
+
+			$creator = Model_User::getById($params["creator"]);
+			if (empty($creator))
+			{
+				throw new HttpStatusException(400, "Invalid user id entered for the project's creator.");
+			}
+
+			$group = new Model_Group($year, $params["name"], $creator);
+			$group->save();
+
 			$this->response->status(201);
+			$this->response->body($group);
 			return;
 		}
 
