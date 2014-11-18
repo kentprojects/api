@@ -12,6 +12,21 @@ final class Model_User extends Model_Abstract
 	protected static $roles = array("staff", "student");
 
 	/**
+	 * Get a staff by their Email.
+	 *
+	 * @param string $email
+	 * @return Model_User
+	 */
+	public static function getByEmail($email)
+	{
+		$statement = Database::prepare(
+			"SELECT `user_id` FROM `User` WHERE `email` = ? AND `status` = 1", "s"
+		);
+		$user_id = $statement->execute($email)->singleval();
+		return (empty($user_id)) ? null : Model_User::getById($user_id);
+	}
+
+	/**
 	 * Get the relevant User by it's ID.
 	 *
 	 * @param int $id
