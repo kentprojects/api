@@ -8,13 +8,13 @@ TASK=" \033[0;34;49m[==]\033[0m "
 USER=" \033[1;1;49m[==]\033[0m "
 
 sudo apt-get update
-debconf-set-selections <<< "mysql-server mysql-server/root_password password password"
-debconf-set-selections <<< "mysql-server mysql-server/root_password_again password password"
+sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password password"
+sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password password"
 sudo apt-get install -y mysql-server apache2 git curl screen &&
 sudo apt-get install -y php5 php5-cli php5-curl php5-mysqlnd php5-json
 
 # If this is becoming a script, change this to use useradd.
-sudo adduser --disabled-password --home /home/kentprojects --shell /usr/bin/zsh kentprojects
+sudo useradd -c KentProjects -d /home/kentprojects -G www-data,sudo -m -s /bin/zsh
 sudo addgroup kentprojects www-data
 
 sudo -u kentprojects mkdir /home/kentprojects/.ssh
