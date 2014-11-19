@@ -14,7 +14,7 @@ sudo apt-get install -y mysql-server apache2 git curl screen &&
 sudo apt-get install -y php5 php5-cli php5-curl php5-mysqlnd php5-json
 
 # If this is becoming a script, change this to use useradd.
-sudo useradd -c KentProjects -d /home/kentprojects -G www-data,sudo -m -s /bin/zsh
+sudo useradd -c KentProjects -d /home/kentprojects -G www-data,sudo -m -s /bin/zsh kentprojects
 sudo addgroup kentprojects www-data
 
 sudo -u kentprojects mkdir /home/kentprojects/.ssh
