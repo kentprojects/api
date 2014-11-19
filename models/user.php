@@ -19,9 +19,7 @@ final class Model_User extends Model_Abstract
 	 */
 	public static function getByEmail($email)
 	{
-		$statement = Database::prepare(
-			"SELECT `user_id` FROM `User` WHERE `email` = ? AND `status` = 1", "s"
-		);
+		$statement = Database::prepare("SELECT `user_id` FROM `User` WHERE `email` = ? AND `status` = 1", "s");
 		$user_id = $statement->execute($email)->singleval();
 		return (empty($user_id)) ? null : Model_User::getById($user_id);
 	}
