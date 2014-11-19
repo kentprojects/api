@@ -7,12 +7,9 @@ WARN=" \033[0;33;49m[==]\033[0m "
 TASK=" \033[0;34;49m[==]\033[0m "
 USER=" \033[1;1;49m[==]\033[0m "
 
-printf "$TASK Please enter a MySQL Root Password: "
-read MYSQL_PASSWORD
-
 sudo apt-get update
-debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQL_PASSWORD"
-debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQL_PASSWORD"
+debconf-set-selections <<< "mysql-server mysql-server/root_password password password"
+debconf-set-selections <<< "mysql-server mysql-server/root_password_again password password"
 sudo apt-get install -y mysql-server apache2 git curl screen &&
 sudo apt-get install -y php5 php5-cli php5-curl php5-mysqlnd php5-json
 
