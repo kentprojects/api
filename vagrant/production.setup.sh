@@ -8,9 +8,7 @@ TASK=" \033[0;34;49m[==]\033[0m "
 USER=" \033[1;1;49m[==]\033[0m "
 
 sudo apt-get update
-echo "mysql-server mysql-server/root_password password password" | sudo debconf-set-selections
-echo "mysql-server mysql-server/root_password_again password password" | sudo debconf-set-selections
-sudo apt-get install -y mysql-server apache2 git curl screen
+sudo apt-get install -y apache2 curl git screen
 sudo apt-get install -y php5 php5-cli php5-curl php5-mysqlnd php5-json
 
 # If this is becoming a script, change this to use useradd.
@@ -29,4 +27,4 @@ sudo -u kentprojects cp /home/kentprojects/.dotfiles/.vimrc /home/kentprojects/.
 sudo -u www-data git clone https://github.com/kentprojects/api.git /var/www/kentprojects-api
 sudo -u www-data git clone https://github.com/kentprojects/web.git /var/www/kentprojects-web
 
-cat /var/www/kentprojects-api/vagrant/production.key.*.txt > /home/kentprojects/.ssh/authorized_keys
+# cat /var/www/kentprojects-api/vagrant/production.key.*.txt > /home/kentprojects/.ssh/authorized_keys
