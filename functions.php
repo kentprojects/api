@@ -1,6 +1,5 @@
 <?php
 /**
- * @category: API
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
@@ -114,7 +113,20 @@ function config($section = null, $key = null)
 {
 	if (empty($GLOBALS["config.ini"]))
 	{
-		$GLOBALS["config.ini"] = parse_ini_file(__DIR__ . "/config.ini", true);
+		if (file_exists(__DIR__ . "/config.production.ini"))
+		{
+			$configFile = __DIR__ . "/config.production.ini";
+		}
+		elseif (file_exists(__DIR__ . "/config.ini"))
+		{
+			$configFile = __DIR__ . "/config.ini";
+		}
+		else
+		{
+			trigger_error("No config file found.", E_USER_ERROR);
+			return null;
+		}
+		$GLOBALS["config.ini"] = parse_ini_file($configFile, true);
 	}
 	switch (func_num_args())
 	{

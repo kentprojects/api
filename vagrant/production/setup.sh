@@ -40,6 +40,12 @@ sudo chown www-data:www-data /var/www/kentprojects-*
 sudo -u www-data git clone https://github.com/kentprojects/api.git /var/www/kentprojects-api
 sudo -u www-data git clone https://github.com/kentprojects/web.git /var/www/kentprojects-web
 
+# If you want the development environments, set this to "TRUE".
+if TRUE; then
+	sudo -u www-data cd /var/www/kentprojects-api && git fetch && git checkout develop
+	sudo -u www-data cd /var/www/kentprojects-web && git fetch && git checkout develop
+fi
+
 # Setup the SSH folder and add the relevant keys.
 sudo -u kentprojects mkdir /home/kentprojects/.ssh
 sudo -u kentprojects chmod 700 /home/kentprojects/.ssh

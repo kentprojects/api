@@ -4,5 +4,5 @@
  * @link: http://kentprojects.com
  */
 DROP DATABASE IF EXISTS `kentprojects`;
-CREATE DATABASE `kentprojects` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-GRANT ALL PRIVILEGES ON `kentprojects`.* TO 'kentprojects'@'localhost' IDENTIFIED BY 'declan4balls' WITH GRANT OPTION;
+CREATE DATABASE `kentprojects` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+GRANT ALL PRIVILEGES ON `kentprojects`.* TO 'kentprojects'@'127.0.0.1' IDENTIFIED BY 'declan4-for-balls' WITH GRANT OPTION;
