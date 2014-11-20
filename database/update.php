@@ -9,7 +9,20 @@
  * The configuration.
  * @var array
  */
-$config = parse_ini_file(__DIR__."/../config.ini", true);
+if (file_exists(__DIR__ . "/../config.production.ini"))
+{
+	$configFile = __DIR__ . "/../config.production.ini";
+}
+elseif (file_exists(__DIR__ . "/../config.ini"))
+{
+	$configFile = __DIR__ . "/config.ini";
+}
+else
+{
+	trigger_error("No config file found.", E_USER_ERROR);
+	exit(1);
+}
+$config = parse_ini_file($configFile, true);
 
 /**
  * A list of all the files.
