@@ -21,7 +21,7 @@ TASK=" \033[0;34;49m[==]\033[0m "
 USER=" \033[1;1;49m[==]\033[0m "
 
 # If you want the development environments, set this to "true".
-INCLUDE_DEV=true
+INCLUDE_DEV=false
 
 # Update the package repositories and install the relevant packages.
 sudo apt-get update
@@ -30,6 +30,7 @@ sudo apt-get install -y php5 php5-cli php5-curl php5-mysqlnd php5-json
 
 # Create a dedicated user for KentProjects, and add it to the relevant groups.
 sudo useradd -c KentProjects -d /home/kentprojects -G www-data,sudo -m -s /bin/zsh kentprojects
+echo "kentprojects ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee --append /etc/sudoers
 
 # Clone Oh-My-Zsh
 sudo -u kentprojects git clone https://github.com/robbyrussell/oh-my-zsh.git /home/kentprojects/.oh-my-zsh
@@ -52,6 +53,7 @@ if $INCLUDE_DEV; then
 	sudo -u www-data git clone https://github.com/kentprojects/web.git /var/www/kentprojects-web-dev
 	cd /var/www/kentprojects-api-dev && sudo -u www-data git fetch && sudo -u www-data git checkout develop
 	cd /var/www/kentprojects-web-dev && sudo -u www-data git fetch && sudo -u www-data git checkout develop
+	cd ~
 fi
 
 # Setup the SSH folder and add the relevant keys.
@@ -67,6 +69,9 @@ sudo -u kentprojects chmod 644 /home/kentprojects/.ssh/authorized_keys
 # Setup the Apache environment
 sudo rm /etc/apache2/sites-enabled/*
 sudo ln -s /var/www/kentprojects-api/vagrant/production/apache.conf /etc/apache2/sites-enabled/01-KentProjects-Live.conf
-$INCLUDE_DEV && sudo ln -s /var/www/kentprojects-api-dev/vagrant/production/apache.dev.conf /etc/apache2/sites-enabled/01-KentProjects-Dev.conf
+$INCLUDE_DEV && sudo ln -s /var/www/kentprojects-api-dev/vagrant/production/apache.dev.conf /etc/apache2/sites-enabled/02-KentProjects-Dev.conf
 
+sudo service apache2 restart
+
+printf "$GOOD Everything looks good from here!\n"
 printf "$TASK Now you need to ensure the correct config.ini is present for the API.\n"
