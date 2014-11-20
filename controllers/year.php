@@ -9,17 +9,18 @@ final class Controller_Year extends Controller
 	/**
 	 * /year
 	 * /year/:id
+	 *
+	 * @throws HttpStatusException
+	 * @return void
 	 */
 	public function action_index()
 	{
-		if (!in_array($this->request->getMethod(), array(Request::GET, Request::POST)))
-		{
-			throw new HttpStatusException(501);
-		}
+		$this->validateMethods(Request::GET, Request::POST);
 
 		if ($this->request->getMethod() === Request::POST)
 		{
 			/**
+			 * POST /year
 			 * Used to create a new year!
 			 * Happy new year! ^_^
 			 */
@@ -52,6 +53,11 @@ final class Controller_Year extends Controller
 			throw new HttpStatusException(404, "Year not found.");
 		}
 
+		/**
+		 * GET /year/:id
+		 * Get a year.
+		 */
+
 		$this->response->status(200);
 		$this->response->body($year);
 	}
@@ -59,13 +65,13 @@ final class Controller_Year extends Controller
 	/**
 	 * /year/staff
 	 * /year/:id/staff
+	 *
+	 * @throws HttpStatusException
+	 * @return void
 	 */
 	public function action_staff()
 	{
-		if (!in_array($this->request->getMethod(), array(Request::GET, Request::POST, Request::DELETE)))
-		{
-			throw new HttpStatusException(501);
-		}
+		$this->validateMethods(Request::GET, Request::POST, Request::DELETE);
 
 		if ($this->request->param("id") === null)
 		{
@@ -81,6 +87,7 @@ final class Controller_Year extends Controller
 		if (($this->request->getMethod() === Request::POST) || ($this->request->getMethod() === Request::DELETE))
 		{
 			/**
+			 * POST|DELETE /year/:id/staff
 			 * Adding / removing staff to a year!
 			 */
 			if (is_array($_POST) || empty($_POST))
@@ -130,6 +137,10 @@ final class Controller_Year extends Controller
 				$year->$method($user);
 			}
 		}
+
+		/**
+		 * GET /year/:id/staff
+		 */
 
 		$this->response->status(200);
 		$this->response->body($year->getStaff());

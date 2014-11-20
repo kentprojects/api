@@ -8,12 +8,17 @@ final class Controller_Years extends Controller
 {
 	/**
 	 * /years
+	 *
+	 * @throws HttpStatusException
+	 * @return void
 	 */
 	public function action_index()
 	{
-		if ($this->request->getMethod() !== Request::GET)
+		$this->validateMethods(Request::GET);
+
+		if ($this->request->param("id") !== null)
 		{
-			throw new HttpStatusException(501);
+			throw new HttpStatusException(400, "No id required.");
 		}
 
 		$this->response->status(200);
