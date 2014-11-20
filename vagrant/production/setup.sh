@@ -29,9 +29,8 @@ sudo useradd -c KentProjects -d /home/kentprojects -G www-data,sudo -m -s /bin/z
 # Clone Oh-My-Zsh
 sudo -u kentprojects git clone https://github.com/robbyrussell/oh-my-zsh.git /home/kentprojects/.oh-my-zsh
 # Clone James's dotfiles and grab the .zshrc and .vimrc
-sudo -u kentprojects git clone https://github.com/jdrydn/dotfiles.git /home/kentprojects/.dotfiles
-sudo -u kentprojects cp /home/kentprojects/.dotfiles/.zshrc /home/kentprojects/.zshrc
-sudo -u kentprojects cp /home/kentprojects/.dotfiles/.vimrc /home/kentprojects/.vimrc
+sudo -u kentprojects wget https://raw.githubusercontent.com/jdrydn/dotfiles/master/.vimrc -O /home/kentprojects/.vimrc
+sudo -u kentprojects wget https://raw.githubusercontent.com/jdrydn/dotfiles/master/.zshrc -O /home/kentprojects/.zshrc
 
 # Create directories for KentProjects.
 sudo mkdir /var/www/kentprojects-api /var/www/kentprojects-web
@@ -44,5 +43,5 @@ sudo -u www-data git clone https://github.com/kentprojects/web.git /var/www/kent
 # Setup the SSH folder and add the relevant keys.
 sudo -u kentprojects mkdir /home/kentprojects/.ssh
 sudo -u kentprojects chmod 700 /home/kentprojects/.ssh
-sudo -u kentprojects touch /home/kentprojects/.ssh/authorized_keys
-# cat /var/www/kentprojects-api/vagrant/production.key.*.txt > /home/kentprojects/.ssh/authorized_keys
+sudo -u kentprojects cp /var/www/kentprojects-api/vagrant/production/keys.txt /home/kentprojects/.ssh/authorized_keys
+sudo -u kentprojects chmod 644 /home/kentprojects/.ssh/authorized_keys
