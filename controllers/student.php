@@ -15,10 +15,7 @@ final class Controller_Student extends Controller
 	 */
 	public function action_index()
 	{
-		if (!in_array($this->request->getMethod(), array(Request::GET, Request::PUT, Request::DELETE)))
-		{
-			throw new HttpStatusException(501);
-		}
+		$this->validateMethods(Request::GET, Request::PUT, Request::DELETE);
 
 		if ($this->request->param("id") === null)
 		{
