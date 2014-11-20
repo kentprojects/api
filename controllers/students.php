@@ -8,6 +8,9 @@ final class Controller_Students extends Controller
 {
 	/**
 	 * /students
+	 *
+	 * @throws HttpStatusException
+	 * @return void
 	 */
 	public function action_index()
 	{
@@ -17,6 +20,11 @@ final class Controller_Students extends Controller
 		{
 			throw new HttpStatusException(400, "No id required.");
 		}
+
+		/**
+		 * GET /students
+		 * Get students by a criteria.
+		 */
 
 		/**
 		 * SELECT `user_id` FROM `User`
