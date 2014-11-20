@@ -25,7 +25,7 @@ INCLUDE_DEV=false
 
 # Update the package repositories and install the relevant packages.
 sudo apt-get update
-sudo apt-get install -y apache2 curl git screen zsh
+sudo apt-get install -y apache2 mysql-client curl git screen zsh
 sudo apt-get install -y php5 php5-cli php5-curl php5-mysqlnd php5-json
 
 # Create a dedicated user for KentProjects, and add it to the relevant groups.
