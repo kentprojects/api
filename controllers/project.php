@@ -9,13 +9,26 @@ final class Controller_Project extends Controller
 	/**
 	 * /project
 	 * /project/:id
+	 *
+	 * @throws HttpStatusException
+	 * @return void
 	 */
 	public function action_index()
 	{
-		$this->validateMethods(Request::GET, Request::POST);
+		$this->validateMethods(Request::GET, Request::POST, Request::PUT, Request::DELETE);
 
 		if ($this->request->getMethod() === Request::POST)
 		{
+			/**
+			 * POST /project
+			 * Used to create a project.
+			 */
+
+			if ($this->request->param("id") !== null)
+			{
+				throw new HttpStatusException(400, "You cannot create a project using an existing project ID.");
+			}
+
 			$params = $this->validateParams(array(
 				"year" => $this->request->post("year", false),
 				"name" => $this->request->post("name", false),
@@ -60,7 +73,87 @@ final class Controller_Project extends Controller
 			throw new HttpStatusException(404, "Project not found.");
 		}
 
+		if ($this->request->getMethod() === Request::PUT)
+		{
+			/**
+			 * PUT /project/:id
+			 * Used to update a project!
+			 */
+			throw new HttpStatusException(501, "Updating a project is coming soon.");
+		}
+		elseif ($this->request->getMethod() === Request::DELETE)
+		{
+			/**
+			 * DELETE /project/:id
+			 * Used to delete a project.
+			 */
+			throw new HttpStatusException(501, "Deleting a project is coming soon.");
+		}
+
+		/**
+		 * GET /project/:id
+		 * Used to get a project.
+		 */
+
 		$this->response->status(200);
 		$this->response->body($project);
+	}
+
+	/**
+	 * /project/group
+	 * /project/:id/group
+	 *
+	 * @throws HttpStatusException
+	 * @return void
+	 */
+	public function action_group()
+	{
+		$this->validateMethods(Request::POST);
+
+		/**
+		 * POST /project/:id/group
+		 */
+
+		if ($this->request->param("id") === null)
+		{
+			throw new HttpStatusException(400, "No project id provided.");
+		}
+
+		$project = Model_Project::getById($this->request->param("id"));
+		if (empty($project))
+		{
+			throw new HttpStatusException(404, "Project not found.");
+		}
+
+		throw new HttpStatusException(501, "Adding a group to a project is coming soon.");
+	}
+
+	/**
+	 * /project/rollover
+	 * /project/:id/rollover
+	 *
+	 * @throws HttpStatusException
+	 * @return void
+	 */
+	public function action_rollover()
+	{
+		$this->validateMethods(Request::POST);
+
+		/**
+		 * POST /project/:id/rollover
+		 */
+
+		if ($this->request->param("id") === null)
+		{
+			throw new HttpStatusException(400, "No project id provided.");
+		}
+
+		$project = Model_Project::getById($this->request->param("id"));
+		if (empty($project))
+		{
+			throw new HttpStatusException(404, "Project not found.");
+		}
+
+		throw new HttpStatusException(501, "Rolling over a project is coming soon.");
 	}
 }
