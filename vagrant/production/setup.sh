@@ -24,6 +24,8 @@ sudo -u kentprojects git clone https://github.com/jdrydn/dotfiles.git /home/kent
 sudo -u kentprojects cp /home/kentprojects/.dotfiles/.zshrc /home/kentprojects/.zshrc
 sudo -u kentprojects cp /home/kentprojects/.dotfiles/.vimrc /home/kentprojects/.vimrc
 
+sudo mkdir /var/www/kentprojects-api /var/www/kentprojects-web
+sudo chown www-data:www-data /var/www/kentprojects-*
 sudo -u www-data git clone https://github.com/kentprojects/api.git /var/www/kentprojects-api
 sudo -u www-data git clone https://github.com/kentprojects/web.git /var/www/kentprojects-web
 
