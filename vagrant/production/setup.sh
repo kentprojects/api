@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # @author: James Dryden <james.dryden@kentprojects.com>
 # @license: Copyright KentProjects
