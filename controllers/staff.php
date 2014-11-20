@@ -25,7 +25,7 @@ final class Controller_Staff extends Controller
 			$user = Model_Staff::getById($this->request->param("id"));
 			if (empty($user))
 			{
-				throw new HttpStatusException(404, "Staff not found.");
+				throw new HttpStatusException(404, "Staff member not found.");
 			}
 
 			if ($this->request->getMethod() === Request::PUT)
@@ -34,7 +34,7 @@ final class Controller_Staff extends Controller
 				 * PUT /staff/:id
 				 * Used to update staff!
 				 */
-				throw new HttpStatusException(501, "Updating staff is coming soon.");
+				throw new HttpStatusException(501, "Updating a staff member is coming soon.");
 			}
 			elseif ($this->request->getMethod() === Request::DELETE)
 			{
@@ -42,8 +42,12 @@ final class Controller_Staff extends Controller
 				 * DELETE /staff/:id
 				 * Used to update staff!
 				 */
-				throw new HttpStatusException(501, "Deleting staff is coming soon.");
+				throw new HttpStatusException(501, "Deleting a staff member is coming soon.");
 			}
+
+			/**
+			 * GET /staff/:id
+			 */
 
 			$this->response->status(200);
 			$this->response->body($user);
@@ -61,8 +65,12 @@ final class Controller_Staff extends Controller
 			 * POST /staff
 			 * Used to create staff!
 			 */
-			throw new HttpStatusException(501, "Creating staff is coming soon.");
+			throw new HttpStatusException(501, "Creating a staff member is coming soon.");
 		}
+
+		/**
+		 * GET /staff
+		 */
 
 		/**
 		 * SELECT `user_id` FROM `User`

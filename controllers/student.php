@@ -45,6 +45,10 @@ final class Controller_Student extends Controller
 			throw new HttpStatusException(501, "Deleting student profiles is coming soon.");
 		}
 
+		/**
+		 * GET /student/:id
+		 */
+
 		$this->response->status(200);
 		$this->response->body($user);
 	}
