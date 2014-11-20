@@ -9,6 +9,9 @@ final class Controller_Staff extends Controller
 	/**
 	 * /staff
 	 * /staff/:id
+	 *
+	 * @throws HttpStatusException
+	 * @return void
 	 */
 	public function action_index()
 	{
@@ -17,7 +20,7 @@ final class Controller_Staff extends Controller
 			/**
 			 * /staff/:id
 			 */
-			$this->validateMethods(Request::GET, Request::PUT);
+			$this->validateMethods(Request::GET, Request::PUT, Request::DELETE);
 
 			$user = Model_Staff::getById($this->request->param("id"));
 			if (empty($user))
@@ -28,8 +31,18 @@ final class Controller_Staff extends Controller
 			if ($this->request->getMethod() === Request::PUT)
 			{
 				/**
+				 * PUT /staff/:id
 				 * Used to update staff!
 				 */
+				throw new HttpStatusException(501, "Updating staff is coming soon.");
+			}
+			elseif ($this->request->getMethod() === Request::DELETE)
+			{
+				/**
+				 * DELETE /staff/:id
+				 * Used to update staff!
+				 */
+				throw new HttpStatusException(501, "Deleting staff is coming soon.");
 			}
 
 			$this->response->status(200);
@@ -40,7 +53,16 @@ final class Controller_Staff extends Controller
 		/**
 		 * /staff
 		 */
-		$this->validateMethods(Request::GET);
+		$this->validateMethods(Request::GET, Request::POST);
+
+		if ($this->request->getMethod() === Request::POST)
+		{
+			/**
+			 * POST /staff
+			 * Used to create staff!
+			 */
+			throw new HttpStatusException(501, "Creating staff is coming soon.");
+		}
 
 		/**
 		 * SELECT `user_id` FROM `User`
