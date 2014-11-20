@@ -40,8 +40,8 @@ sudo chown www-data:www-data /var/www/kentprojects-*
 sudo -u www-data git clone https://github.com/kentprojects/api.git /var/www/kentprojects-api
 sudo -u www-data git clone https://github.com/kentprojects/web.git /var/www/kentprojects-web
 
-# If you want the development environments, set this to "TRUE".
-if TRUE; then
+# If you want the development environments, set this to "true".
+if true; then
 	sudo -u www-data cd /var/www/kentprojects-api && git fetch && git checkout develop
 	sudo -u www-data cd /var/www/kentprojects-web && git fetch && git checkout develop
 fi
