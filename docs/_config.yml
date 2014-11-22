@@ -1,0 +1,9 @@
+markdown: redcarpet
+highlighter: rouge
+
+exclude: [old]
+permalink: pretty
+relative_permalinks: true
+
+title: 'KentProjects'
+tagline: 'Documentation for an API'
