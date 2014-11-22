@@ -15,7 +15,7 @@ if (file_exists(__DIR__ . "/../config.production.ini"))
 }
 elseif (file_exists(__DIR__ . "/../config.ini"))
 {
-	$configFile = __DIR__ . "/config.ini";
+	$configFile = __DIR__ . "/../config.ini";
 }
 else
 {
