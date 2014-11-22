@@ -70,6 +70,7 @@ sudo -u kentprojects chmod 644 /home/kentprojects/.ssh/authorized_keys
 sudo rm /etc/apache2/sites-enabled/*
 sudo ln -s /var/www/kentprojects-api/vagrant/production/apache.conf /etc/apache2/sites-enabled/01-KentProjects-Live.conf
 $INCLUDE_DEV && sudo ln -s /var/www/kentprojects-api-dev/vagrant/production/apache.dev.conf /etc/apache2/sites-enabled/02-KentProjects-Dev.conf
+false && sudo ln -s /var/www/kentprojects-api/vagrant/production/apache.deployer.conf /etc/apache2/sites-enabled/03-Deployer.conf
 
 sudo service apache2 restart
 
