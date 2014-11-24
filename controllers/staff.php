@@ -76,7 +76,7 @@ final class Controller_Staff extends Controller
 		 * SELECT `user_id` FROM `User`
 		 * WHERE `role` = 'staff' AND `status` = 1
 		 */
-		$query = new Query_Builder("user_id", "User");
+		$query = new Query("user_id", "User");
 		$query->where(array("field" => "role", "value" => "staff"));
 		$query->where(array("field" => "status", "value" => 1));
 

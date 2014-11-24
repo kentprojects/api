@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-final class Query_Builder
+final class Query
 {
 	/**
 	 * @var array

@@ -30,7 +30,7 @@ final class Controller_Groups extends Controller
 		 * SELECT `group_id` FROM `Group`
 		 * WHERE `status` = 1
 		 */
-		$query = new Query_Builder("group_id", "Group");
+		$query = new Query("group_id", "Group");
 		$query->where(array("field" => "status", "value" => 1));
 
 		if ($this->request->query("year") !== null)

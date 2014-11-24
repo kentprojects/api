@@ -30,7 +30,7 @@ final class Controller_Projects extends Controller
 		 * SELECT `project_id` FROM `Project`
 		 * WHERE `status` = 1
 		 */
-		$query = new Query_Builder("project_id", "Project");
+		$query = new Query("project_id", "Project");
 		$query->where(array("field" => "status", "value" => 1));
 
 		if ($this->request->query("year") !== null)

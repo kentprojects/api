@@ -30,7 +30,7 @@ final class Controller_Students extends Controller
 		 * SELECT `user_id` FROM `User`
 		 * WHERE `role` = 'student' AND `status` = 1
 		 */
-		$query = new Query_Builder("user_id", "User");
+		$query = new Query("user_id", "User");
 		$query->where(array("field" => "role", "value" => "student"));
 		$query->where(array("field" => "status", "value" => 1));
 
