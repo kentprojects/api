@@ -19,7 +19,7 @@ require_once __DIR__ . "/exceptions.php";
 spl_autoload_register(
 /**
  * @param string $class
- * @return string The filename where the class exists.
+ * @return bool
  */
 	function ($class)
 	{
@@ -63,7 +63,7 @@ spl_autoload_register(
 
 		if (empty($filename) || !file_exists($filename))
 		{
-			trigger_error("Class {$class} not found.", E_USER_ERROR);
+			return false;
 		}
 
 		/** @noinspection PhpIncludeInspection */
