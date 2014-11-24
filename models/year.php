@@ -101,19 +101,17 @@ class Model_Year extends Model_Abstract
 	}
 
 	/**
-	 * Rather than return an array (which will become an object), return an int.
-	 *
-	 * @return int
+	 * @return array
 	 */
 	public function jsonSerialize()
 	{
-		return array_merge(
+		return $this->validateFields(array_merge(
 			parent::jsonSerialize(),
 			array(
 				"projects" => 0,
 				"users" => 0
 			)
-		);
+		));
 	}
 
 	/**

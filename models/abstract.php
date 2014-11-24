@@ -7,6 +7,13 @@
 abstract class Model_Abstract implements JsonSerializable
 {
 	/**
+	 * An array of the allowed fields.
+	 *
+	 * @var array
+	 */
+	private static $limitFields = array();
+
+	/**
 	 * @return string
 	 */
 	private static function cachename()
@@ -30,6 +37,15 @@ abstract class Model_Abstract implements JsonSerializable
 	public static function getById($id)
 	{
 		return Cache::get(static::cachename().".".$id);
+	}
+
+	/**
+	 * @param array $fields
+	 * @return void
+	 */
+	public static function returnFields(array $fields)
+	{
+		static::$limitFields[get_called_class()] = array_merge(array("id"), $fields);
 	}
 	
 	/**
@@ -76,6 +92,27 @@ abstract class Model_Abstract implements JsonSerializable
 		return array(
 			"id" => $this->getId()
 		);
+	}
+
+	/**
+	 * Validate that these fields are allowed back by the API.
+	 *
+	 * @param array $jsonSerialized
+	 * @return array
+	 */
+	protected function validateFields(array $jsonSerialized)
+	{
+		if (!empty(static::$limitFields[get_called_class()]))
+		{
+			foreach ($jsonSerialized as $key => $value)
+			{
+				if (!in_array($key, static::$limitFields[get_called_class()]))
+				{
+					unset($jsonSerialized[$key]);
+				}
+			}
+		}
+		return $jsonSerialized;
 	}
 	
 	/**

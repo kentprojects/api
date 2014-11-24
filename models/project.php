@@ -158,6 +158,25 @@ class Model_Project extends Model_Abstract
 		return $this->year;
 	}
 
+	/**
+	 * @return array
+	 */
+	public function jsonSerialize()
+	{
+		return $this->validateFields(array_merge(
+			parent::jsonSerialize(),
+			array(
+				"year" => (string)$this->year,
+				"group" => $this->group,
+				"name" => $this->name,
+				"slug" => $this->slug,
+				"creator" => $this->creator,
+				"created" => $this->created,
+				"updated" => $this->updated
+			)
+		));
+	}
+
 	public function save()
 	{
 		if (empty($this->id))

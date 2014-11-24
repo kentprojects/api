@@ -33,6 +33,11 @@ final class Controller_Projects extends Controller
 		$query = new Query("project_id", "Project");
 		$query->where(array("field" => "status", "value" => 1));
 
+		if ($this->request->query("fields") !== null)
+		{
+			Model_Project::returnFields(explode(",", $this->request->query("fields")));
+		}
+
 		if ($this->request->query("year") !== null)
 		{
 			/**

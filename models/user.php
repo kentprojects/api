@@ -143,18 +143,30 @@ final class Model_User extends Model_Abstract
 	 */
 	public function jsonSerialize()
 	{
-		return array_merge(
+		return $this->validateFields(array_merge(
 			parent::jsonSerialize(),
 			array(
 				"email" => $this->email,
 				"first_name" => $this->first_name,
 				"last_name" => $this->last_name,
-				"role" => $this->role,
+				"role" => $this->role
+			),
+			($this->isStaff()
+				? array(
+					"is" => array(
+						"convenor" => $this->isConvener(),
+						"secondmarker" => $this->isSecondMarker(),
+						"supervisor" => $this->isSupervisor()
+					)
+				)
+				: array()
+			),
+			array(
 				"created" => $this->created,
 				"lastlogin" => $this->lastlogin,
 				"updated" => $this->updated
 			)
-		);
+		));
 	}
 
 	/**

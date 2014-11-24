@@ -140,6 +140,23 @@ class Model_Group extends Model_Abstract
 	}
 
 	/**
+	 * @return array
+	 */
+	public function jsonSerialize()
+	{
+		return $this->validateFields(array_merge(
+			parent::jsonSerialize(),
+			array(
+				"year" => (string)$this->year,
+				"name" => $this->name,
+				"creator" => $this->creator,
+				"created" => $this->created,
+				"updated" => $this->updated
+			)
+		));
+	}
+
+	/**
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */
