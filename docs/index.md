@@ -3,6 +3,8 @@ layout: page
 title: KentProjects API
 ---
 
+![The Kent Eye for the 50th anniversary.](/img/kenteye.jpg)
+
 The KentProjects API is a simple API created by a team of people working on the CO600 Project "KentProjects".
 
 We are:
