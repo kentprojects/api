@@ -38,6 +38,16 @@ final class Controller_Projects extends Controller
 			Model_Project::returnFields(explode(",", $this->request->query("fields")));
 		}
 
+		if ($this->request->query("ids") !== null)
+		{
+			$query->where(array(
+				"field" => "project_id",
+				"operator" => "IN",
+				"type" => "i",
+				"values" => explode(",", $this->request->query("ids"))
+			));
+		}
+
 		if ($this->request->query("year") !== null)
 		{
 			/**
