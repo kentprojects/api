@@ -75,12 +75,12 @@ final class Auth
 
 			if ($this->request->query("signature", null) === null)
 			{
-				throw new HttpStatusException(400, "Missing signature");
+				throw new HttpStatusException(400, "Missing signature.");
 			}
 
 			if (intval($this->request->query("expires")) < time())
 			{
-				throw new HttpStatusException(400, "Expired request");
+				throw new HttpStatusException(400, "Expired request.");
 			}
 
 			if (empty($this->applications[$this->request->query("key")]))
