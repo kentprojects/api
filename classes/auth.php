@@ -70,7 +70,7 @@ final class Auth
 
 			if ($this->request->query("expires", null) === null)
 			{
-				throw new HttpStatusException(400, "Missing expiry timestamp");
+				throw new HttpStatusException(400, "Missing expiry timestamp.");
 			}
 
 			if ($this->request->query("signature", null) === null)
