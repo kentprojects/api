@@ -53,6 +53,7 @@ final class Auth
 			}
 			$this->applications[$details["key"]] = (object)array(
 				"name" => $name,
+				"key" => $details["key"],
 				"secret" => $details["secret"]
 			);
 		}

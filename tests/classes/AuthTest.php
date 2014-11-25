@@ -105,5 +105,54 @@ class AuthTest extends KentProjects_Controller_TestBase
 		new Auth($request, $response, Auth::USER);
 	}
 
+	/**
+	 * @expectedException HttpStatusException
+	 * @expectedExceptionCode 400
+	 * @expectedExceptionMessage Invalid signature.
+	 */
+	public function testInvalidSignature()
+	{
+		$applications = parse_ini_file(APPLICATION_PATH . "/applications.ini", true);
 
+		$request = $this->createUnsignedRequest(
+			Request::GET,
+			array(
+				"key" => $applications["phpunit"]["key"],
+				"expires" => time() + 100,
+				"signature" => "thisisnotthesignatureyourelookingfor"
+			)
+		);
+		$response = new Response($request);
+		new Auth($request, $response, Auth::APP);
+	}
+
+	public function testGetApplication()
+	{
+		$applications = parse_ini_file(APPLICATION_PATH . "/applications.ini", true);
+
+		$request = $this->createSignedRequest(
+			Request::GET,
+			array(
+				"key" => $applications["phpunit"]["key"]
+			)
+		);
+		$response = new Response($request);
+		$auth = new Auth($request, $response, Auth::APP);
+		$this->assertEquals($applications["phpunit"]["key"], $auth->getApplication()->key);
+	}
+
+	public function getGetUser()
+	{
+		$applications = parse_ini_file(APPLICATION_PATH . "/applications.ini", true);
+
+		$request = $this->createSignedRequest(
+			Request::GET,
+			array(
+				"user" => "Declan"
+			)
+		);
+		$response = new Response($request);
+		$auth = new Auth($request, $response, Auth::USER);
+		$this->assertEmpty($auth->getUser());
+	}
 }
