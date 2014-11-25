@@ -3,4 +3,4 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-USE `kentprojects`;
+USE `kentprojectstest`;

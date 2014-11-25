@@ -17,4 +17,12 @@ class RequestTest extends KentProjects_TestBase
 		$request = Request::factory(Request::GET, "/user/22");
 		$this->assertEquals("Request_Internal", get_class($request));
 	}
+
+	/**
+	 * @expectedException Exception
+	 */
+	public function testMalformedUrlRequestFetch()
+	{
+		Request::factory(Request::GET, "");
+	}
 }

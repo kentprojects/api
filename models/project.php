@@ -14,22 +14,31 @@ class Model_Project extends Model_Abstract
 	 */
 	public static function getById($id)
 	{
-		$statement = Database::prepare(
-			"SELECT
-				`project_id` AS 'id',
-				`year`,
-				`group_id` AS 'group',
-				`name`,
-				`slug`,
-				`creator_id` AS 'creator',
-				`created`,
-				`updated`,
-				`status`
-			 FROM `Project`
-			 WHERE `project_id` = ?",
-			"i", __CLASS__
-		);
-		return $statement->execute($id)->singleton();
+		$project = parent::getById($id);
+		if (empty($project))
+		{
+			$statement = Database::prepare(
+				"SELECT
+					`project_id` AS 'id',
+					`year`,
+					`group_id` AS 'group',
+					`name`,
+					`slug`,
+					`creator_id` AS 'creator',
+					`created`,
+					`updated`,
+					`status`
+				 FROM `Project`
+			 	 WHERE `project_id` = ?",
+				"i", __CLASS__
+			);
+			$project = $statement->execute($id)->singleton();
+			if (!empty($project))
+			{
+				Cache::set($project);
+			}
+		}
+		return $project;
 	}
 
 	/**

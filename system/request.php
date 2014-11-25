@@ -464,4 +464,9 @@ class Request_Internal extends Request
 			? $default
 			: $this->param[(string)$key];
 	}
+
+	public function setParamData(array $params)
+	{
+		$this->param = $params;
+	}
 }

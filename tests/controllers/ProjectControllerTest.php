@@ -6,9 +6,23 @@
  */
 class ProjectControllerTest extends KentProjects_Controller_TestBase
 {
-	public function testCanBeNegated()
+	public function testGetProjects()
 	{
-		$this->assertEquals(1, 1);
-		$this->assertEquals(1, 2);
+		$request = $this->createGoodRequest(Request::GET);
+		$response = new Response($request);
+
+		$this->runController($request, $response, "Projects");
+
+		$this->assertEquals(200, $response->status());
+	}
+
+	public function testGetProject()
+	{
+		$request = $this->createGoodRequest(Request::GET, array(), array(), array("id" => 22));
+		$response = new Response($request);
+
+		$this->runController($request, $response, "Project");
+
+		$this->assertEquals(200, $response->status());
 	}
 }
