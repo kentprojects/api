@@ -13,7 +13,7 @@ abstract class KentProjects_Controller_TestBase extends KentProjects_TestBase
 	 * @param array $paramData
 	 * @return Request_Internal
 	 */
-	protected function createBadRequest($method, array $getData = array(), array $postData = array(), array $paramData = array())
+	protected function createBadSignedRequest($method, array $getData = array(), array $postData = array(), array $paramData = array())
 	{
 		$request = Request::factory($method, "/test");
 		$getData = $this->signRequest($getData);
@@ -32,7 +32,7 @@ abstract class KentProjects_Controller_TestBase extends KentProjects_TestBase
 	 * @param array $paramData
 	 * @return Request_Internal
 	 */
-	protected function createGoodRequest($method, array $getData = array(), array $postData = array(), array $paramData = array())
+	protected function createSignedRequest($method, array $getData = array(), array $postData = array(), array $paramData = array())
 	{
 		$request = Request::factory($method, "/test");
 		$request->setQueryData($this->signRequest($getData));

@@ -8,7 +8,7 @@ class ProjectControllerTest extends KentProjects_Controller_TestBase
 {
 	public function testGetProjects()
 	{
-		$request = $this->createGoodRequest(Request::GET);
+		$request = $this->createSignedRequest(Request::GET);
 		$response = new Response($request);
 
 		$this->runController($request, $response, "Projects");
@@ -18,7 +18,7 @@ class ProjectControllerTest extends KentProjects_Controller_TestBase
 
 	public function testGetProject()
 	{
-		$request = $this->createGoodRequest(Request::GET, array(), array(), array("id" => 22));
+		$request = $this->createSignedRequest(Request::GET, array(), array(), array("id" => 22));
 		$response = new Response($request);
 
 		$this->runController($request, $response, "Project");
