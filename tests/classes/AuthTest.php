@@ -143,12 +143,10 @@ class AuthTest extends KentProjects_Controller_TestBase
 
 	public function getGetUser()
 	{
-		$applications = parse_ini_file(APPLICATION_PATH . "/applications.ini", true);
-
 		$request = $this->createSignedRequest(
 			Request::GET,
 			array(
-				"user" => "Declan"
+				"user" => config("phpunit-user", "token")
 			)
 		);
 		$response = new Response($request);
