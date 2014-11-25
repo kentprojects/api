@@ -42,6 +42,22 @@ abstract class KentProjects_Controller_TestBase extends KentProjects_TestBase
 	}
 
 	/**
+	 * @param string $method
+	 * @param array $getData
+	 * @param array $postData
+	 * @param array $paramData
+	 * @return Request_Internal
+	 */
+	protected function createUnsignedRequest($method, array $getData = array(), array $postData = array(), array $paramData = array())
+	{
+		$request = Request::factory($method, "/test");
+		$request->setQueryData($getData);
+		$request->setPostData($postData);
+		$request->setParamData($paramData);
+		return $request;
+	}
+
+	/**
 	 * @param Request_Internal $request
 	 * @param Response $response
 	 * @param string $controller
