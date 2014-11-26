@@ -6,6 +6,13 @@
  */
 final class Query
 {
+	const AAND = "query:where:and";
+	const EQ = "query:where:equals";
+	const IN = "query:where:in";
+	const ON = "query:join:on";
+	const OOR = "query:where:or";
+	const USING = "query:join:using";
+
 	/**
 	 * @var array
 	 */
@@ -31,166 +38,88 @@ final class Query
 	{
 		$this->fields = is_array($field) ? $field : array($field);
 		$this->table = $table;
-
-		foreach ($this->fields as $k => $field)
-		{
-			$this->fields[$k] = "`$field`";
-		}
 	}
 
 	/**
-	 * @param bool $printQuery
-	 * @return _Database_Result|_Database_State
+	 * @param bool $returnResults
+	 * @return _Database_Result|_Database_State|_QueryStub
 	 */
-	public function execute($printQuery = false)
+	public function execute($returnResults = false)
 	{
-		$query = "SELECT " . implode(",", $this->fields) . " FROM `" . $this->table . "`";
+		$query = "SELECT ";
+		$query .= implode(
+			", ",
+			array_map(
+				function ($field)
+				{
+					return "`$field`";
+				},
+				$this->fields
+			)
+		);
+		$query .= " FROM `" . $this->table . "`";
 		$types = "";
 		$values = array();
 
 		if (!empty($this->joins))
 		{
-			foreach ($this->joins as $join)
-			{
-				$joinQuery = sprintf(" JOIN `%s`", $join->table);
-				if ($join->how === "USING")
-				{
-					$joinQuery .= sprintf(" USING (`%s`)", $join->field);
-				}
-				elseif ($join->how === "ON")
-				{
-					$joinQuery .= sprintf(
-						" ON `%s`.`%s` = `%s`.`%s`",
-						$join->source, $join->from, $join->table, $join->to
-					);
-				}
-				$query .= $joinQuery;
-			}
+			$query .= PHP_EOL;
+			$query .= implode(
+				PHP_EOL,
+				array_map(
+					function ($join) use (&$types, &$values)
+					{
+						/** @var _QueryStub $join */
+						$types .= $join->types;
+						$values = array_merge($values, $join->values);
+						return $join->sql;
+					},
+					$this->joins
+				)
+			);
 		}
 
 		if (!empty($this->where))
 		{
-			$query .= " WHERE";
-			foreach ($this->where as $i => $where)
-			{
-				if ($i > 0)
-				{
-					$query .= " AND";
-				}
-
-				if (!empty($where->type))
-				{
-					if (!empty($where->values))
+			$query .= " WHERE ";
+			$query .= implode(
+				" AND ",
+				array_map(
+					function ($where) use (&$types, &$values)
 					{
-						switch ($where->operator)
-						{
-							case "AND":
-								$query .= implode(
-									" " . $where->operator,
-									array_map(function ($value) use (&$where, &$types, &$values)
-									{
-										$types .= $where->type;
-										$values[] = $value;
-										return sprintf(" `%s`.`%s` = ?", $where->table, $where->field);
-									}, $where->values)
-								);
-								break;
-							case "OR":
-								$query .= " (" . implode(
-										" " . $where->operator . " ",
-										array_map(function ($value) use (&$where, &$types, &$values)
-										{
-											$types .= $where->type;
-											$values[] = $value;
-											return sprintf("`%s`.`%s` = ?", $where->table, $where->field);
-										}, $where->values)
-									) . ")";
-								break;
-							case "IN":
-								$query .= sprintf(" `%s`.`%s` IN (", $where->table, $where->field) .
-									implode(", ",
-										array_map(function ($value) use (&$where, &$types, &$values)
-										{
-											$types .= $where->type;
-											$values[] = $value;
-											return "?";
-										}, $where->values)
-									) . ")";
-								break;
-							default:
-								trigger_error("This should not be able to be reached.", E_USER_ERROR);
-						}
-					}
-					else
-					{
-						$query .= sprintf(" `%s`.`%s` = ?", $where->table, $where->field);
-						$types .= $where->type;
-						$values[] = $where->value;
-					}
-				}
-				else
-				{
-					if (!empty($where->values))
-					{
-						switch ($where->operator)
-						{
-							case "AND":
-								$query .= implode(
-									" " . $where->operator . " ",
-									array_map(function ($value) use (&$where)
-									{
-										return sprintf(
-											(is_numeric($value) ? "`%s`.`%s` = %d" : "`%s`.`%s` = '%s'"),
-											$where->table, $where->field, $value
-										);
-									}, $where->values)
-								);
-								break;
-							case "OR":
-								$query .= " (" . implode(
-										" " . $where->operator . " ",
-										array_map(function ($value) use (&$where)
-										{
-											return sprintf(
-												(is_numeric($value) ? "`%s`.`%s` = %d" : "`%s`.`%s` = '%s'"),
-												$where->table, $where->field, $value
-											);
-										}, $where->values)
-									) . ")";
-								break;
-							case "IN":
-								$query .= "%s`.`%s` IN (" . implode(", ", $where->values) . ")";
-								break;
-							default:
-								trigger_error("This should not be able to be reached.", E_USER_ERROR);
-						}
-					}
-					else
-					{
-						if (is_numeric($where->value))
-						{
-							$query .= sprintf(" `%s`.`%s` = %d", $where->table, $where->field, $where->value);
-						}
-						else
-						{
-							$query .= sprintf(" `%s`.`%s` = '%s'", $where->table, $where->field, $where->value);
-						}
-					}
-				}
-			}
+						/** @var _QueryStub $where */
+						$types .= $where->types;
+						$values = array_merge($values, $where->values);
+						return $where->sql;
+					},
+					$this->where
+				)
+			);
 		}
 
-		if ($printQuery === true)
+		if ($returnResults === true)
 		{
-			return array(
-				"query" => $query,
-				"types" => $types,
-				"values" => $values
-			);
+			return new _QueryStub($query, $types, $values);
 		}
 
 		$statement = Database::prepare($query, $types);
 		return call_user_func_array(array($statement, "execute"), $values);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getFields()
+	{
+		return $this->fields;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTable()
+	{
+		return $this->table;
 	}
 
 	/**
@@ -206,19 +135,33 @@ final class Query
 			throw new InvalidArgumentException("Missing table / how keys.");
 		}
 
-		$join->how = strtoupper($join->how);
 		$join->source = $this->table;
 
-		if (($join->how === "USING") && (empty($join->field)))
+		$joinQuery = sprintf(" JOIN `%s`", $join->table);
+		switch ($join->how)
 		{
-			throw new InvalidArgumentException("Missing field for JOIN USING.");
-		}
-		elseif (($join->how === "ON") && (empty($join->from) || empty($join->to)))
-		{
-			throw new InvalidArgumentException("Missing from / to for JOIN ON.");
+			case Query::ON:
+				if (empty($join->from) || empty($join->to))
+				{
+					throw new InvalidArgumentException("Missing from / to for JOIN ON.");
+				}
+				$joinQuery .= sprintf(
+					" ON `%s`.`%s` = `%s`.`%s`",
+					$join->source, $join->from, $join->table, $join->to
+				);
+				break;
+			case Query::USING:
+				if (empty($join->field))
+				{
+					throw new InvalidArgumentException("Missing field for JOIN USING.");
+				}
+				$joinQuery .= sprintf(" USING (`%s`)", $join->field);
+				break;
+			default:
+				throw new InvalidArgumentException("Invalid operator for join.");
 		}
 
-		$this->joins[] = $join;
+		$this->joins[] = new _QueryStub($joinQuery);
 	}
 
 	/**
@@ -228,34 +171,139 @@ final class Query
 	public function where(array $where)
 	{
 		$where = (object)$where;
-		if (!empty($where->operator))
-		{
-			$where->operator = strtoupper($where->operator);
-		}
 
-		if (empty($where->field) || (empty($where->value) && empty($where->values)))
+		if (empty($where->field) || (!property_exists($where, "value") && !property_exists($where, "values")))
 		{
 			throw new InvalidArgumentException("Missing field / value.");
 		}
-		elseif (!empty($where->value) && !empty($where->values))
+		elseif (property_exists($where, "value") && property_exists($where, "values"))
 		{
 			throw new InvalidArgumentException("You cannot have multiple value & values.");
 		}
+		elseif (property_exists($where, "values") && !is_array($where->values))
+		{
+			throw new InvalidArgumentException("Values should be an array.");
+		}
 		elseif (!empty($where->values) && empty($where->operator))
 		{
-			throw new InvalidArgumentException("Missing operator (AND|OR|IN) with values.");
+			/** @noinspection SpellCheckingInspection */
+			throw new InvalidArgumentException("Missing operator (AAND|OOR|IN) with values.");
 		}
-		elseif (!empty($where->operator) && !in_array($where->operator, array("AND", "OR", "IN")))
+		elseif (!empty($where->operator) && (strpos($where->operator, "query:where:") !== 0))
 		{
 			throw new InvalidArgumentException("Invalid operator for where statement.");
 		}
 
-		if (empty($where->operator))
+		$query = new _QueryStub();
+		$where->table = empty($where->table) ? $this->table : $where->table;
+
+		if (!empty($where->values))
 		{
-			$where->operator = "AND";
+			switch ($where->operator)
+			{
+				case Query::AAND:
+				case Query::OOR:
+					$query->sql = "(";
+					$query->sql .= implode(
+						($where->operator === Query::AAND ? " AND " : " OR "),
+						array_map(
+							function ($value) use ($where, &$query)
+							{
+								if (!empty($where->type))
+								{
+									$query->types .= $where->type;
+									$query->values[] = $value;
+									return sprintf("`%s`.`%s` = ?", $where->table, $where->field);
+								}
+								else
+								{
+									return sprintf(
+										(is_numeric($value) ? "`%s`.`%s` = %d" : "`%s`.`%s` = '%d'"),
+										$where->table, $where->field, $value
+									);
+								}
+							},
+							$where->values
+						)
+					);
+					$query->sql .= ")";
+					break;
+				case Query::IN:
+					$query->sql = sprintf("`%s`.`%s` IN (", $where->table, $where->field);
+					$query->sql .= implode(
+						", ",
+						array_map(
+							function ($value) use (&$where, &$query)
+							{
+								if (!empty($where->type))
+								{
+									$query->types .= $where->type;
+									$query->values[] = $value;
+									return "?";
+								}
+								else
+								{
+									return sprintf((is_numeric($value) ? "%d" : "'%d'"), $value);
+								}
+							},
+							$where->values
+						)
+					);
+					$query->sql .= ")";
+					break;
+				default:
+					trigger_error("No operator for WHERE clause with multiple values.", E_USER_ERROR);
+			}
+		}
+		else
+		{
+			if (!empty($where->type))
+			{
+				$query->sql .= sprintf("`%s`.`%s` = ?", $where->table, $where->field);
+				$query->types .= $where->type;
+				$query->values[] = $where->value;
+			}
+			else
+			{
+				$query->sql = sprintf(
+					(is_numeric($where->value) ? "`%s`.`%s` = %d" : "`%s`.`%s` = '%s'"),
+					$where->table, $where->field, $where->value
+				);
+			}
 		}
 
-		$where->table = empty($where->table) ? $this->table : $where->table;
-		$this->where[] = $where;
+		$this->where[] = $query;
+	}
+}
+
+/**
+ * Class _QueryStub
+ * Represents a piece of a query.
+ */
+final class _QueryStub
+{
+	/**
+	 * @var string
+	 */
+	public $sql;
+	/**
+	 * @var string
+	 */
+	public $types;
+	/**
+	 * @var array
+	 */
+	public $values;
+
+	/**
+	 * @param string $sql
+	 * [ @param string $types ]
+	 * [ @param array $values ]
+	 */
+	public function __construct($sql = "", $types = "", array $values = array())
+	{
+		$this->sql = $sql;
+		$this->types = $types;
+		$this->values = $values;
 	}
 }

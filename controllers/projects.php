@@ -42,7 +42,7 @@ final class Controller_Projects extends Controller
 		{
 			$query->where(array(
 				"field" => "project_id",
-				"operator" => "IN",
+				"operator" => Query::IN,
 				"type" => "i",
 				"values" => explode(",", $this->request->query("ids"))
 			));
