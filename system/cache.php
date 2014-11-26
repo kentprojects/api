@@ -12,4 +12,9 @@ abstract class Cache
 	{
 		return null;
 	}
+
+	public static function set()
+	{
+
+	}
 }

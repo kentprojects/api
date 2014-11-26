@@ -9,3 +9,4 @@ if [ -z "$1" ]; then
 	exit 2
 fi
 php phpunit.phar --bootstrap functions.php --color --verbose $@
+exit $?

@@ -77,7 +77,7 @@ sudo service apache2 restart
 
 if $INCLUDE_JEKYLL; then
 	sudo apt-get install -y make
-	sudo apt-get install -y ruby-1.9.1-dev gem nodejs npm
+	sudo apt-get install -y ruby1.9.1-dev gem nodejs npm
 	sudo gem install json jekyll rouge
 fi
 
