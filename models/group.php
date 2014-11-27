@@ -67,7 +67,7 @@ class Model_Group extends Model_Abstract
 	 * @param string $name
 	 * @param Model_User $creator
 	 */
-	public function __construct(Model_Year $year, $name, Model_User $creator)
+	public function __construct(Model_Year $year = null, $name = null, Model_User $creator = null)
 	{
 		if ($this->getId() !== null)
 		{

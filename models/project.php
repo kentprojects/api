@@ -90,7 +90,7 @@ class Model_Project extends Model_Abstract
 	 */
 	protected $status;
 
-	public function __construct(Model_Year $year, $name, $slug, Model_User $creator)
+	public function __construct(Model_Year $year = null, $name = null, $slug = null, Model_User $creator = null)
 	{
 		if ($this->getId() !== null)
 		{

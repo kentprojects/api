@@ -7,6 +7,8 @@
 require_once __DIR__ . "/../functions.php";
 require_once __DIR__ . "/base/abstract.php";
 require_once __DIR__ . "/base/controller.php";
+require_once __DIR__ . "/base/fakedatabase.php";
+require_once __DIR__ . "/base/model.php";
 
 /**
  * Print out to the stderr channel.

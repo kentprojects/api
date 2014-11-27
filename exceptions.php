@@ -14,9 +14,16 @@ final class DatabaseException extends Exception
 	protected $types;
 	protected $params;
 
-	public function __construct($errormessage, $errorno, $query = null, $types = null, $params = null)
+	/**
+	 * @param string $error_message
+	 * @param int $error_no
+	 * @param string $query
+	 * @param string $types
+	 * @param array $params
+	 */
+	public function __construct($error_message, $error_no = 0, $query = null, $types = null, $params = null)
 	{
-		parent::__construct($errormessage, $errorno);
+		parent::__construct($error_message, $error_no);
 		$this->query = $query;
 		$this->types = $types;
 		$this->params = $params;

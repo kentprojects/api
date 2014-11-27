@@ -14,6 +14,50 @@ abstract class Model_Abstract implements JsonSerializable
 	private static $limitFields = array();
 
 	/**
+	 * Builds a new model like the Database does.
+	 *
+	 * @param array|stdClass $data
+	 * @param string $idField
+	 * @throws InvalidArgumentException
+	 * @return Model_Abstract
+	 */
+	public static function build($data, $idField)
+	{
+		if (config("environment") !== "testing")
+		{
+			throw new InvalidArgumentException("Only the testing environment can call this!");
+		}
+
+		if (is_object($data))
+		{
+			if (get_class($data) !== "stdClass")
+			{
+				throw new InvalidArgumentException("Data is an object not of stdClass.");
+			}
+		}
+
+		$class = get_called_class();
+
+		/** @var Model_Abstract $object */
+		$object = new $class;
+
+		foreach ($data as $key => $value)
+		{
+			if ($key === $idField)
+			{
+				$object->id = $value;
+			}
+			else
+			{
+				$object->$key = $value;
+			}
+		}
+
+		$object->__construct();
+		return $object;
+	}
+
+	/**
 	 * @return string
 	 */
 	private static function cachename()

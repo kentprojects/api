@@ -5,6 +5,7 @@
  * @link: http://kentprojects.com
  */
 
+/** @noinspection PhpUndefinedClassInspection */
 abstract class Database
 {
 	/**
@@ -61,6 +62,7 @@ abstract class Database
 	}
 }
 
+/** @noinspection PhpUndefinedClassInspection */
 class _Database_Query
 {
 	/**
@@ -155,6 +157,7 @@ class _Database_Query
 	}
 }
 
+/** @noinspection PhpUndefinedClassInspection */
 class _Database_Result implements Countable
 {
 	/**
@@ -167,7 +170,7 @@ class _Database_Result implements Countable
 	 * Defines the format of the results.
 	 * @var string
 	 */
-	protected $type = 'object';
+	protected $type = "object";
 
 	/**
 	 * Builds a new Database Result object.
@@ -190,13 +193,14 @@ class _Database_Result implements Countable
 	 */
 	public function as_assoc()
 	{
-		$this->type = 'assoc';
+		$this->type = "assoc";
 		return $this;
 	}
 
 	/**
 	 * Set the class to return results as a class.
 	 *
+	 * @param string $name
 	 * @return $this
 	 */
 	public function as_class($name)
@@ -213,7 +217,7 @@ class _Database_Result implements Countable
 	 */
 	public function as_object()
 	{
-		$this->type = 'object';
+		$this->type = "object";
 		return $this;
 	}
 
@@ -226,11 +230,11 @@ class _Database_Result implements Countable
 	{
 		$results = array();
 		switch($this->type) {
-			case 'assoc':
+			case "assoc":
 				while ($row = $this->results->fetch_assoc())
 					$results[] = $row;
 			break;
-			case 'object':
+			case "object":
 				while ($row = $this->results->fetch_object())
 					$results[] = $row;
 			break;
@@ -295,6 +299,7 @@ class _Database_Result implements Countable
 	}
 }
 
+/** @noinspection PhpUndefinedClassInspection */
 class _Database_State
 {
 	/**
