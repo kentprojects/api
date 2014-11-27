@@ -19,7 +19,7 @@ class Authentication_Confirm extends Authentication_Abstract
 	 */
 	public function action()
 	{
-		if ($this->request->query("auth") === null)
+		if ($this->request->post("auth") === null)
 		{
 			throw new HttpStatusException(400, "Missing state code.");
 		}
@@ -54,7 +54,7 @@ class Authentication_Confirm extends Authentication_Abstract
 	private function validateCode()
 	{
 		$statement = Database::prepare("SELECT `user_id` FROM `Authentication` WHERE `token` = ?", "s");
-		$user_id = $statement->execute($this->request->query("auth"))->singleval();
+		$user_id = $statement->execute($this->request->post("auth"))->singleval();
 		return (empty($user_id)) ? null : Model_User::getById($user_id);
 	}
 }

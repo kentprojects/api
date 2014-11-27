@@ -37,7 +37,7 @@ class Authentication_Internal extends Authentication_Abstract
 			"username" => "mjw59"
 		),
 	);
-	protected $success = "/success.html";
+	protected $success = "/login.php";
 	
 	/**
 	 * The main action this authentication provider uses.
@@ -72,7 +72,7 @@ class Authentication_Internal extends Authentication_Abstract
 			$user->setRole($authUser["role"]);
 			$user->save();
 		}
-		
-        throw new HttpRedirectException(302, $url["scheme"]."://".$url["host"].(!empty($url["port"])?":".$url["port"]:"").$this->success."#".$this->generateAuthToken($user));
+
+		throw new HttpRedirectException(302, $url["scheme"] . "://" . $url["host"] . (!empty($url["port"]) ? ":" . $url["port"] : "") . $this->success . "?auth=" . $this->generateAuthToken($user));
 	}
 }
