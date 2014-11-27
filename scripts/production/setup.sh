@@ -61,17 +61,17 @@ fi
 sudo -u kentprojects mkdir /home/kentprojects/.ssh
 sudo -u kentprojects chmod 700 /home/kentprojects/.ssh
 if $INCLUDE_DEV; then
-	sudo -u kentprojects cp /var/www/kentprojects-api-dev/vagrant/production/keys.txt /home/kentprojects/.ssh/authorized_keys
+	sudo -u kentprojects cp /var/www/kentprojects-api-dev/vagrant/scripts/production/keys.txt /home/kentprojects/.ssh/authorized_keys
 else
-	sudo -u kentprojects cp /var/www/kentprojects-api/vagrant/production/keys.txt /home/kentprojects/.ssh/authorized_keys
+	sudo -u kentprojects cp /var/www/kentprojects-api/vagrant/scripts/production/keys.txt /home/kentprojects/.ssh/authorized_keys
 fi
 sudo -u kentprojects chmod 644 /home/kentprojects/.ssh/authorized_keys
 
 # Setup the Apache environment
 sudo rm /etc/apache2/sites-enabled/*
-sudo ln -s /var/www/kentprojects-api/vagrant/production/apache.conf /etc/apache2/sites-enabled/01-KentProjects-Live.conf
-$INCLUDE_DEV && sudo ln -s /var/www/kentprojects-api-dev/vagrant/production/apache.dev.conf /etc/apache2/sites-enabled/02-KentProjects-Dev.conf
-false && sudo ln -s /var/www/kentprojects-api/vagrant/production/apache.deployer.conf /etc/apache2/sites-enabled/03-Deployer.conf
+sudo ln -s /var/www/kentprojects-api/vagrant/scripts/production/apache.conf /etc/apache2/sites-enabled/01-KentProjects-Live.conf
+$INCLUDE_DEV && sudo ln -s /var/www/kentprojects-api-dev/vagrant/scripts/production/apache.dev.conf /etc/apache2/sites-enabled/02-KentProjects-Dev.conf
+false && sudo ln -s /var/www/kentprojects-api/vagrant/scripts/production/apache.deployer.conf /etc/apache2/sites-enabled/03-Deployer.conf
 
 sudo service apache2 restart
 
