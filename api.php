@@ -29,7 +29,7 @@ $request->setHeaders(apache_request_headers());
  * Set the GET and POST data.
  */
 $request->setQueryData($_GET);
-$request->setPostData(json_decode(file_get_contents("php://input")));
+$request->setPostData(json_decode(file_get_contents("php://input"), true));
 
 /**
  * Execute the request and send the response.

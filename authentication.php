@@ -21,7 +21,7 @@ if (!($request instanceof Request_Internal))
 }
 $request->setHeaders(apache_request_headers());
 $request->setQueryData($_GET);
-$request->setPostData(json_decode(file_get_contents("php://input")));
+$request->setPostData(json_decode(file_get_contents("php://input"), true));
 $response = new Response;
 
 try
