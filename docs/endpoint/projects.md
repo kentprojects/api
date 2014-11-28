@@ -7,14 +7,6 @@ title: Projects
 GET /projects HTTP/1.1
 ```
 
-This endpoint allows you to get a list of projects based on certain criteria.
-
-## Get all the projects
-
-```http
-GET /projects HTTP/1.1
-```
-
 That's a simple GET request to get all the projects. That will return:
 
 ```http

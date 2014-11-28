@@ -72,7 +72,7 @@ final class Controller_Group extends Controller
 			 */
 			throw new HttpStatusException(501, "Updating a group is coming soon.");
 		}
-		elseif ($this->request->getMethod() === Request::PUT)
+		elseif ($this->request->getMethod() === Request::DELETE)
 		{
 			/**
 			 * DELETE /group/:id
