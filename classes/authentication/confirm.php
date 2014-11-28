@@ -45,7 +45,7 @@ class Authentication_Confirm extends Authentication_Abstract
 	 */
 	private function clearCode()
 	{
-		Database::prepare("DELETE FROM `Authentication` WHERE `token` = ?", "s")->execute($this->request->query("auth"));
+		Database::prepare("DELETE FROM `Authentication` WHERE `token` = ?", "s")->execute($this->request->query("code"));
 	}
 	
 	/**
@@ -54,7 +54,7 @@ class Authentication_Confirm extends Authentication_Abstract
 	private function validateCode()
 	{
 		$statement = Database::prepare("SELECT `user_id` FROM `Authentication` WHERE `token` = ?", "s");
-		$user_id = $statement->execute($this->request->post("auth"))->singleval();
+		$user_id = $statement->execute($this->request->post("code"))->singleval();
 		return (empty($user_id)) ? null : Model_User::getById($user_id);
 	}
 }
