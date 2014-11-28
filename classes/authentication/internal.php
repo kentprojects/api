@@ -10,7 +10,7 @@ class Authentication_Internal extends Authentication_Abstract
 	 * @var string
 	 */
 	protected $authentication = Auth::NONE;
-	
+
 	protected $fakecodes = array(
 		"f4dfeada0e91e1791a80da1bb26a7d96" => array(
 			"role" => "staff",
@@ -38,7 +38,7 @@ class Authentication_Internal extends Authentication_Abstract
 		),
 	);
 	protected $success = "/login.php";
-	
+
 	/**
 	 * The main action this authentication provider uses.
 	 *
@@ -52,23 +52,23 @@ class Authentication_Internal extends Authentication_Abstract
 		{
 			throw new HttpStatusException(400, "Missing state code.");
 		}
-		
+
 		$url = parse_url($_SERVER["HTTP_REFERER"]);
-		
+
 		if (!array_key_exists($this->request->query("auth"), $this->fakecodes))
 		{
 			throw new HttpStatusException(400, "Invalid state code.");
 		}
-		
+
 		$authUser = $this->fakecodes[$this->request->query("auth")];
-		
+
 		// print_r($url); print_r($authUser); exit(1);
-		
-		$user = Model_User::getByEmail($authUser["username"]."@kent.ac.uk");
+
+		$user = Model_User::getByEmail($authUser["username"] . "@kent.ac.uk");
 		if (empty($user))
 		{
 			$user = new Model_User;
-			$user->setEmail($authUser["username"]."@kent.ac.uk");
+			$user->setEmail($authUser["username"] . "@kent.ac.uk");
 			$user->setRole($authUser["role"]);
 			$user->save();
 		}
