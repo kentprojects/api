@@ -1,8 +1,24 @@
 [
 	{
-		"project_id": 1
+		"project_id": 1,
+		"year": 2014,
+		"group_id": null,
+		"name": "Kettle Project",
+		"slug": "kettle-project",
+		"creator_id": 2,
+		"created": "2014-10-23 09:32:54",
+		"updated": "2014-10-23 09:32:54",
+		"status": 1
 	},
 	{
-		"project_id": 2
+		"project_id": 2,
+		"year": 2014,
+		"group_id": null,
+		"name": "Knock The Cup",
+		"slug": "knock-the-cup",
+		"creator_id": 3,
+		"created": "2014-12-13 16:35:12",
+		"updated": "2014-12-13 16:35:12",
+		"status": 1
 	}
 ]
