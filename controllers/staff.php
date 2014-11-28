@@ -40,7 +40,7 @@ final class Controller_Staff extends Controller
 			{
 				/**
 				 * DELETE /staff/:id
-				 * Used to update staff!
+				 * Used to delete staff!
 				 */
 				throw new HttpStatusException(501, "Deleting a staff member is coming soon.");
 			}
