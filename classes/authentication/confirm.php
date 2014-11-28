@@ -19,7 +19,7 @@ class Authentication_Confirm extends Authentication_Abstract
 	 */
 	public function action()
 	{
-		if ($this->request->post("auth") === null)
+		if ($this->request->post("code") === null)
 		{
 			throw new HttpStatusException(400, "Missing state code.");
 		}
