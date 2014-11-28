@@ -53,6 +53,8 @@ class Authentication_Internal extends Authentication_Abstract
 			throw new HttpStatusException(400, "Missing state code.");
 		}
 
+		error_log("THE CODE ON THE API IS " . $this->request->query("auth"));
+
 		$url = parse_url($_SERVER["HTTP_REFERER"]);
 
 		if (!array_key_exists($this->request->query("auth"), $this->fakecodes))
