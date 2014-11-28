@@ -18,7 +18,7 @@ GET /student/:id HTTP/1.1
 That's a simple GET request to get specific student by their ID. That will return:
 
 ```http
-	HTTP/1.1 200 OK
+HTTP/1.1 200 OK
 ```
 
 ```json
