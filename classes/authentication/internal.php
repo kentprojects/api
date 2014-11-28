@@ -53,8 +53,6 @@ class Authentication_Internal extends Authentication_Abstract
 			throw new HttpStatusException(400, "Missing state code.");
 		}
 
-		error_log("THE CODE ON THE API IS " . $this->request->query("auth"));
-
 		$url = parse_url($_SERVER["HTTP_REFERER"]);
 
 		if (!array_key_exists($this->request->query("auth"), $this->fakecodes))
@@ -75,6 +73,6 @@ class Authentication_Internal extends Authentication_Abstract
 			$user->save();
 		}
 
-		throw new HttpRedirectException(302, $url["scheme"] . "://" . $url["host"] . (!empty($url["port"]) ? ":" . $url["port"] : "") . $this->success . "?auth=" . $this->generateAuthToken($user));
+		throw new HttpRedirectException(302, $url["scheme"] . "://" . $url["host"] . (!empty($url["port"]) ? ":" . $url["port"] : "") . $this->success . "?success=" . $this->generateAuthToken($user));
 	}
 }
