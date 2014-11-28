@@ -89,7 +89,7 @@ abstract class Model_Abstract implements JsonSerializable
 	 */
 	public static function returnFields(array $fields)
 	{
-		static::$limitFields[get_called_class()] = array_merge(array("id"), $fields);
+		self::$limitFields[get_called_class()] = array_merge(array("id"), $fields);
 	}
 	
 	/**
@@ -146,11 +146,11 @@ abstract class Model_Abstract implements JsonSerializable
 	 */
 	protected function validateFields(array $jsonSerialized)
 	{
-		if (!empty(static::$limitFields[get_called_class()]))
+		if (!empty(self::$limitFields[get_called_class()]))
 		{
 			foreach ($jsonSerialized as $key => $value)
 			{
-				if (!in_array($key, static::$limitFields[get_called_class()]))
+				if (!in_array($key, self::$limitFields[get_called_class()]))
 				{
 					unset($jsonSerialized[$key]);
 				}
