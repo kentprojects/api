@@ -11,8 +11,8 @@ pushd "$BASE_PATH"
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-if false && [ "$CURRENT_BRANCH" != "master" ] && [[ $CURRENT_BRANCH != "hotfix*" ]]; then
-	printf "$FAIL The current working directory at $BASE_PATH isn't at the 'master' branch.\n"
+if false && [ "$CURRENT_BRANCH" != "master" ] || [[ $CURRENT_BRANCH != hotfix* ]]; then
+	printf "$FAIL The current working directory at $BASE_PATH isn't at the 'master' or a 'hotfix' branch.\n"
 	exit 2
 fi
 
@@ -26,7 +26,7 @@ printf "$GOOD Repository looks good!\n\n"
 printf "This hotfix script is designed to create a hotfix branch for quick fixes to the master branch.\n"
 printf "The hotfix branch will be merged back into master & develop to ensure changes aren't lost!\n\n"
 
-if [[ $CURRENT_BRANCH == "hotfix*" ]]; then
+if [[ $CURRENT_BRANCH == hotfix* ]]; then
 	printf "$TASK This script will merge your hotfix branch into the 'master' and 'develop' branches.\n"
 	printf "$TASK This will complete the hotfix and return you to 'master'!\n"
 	Question "Do you wish to proceed?" "User declined to close a hotfix."
