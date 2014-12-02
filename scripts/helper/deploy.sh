@@ -1,10 +1,7 @@
 #!/bin/sh
 
 CURRENT_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-
-if [ -z "$BASE_PATH" ]; then
-	BASE_PATH=$(dirname $(dirname $CURRENT_PATH))
-fi
+BASE_PATH=$(dirname $(dirname $CURRENT_PATH))
 
 source "$CURRENT_PATH/functions.sh"
 pushd "$BASE_PATH"

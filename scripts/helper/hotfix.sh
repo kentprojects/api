@@ -1,22 +1,19 @@
 #!/bin/sh
 
 CURRENT_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-
-if [ -z "$BASE_PATH" ]; then
-	BASE_PATH=$(dirname $(dirname $CURRENT_PATH))
-fi
+BASE_PATH=$(dirname $(dirname $CURRENT_PATH))
 
 source "$CURRENT_PATH/functions.sh"
 pushd "$BASE_PATH"
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-if false && [ "$CURRENT_BRANCH" != "master" ] || [[ $CURRENT_BRANCH != hotfix* ]]; then
+if [ "$CURRENT_BRANCH" != "master" ] || [[ $CURRENT_BRANCH != hotfix* ]]; then
 	printf "$FAIL The current working directory at $BASE_PATH isn't at the 'master' branch.\n"
 	exit 2
 fi
 
-if false && ! git diff-index --quiet HEAD --; then
+if ! git diff-index --quiet HEAD --; then
 	printf "$FAIL The current working directory at $BASE_PATH has some outstanding changes.\n"
 	printf "$USER Please handle all outstanding changes before hotfixing.\n"
 	exit 1

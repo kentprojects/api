@@ -1,7 +1,5 @@
 #!/bin/sh
 
-BASE_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-
 case "$1" in
 	"deploy") sh scripts/helper/deploy.sh ;;
 	"hotfix") sh scripts/helper/hotfix.sh ;;
