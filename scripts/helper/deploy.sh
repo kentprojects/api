@@ -42,7 +42,7 @@ Question "Do you wish to proceed?" "User declined the deployment."
 
 git pull &&
 git checkout $DESTINATION_BRANCH &&
-git merge --no-ff $SOURCE_BRANCH &&
+git merge --no-ff $SOURCE_BRANCH -m "Merging develop branch with master branch." &&
 git push origin $DESTINATION_BRANCH &&
 git checkout $SOURCE_BRANCH
 

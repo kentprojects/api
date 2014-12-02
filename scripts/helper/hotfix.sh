@@ -12,7 +12,7 @@ pushd "$BASE_PATH"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 if false && [ "$CURRENT_BRANCH" != "master" ] || [[ $CURRENT_BRANCH != hotfix* ]]; then
-	printf "$FAIL The current working directory at $BASE_PATH isn't at the 'master' or a 'hotfix' branch.\n"
+	printf "$FAIL The current working directory at $BASE_PATH isn't at the 'master' branch.\n"
 	exit 2
 fi
 
@@ -32,9 +32,9 @@ if [[ $CURRENT_BRANCH == hotfix* ]]; then
 	Question "Do you wish to proceed?" "User declined to close a hotfix."
 
 	git checkout master
-	git merge --no-ff $CURRENT_BRANCH
+	git merge --no-ff $CURRENT_BRANCH -m "Merging hotfix '$CURRENT_BRANCH' with master."
 	git checkout develop
-	git merge --no-ff $CURRENT_BRANCH
+	git merge --no-ff $CURRENT_BRANCH -m "Merging hotfix '$CURRENT_BRANCH' with develop."
 	git branch -d $CURRENT_BRANCH
 	git checkout master
 	git push --all origin
@@ -47,7 +47,7 @@ else
 
 	# Check the $HOTFIX_SLUG?
 
-	git checkout -b "hotfix/"$(date +"%Y-%m-%d")"$HOTFIX_SLUG" master
+	git checkout -b "hotfix/"$(date +"%Y-%m-%d")"-$HOTFIX_SLUG" master
 fi
 
 popd
