@@ -36,7 +36,6 @@ To keep the changes made in the release branch, we need to merge those back into
 	Finishing a release branch
 	$ git checkout master
 	$ git merge --no-ff release/0.2
-	$ git tag -a 0.2
 	$ git checkout develop
 	$ git merge --no-ff release/0.2
 	$ git branch -d release/0.2
@@ -57,7 +56,6 @@ For resolving critical bugs just after a release.
 	Finishing a hotfix branch
 	$ git checkout master
 	$ git merge --no-ff hotfix/0.2.1
-	$ git tag -a 0.2.1
 	$ git checkout develop
 	$ git merge --no-ff hotfix/0.2.1
 	$ git branch -d hotfix/0.2.1
