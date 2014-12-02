@@ -1,3 +1,11 @@
+```
+/**
+ * @author: KentProjects <developer@kentprojects.com>
+ * @license: Copyright KentProjects
+ * @link: http://kentprojects.com
+ */
+```
+
 # Setting up a KentProjects production environment
 
 Well. This bit is meant to be fun!
