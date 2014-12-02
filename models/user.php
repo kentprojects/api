@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-final class Model_User extends Model_Abstract
+final class Model_User extends Model
 {
 	/**
 	 * @var array

@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-abstract class Model_Student extends Model_Abstract
+abstract class Model_Student extends Model
 {
 	/**
 	 * Get a student by their Email.

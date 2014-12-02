@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-class Model_Year extends Model_Abstract
+class Model_Year extends Model
 {
 	/**
 	 * @return Model_Year

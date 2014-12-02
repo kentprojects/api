@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-class Model_Group extends Model_Abstract
+class Model_Group extends Model
 {
 	/**
 	 * Get the relevant Group by it's ID.
