@@ -4,9 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-
-/** @noinspection PhpUndefinedClassInspection */
-final class Database
+final class DatabaseStub
 {
 	/**
 	 * @var array
@@ -46,20 +44,26 @@ final class Database
 		return static::$dataSets[$model];
 	}
 
-	public static function prepare($query, $types = "", $format = "")
+	public static function prepare(/** @noinspection PhpUnusedParameterInspection */
+		$query, $types = "", $format = "")
 	{
 		$backtrace = debug_backtrace();
 		array_shift($backtrace);
+		array_shift($backtrace);
 		$function = array_shift($backtrace);
+
+		if ($function["class"] == "Query")
+		{
+			$function = array_shift($backtrace);
+		}
 
 		//throw new Exception(print_r($function, true));
 
-		return new _Database_Query($function["class"], $function["function"], $function["args"], $format);
+		return new _Database_Query_Stub($function["class"], $function["function"], $function["args"], $format);
 	}
 }
 
-/** @noinspection PhpUndefinedClassInspection */
-class _Database_Query
+class _Database_Query_Stub
 {
 	/**
 	 * @var array
@@ -100,11 +104,15 @@ class _Database_Query
 	 * Runs the query.
 	 *
 	 * @throws DatabaseException
-	 * @throws Exception
-	 * @return _Database_Result|_Database_State
+	 * @return _Database_Result_Stub|_Database_State_Stub
 	 */
 	public function execute()
 	{
+		if (strpos($this->class, "Controller_") === 0)
+		{
+			return (new _Database_Controllers_Query_Stub($this))->execute();
+		}
+
 		switch ($this->function)
 		{
 			case "getByEmail":
@@ -120,25 +128,26 @@ class _Database_Query
 					throw new DatabaseException("Missing argument for {$this->function}.");
 				}
 
-				$data = Database::load($this->class);
+				$data = DatabaseStub::load($this->class);
 				if (empty($data))
 				{
-					return new _Database_Result($this, array());
+					return new _Database_Result_Stub($this, array());
 				}
 
-				$idField = Database::getIdFieldFromClass($this->class);
+				$idField = DatabaseStub::getIdFieldFromClass($this->class);
 				foreach ($data as $item)
 				{
 					if ($item->$idField === $id)
 					{
-						return new _Database_Result($this, array($item));
+						return new _Database_Result_Stub($this, array($item));
 					}
 				}
-				return new _Database_Result($this, array());
+				return new _Database_Result_Stub($this, array());
 				break;
 			default:
 				throw new DatabaseException("Method {$this->function} doesn't exist in the fake Database class.");
 		}
+
 		return null;
 	}
 
@@ -175,11 +184,10 @@ class _Database_Query
 	}
 }
 
-/** @noinspection PhpUndefinedClassInspection */
-class _Database_Result implements Countable
+class _Database_Result_Stub implements Countable
 {
 	/**
-	 * @var _Database_Query
+	 * @var _Database_Query_Stub
 	 */
 	protected $query;
 	/**
@@ -194,10 +202,10 @@ class _Database_Result implements Countable
 	/**
 	 * Builds a new Database Result object.
 	 *
-	 * @param _Database_Query $query
+	 * @param _Database_Query_Stub $query
 	 * @param array $results
 	 */
-	public function __construct(_Database_Query $query, array $results)
+	public function __construct(_Database_Query_Stub $query, array $results)
 	{
 		$this->query = $query;
 		$this->results = $results;
@@ -262,11 +270,11 @@ class _Database_Result implements Countable
 			case "object":
 				break;
 			default:
-				/** @var Model_Abstract $class */
+				/** @var Model $class */
 				$class = $this->query->getFormat();
 				foreach ($this->results as &$result)
 				{
-					$result = $class::build($result, Database::getIdFieldFromClass($this->query->getFormat()));
+					$result = $class::build($result, DatabaseStub::getIdFieldFromClass($this->query->getFormat()));
 				}
 		}
 		return $this->results;
@@ -325,8 +333,7 @@ class _Database_Result implements Countable
 	}
 }
 
-/** @noinspection PhpUndefinedClassInspection */
-class _Database_State
+class _Database_State_Stub
 {
 	/**
 	 * The number of affected rows from the query.
@@ -359,5 +366,57 @@ class _Database_State
 		$this->affected_rows = $affected_rows;
 		$this->insert_id = $insert_id;
 		$this->num_rows = $num_rows;
+	}
+}
+
+final class _Database_Controllers_Query_Stub
+{
+	/**
+	 * @var _Database_Query_Stub
+	 */
+	protected $query;
+
+	/**
+	 * @param _Database_Query_Stub $query
+	 */
+	public function __construct(_Database_Query_Stub $query)
+	{
+		$this->query = $query;
+	}
+
+	/**
+	 * Runs the query for a controller.
+	 *
+	 * @return _Database_Result_Stub
+	 */
+	public function execute()
+	{
+		switch ($this->query->getClass())
+		{
+			case "Controller_Projects":
+				return $this->runControllerProjects();
+				break;
+		}
+		return null;
+	}
+
+	/**
+	 * Runs the query for the projects controller.
+	 *
+	 * @return _Database_Result_Stub
+	 */
+	private function runControllerProjects()
+	{
+		switch ($this->query->getFunction())
+		{
+			case "action_index":
+				$data = DatabaseStub::load($this->query->getClass());
+				if (empty($data))
+				{
+					return new _Database_Result_Stub($this->query, array());
+				}
+				break;
+		}
+		return null;
 	}
 }
