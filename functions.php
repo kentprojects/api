@@ -42,8 +42,9 @@ spl_autoload_register(
 		}
 		/**
 		 * If the word "_Map" exists in this class, handle it.
+		 * Checking to see if "Map" exists in general will make this function quicker for other classes!
 		 */
-		elseif (strpos($class, "_Map") !== false)
+		elseif ((strpos($class, "Map") !== false) && (strpos($class, "Map") === (strlen($class) - 3)))
 		{
 			$filename = APPLICATION_PATH . "/models/maps/" . str_replace("_", "", strtolower($class)) . ".php";
 		}

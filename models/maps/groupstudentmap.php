@@ -4,10 +4,10 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  *
- * Class Group_Student_Map
+ * Class GroupStudentMap
  * This class is designed to bring two objects together by way of a map table.
  */
-class Group_Student_Map extends ModelMap
+class GroupStudentMap extends ModelMap
 {
 	/**
 	 * @param Model_Group $group

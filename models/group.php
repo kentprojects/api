@@ -60,6 +60,11 @@ class Model_Group extends Model
 	protected $status;
 
 	/**
+	 * @var GroupStudentMap
+	 */
+	private $students;
+
+	/**
 	 * The reason for the @noinspection lines is because when the Database builds the model, the other 'Model' values
 	 * are actually ids, and the models need fetching.
 	 *
@@ -77,10 +82,28 @@ class Model_Group extends Model
 			$this->creator = Model_User::getById($this->creator);
 			return;
 		}
+		else
+		{
+			if (empty($year))
+			{
+				trigger_error("Missing YEAR passed to the GROUP constructor", E_USER_ERROR);
+			}
+			$this->year = $year;
 
-		$this->year = $year;
-		$this->name = $name;
-		$this->creator = $creator;
+			if (empty($name))
+			{
+				trigger_error("Missing NAME passed to the GROUP constructor", E_USER_ERROR);
+			}
+			$this->name = $name;
+
+			if (empty($creator))
+			{
+				trigger_error("Missing CREATOR passed to the GROUP constructor", E_USER_ERROR);
+			}
+			$this->creator = $creator;
+		}
+
+		$this->students = new GroupStudentMap($this);
 	}
 
 	/**
@@ -149,6 +172,7 @@ class Model_Group extends Model
 			array(
 				"year" => (string)$this->year,
 				"name" => $this->name,
+				"students" => $this->students,
 				"creator" => $this->creator,
 				"created" => $this->created,
 				"updated" => $this->updated

@@ -44,7 +44,10 @@ abstract class ModelMap implements IteratorAggregate, JsonSerializable
 			$this->saveSQL = $saveSQL;
 		}
 
-		$this->fetch();
+		if ($this->source->getId() !== null)
+		{
+			$this->fetch();
+		}
 	}
 
 	/**
@@ -73,12 +76,7 @@ abstract class ModelMap implements IteratorAggregate, JsonSerializable
 	 */
 	public function clear()
 	{
-		if (empty($this->clearSQL))
-		{
-			throw new InvalidArgumentException("Missing clearSQL for " . get_called_class());
-		}
-
-		Database::prepare($this->clearSQL, "i")->execute($this->source->getId());
+		$this->data = array();
 	}
 
 	/**
@@ -111,7 +109,7 @@ abstract class ModelMap implements IteratorAggregate, JsonSerializable
 	/**
 	 * Useful so the ModelMap can partake in a foreach loop.
 	 *
-	 * @return array|Traversable
+	 * @return array
 	 */
 	public function getIterator()
 	{
@@ -149,24 +147,34 @@ abstract class ModelMap implements IteratorAggregate, JsonSerializable
 	 */
 	public function save()
 	{
-		if (empty($this->saveSQL))
+		if (empty($this->clearSQL))
 		{
-			throw new InvalidArgumentException("Missing saveSQL for " . get_called_class());
+			throw new InvalidArgumentException("Missing clearSQL for " . get_called_class());
 		}
 
-		$query = array();
-		$types = "";
-		$values = array();
+		Database::prepare($this->clearSQL, "i")->execute($this->source->getId());
 
-		foreach ($this->data as $id => $model)
+		if (empty($this->data))
 		{
-			$query[] = "(?,?)";
-			$types .= "ii";
-			$values[] = $id;
+			return;
 		}
 
-		$this->clear();
-		$statement = Database::prepare(str_replace("(?,?)", implode(", ", $query), $this->saveSQL), $types);
-		call_user_func_array(array($statement, "execute"), $values);
+		if (!empty($this->saveSQL))
+		{
+			$query = array();
+			$types = "";
+			$values = array();
+
+			foreach ($this->data as $id => $model)
+			{
+				$query[] = "(?,?)";
+				$types .= "ii";
+				$values[] = $id;
+			}
+
+			$this->clear();
+			$statement = Database::prepare(str_replace("(?,?)", implode(", ", $query), $this->saveSQL), $types);
+			call_user_func_array(array($statement, "execute"), $values);
+		}
 	}
 }
