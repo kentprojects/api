@@ -112,6 +112,7 @@ final class Auth
 
 			if ($local !== $this->request->query("signature"))
 			{
+				/*
 				error_log(json_encode(array(
 					"INVALID" => "SIGNATURE",
 					"local" => $local,
@@ -120,6 +121,7 @@ final class Auth
 					"app" => $this->application,
 					"sum" => config("checksum", "salt") . $this->application->secret . json_encode($query)
 				)));
+				*/
 				throw new HttpStatusException(400, "Invalid signature.");
 			}
 
