@@ -46,15 +46,9 @@ class EyeRequest
 	}
 }
 
-if (file_exists(__DIR__ . "/config.production.ini"))
-{
-	$config = parse_ini_file(__DIR__ . "/config.production.ini", true);
-}
-else
-{
-	$config = parse_ini_file(__DIR__ . "/config.ini", true);
-}
-
+$config = (file_exists(__DIR__ . "/config.production.ini"))
+	? parse_ini_file(__DIR__ . "/config.production.ini", true)
+	: parse_ini_file(__DIR__ . "/config.ini", true);
 $request = new EyeRequest;
 $signRequest = true;
 $urlParams = array();
