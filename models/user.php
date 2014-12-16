@@ -96,6 +96,14 @@ final class Model_User extends Model
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return trim($this->first_name . " " . $this->last_name);
+	}
+
+	/**
 	 * @return bool
 	 */
 	public function isConvener()
@@ -147,6 +155,7 @@ final class Model_User extends Model
 			parent::jsonSerialize(),
 			array(
 				"email" => $this->email,
+				"name" => $this->getName(),
 				"first_name" => $this->first_name,
 				"last_name" => $this->last_name,
 				"role" => $this->role
