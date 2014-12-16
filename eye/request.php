@@ -243,13 +243,17 @@ if (!empty($response["json"]))
 	/**
 	 * @var array|stdClass|null
 	 */
-	$response["body"] = json_encode($response["json"], JSON_PRETTY_PRINT);
+	$response["body"] = json_encode($response["json"], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+}
+else
+{
+	$response["body"] = $response["json"];
 }
 
 echo <<<EOT
 	<hr/>
 
 	<p><pre><a href="{$request->url}" target="_blank">{$request->url}</a></pre></p>
-	<pre>{$response["body"]}</pre>
+	<pre><code>{$response["body"]}</code></pre>
 	<pre>{$response["info"]}</pre>
 EOT;
