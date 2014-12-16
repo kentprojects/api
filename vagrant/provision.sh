@@ -4,18 +4,16 @@
 # @license: Copyright KentProjects
 # @link: http://kentprojects.com
 #
-
 locale-gen en_GB.UTF-8
 
 apt-get update
 debconf-set-selections <<< "mysql-server mysql-server/root_password password password"
 debconf-set-selections <<< "mysql-server mysql-server/root_password_again password password"
-
-apt-get install -y mysql-server apache2 curl screen &&
+apt-get install -y mysql-server apache2 curl screen && \
 apt-get install -y php5 php5-cli php5-curl php5-mysqlnd php5-json
 
 if [ "$?" != "0" ]; then
-	echo "Something went wrong trying to install the packages. Aborting."
+	echo "Something went wrong trying to install the packages. ABORTING."
 	exit 1
 fi
 
