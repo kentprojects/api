@@ -42,7 +42,7 @@ final class Controller_Students extends Controller
 			 */
 			$query->join(array(
 				"table" => "User_Year_Map",
-				"how" => "USING",
+				"operator" => Query::USING,
 				"field" => "user_id"
 			));
 			$query->where(array(
