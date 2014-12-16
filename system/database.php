@@ -34,11 +34,6 @@ abstract class Database
 	 */
 	public static function prepare($query, $types = "", $format = null)
 	{
-		if (USE_DATABASE_STUB)
-		{
-			return DatabaseStub::prepare($query, $types, $format);
-		}
-
 		if (empty(static::$mysqli))
 		{
 			static::$mysqli = @new mysqli(
