@@ -49,6 +49,7 @@ class EyeRequest
 $config = (file_exists(__DIR__ . "/config.production.ini"))
 	? parse_ini_file(__DIR__ . "/config.production.ini", true)
 	: parse_ini_file(__DIR__ . "/config.ini", true);
+
 $request = new EyeRequest;
 $signRequest = true;
 $urlParams = array();
@@ -62,7 +63,9 @@ if (!empty($_POST["url"]))
 {
 	$request->url = $_POST["url"];
 }
-EyeRequest::$salt = (stripos($request->url, "api.dev") === false) ? $config["live-api"] : $config["dev-api"];
+EyeRequest::$salt = (stripos($request->url, "api.dev") === false)
+	? $config["live-api"]["salt"]
+	: $config["dev-api"]["salt"];
 
 if (!empty($_POST["params-keys"]))
 {
