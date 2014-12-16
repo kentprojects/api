@@ -6,9 +6,21 @@
  */
 class EyeRequest
 {
+	/**
+	 * @var int
+	 */
 	public static $expires = 600;
+	/**
+	 * @var string
+	 */
 	public static $key;
-	public static $salt = "";
+	/**
+	 * @var string
+	 */
+	public static $salt;
+	/**
+	 * @var string
+	 */
 	public static $secret;
 
 	/**
@@ -26,15 +38,33 @@ class EyeRequest
 		$params["signature"] = md5(static::$salt . static::$secret . json_encode($params));
 	}
 
+	/**
+	 * @var string
+	 */
 	public $body = "";
+	/**
+	 * @var array
+	 */
 	public $headers = array(
 		"Accept" => "application/json",
 		"Content-Type" => "application/json"
 	);
+	/**
+	 * @var string
+	 */
 	public $method = "GET";
+	/**
+	 * @var array
+	 */
 	public $params = array();
+	/**
+	 * @var string
+	 */
 	public $url;
 
+	/**
+	 * @return string[]
+	 */
 	public function getHeaders()
 	{
 		$headers = array();
@@ -46,12 +76,24 @@ class EyeRequest
 	}
 }
 
+/**
+ * @var array
+ */
 $config = (file_exists(__DIR__ . "/config.production.ini"))
 	? parse_ini_file(__DIR__ . "/config.production.ini", true)
 	: parse_ini_file(__DIR__ . "/config.ini", true);
 
+/**
+ * @var EyeRequest
+ */
 $request = new EyeRequest;
+/**
+ * @var bool
+ */
 $signRequest = true;
+/**
+ * @var array
+ */
 $urlParams = array();
 
 if (!empty($_POST["method"]))
@@ -63,6 +105,7 @@ if (!empty($_POST["url"]))
 {
 	$request->url = $_POST["url"];
 }
+
 EyeRequest::$salt = (stripos($request->url, "api.dev") === false)
 	? $config["live-api"]["salt"]
 	: $config["dev-api"]["salt"];
@@ -117,6 +160,7 @@ if (strpos($request->url, "?") > 1)
 }
 
 $urlParams = array_merge($urlParams, $request->params);
+
 if (!empty($request->body))
 {
 	$request->body = json_encode($request->body);
@@ -141,7 +185,9 @@ if (!empty($urlParams))
 	$request->url = sprintf("%s?%s", $request->url, http_build_query($urlParams, "", "&"));
 }
 
-// Initiate the CURL object.
+/**
+ * Initiate the CURL object.
+ */
 $ch = curl_init();
 $fh = null;
 
@@ -174,7 +220,11 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 curl_setopt($ch, CURLOPT_URL, $request->url);
 
-// Run the CURL request.
+/**
+ * Run the CURL request.
+ *
+ * @var array
+ */
 $response = array(
 	"body" => curl_exec($ch),
 	"info" => curl_getinfo($ch),
@@ -190,15 +240,16 @@ $response["info"] = print_r($response["info"], true);
 $response["json"] = json_decode($response["body"]);
 if (!empty($response["json"]))
 {
+	/**
+	 * @var array|stdClass|null
+	 */
 	$response["body"] = json_encode($response["json"], JSON_PRETTY_PRINT);
 }
 
 echo <<<EOT
-
 	<hr/>
 
 	<p><pre><a href="{$request->url}" target="_blank">{$request->url}</a></pre></p>
 	<pre>{$response["body"]}</pre>
 	<pre>{$response["info"]}</pre>
-
 EOT;
