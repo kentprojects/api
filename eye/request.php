@@ -8,6 +8,7 @@ class EyeRequest
 {
 	public static $expires = 600;
 	public static $key;
+	public static $salt = "";
 	public static $secret;
 
 	/**
@@ -16,13 +17,13 @@ class EyeRequest
 	 */
 	public static function checksum(array &$params)
 	{
-		unset($params["sig"]);
+		unset($params["signature"]);
 		ksort($params);
 		array_walk($params, function (&$v)
 		{
 			$v = (string)$v;
 		});
-		$params["signature"] = md5(static::$secret . serialize($params));
+		$params["signature"] = md5(static::$salt . static::$secret . json_encode($params));
 	}
 
 	public $body = "";
@@ -45,6 +46,7 @@ class EyeRequest
 	}
 }
 
+$config = parse_ini_file(__DIR__ . "/config.ini", true);
 $request = new EyeRequest;
 $signRequest = true;
 $urlParams = array();
@@ -53,10 +55,13 @@ if (!empty($_POST["method"]))
 {
 	$request->method = strtoupper($_POST["method"]);
 }
+
 if (!empty($_POST["url"]))
 {
 	$request->url = $_POST["url"];
 }
+EyeRequest::$salt = (stripos($request->url, "api.dev") === false) ? $config["live-api"] : $config["dev-api"];
+
 if (!empty($_POST["params-keys"]))
 {
 	for ($i = 0; $i < count($_POST["params-keys"]); $i++)
@@ -67,6 +72,7 @@ if (!empty($_POST["params-keys"]))
 		}
 	}
 }
+
 if (!empty($_POST["key"]))
 {
 	/**
@@ -86,6 +92,7 @@ if (!empty($_POST["key"]))
 		$request::$secret = $applications[$_POST["key"]]["secret"];
 	}
 }
+
 if (!empty($_POST["params-body"]))
 {
 	$request->body = json_decode($_POST["params-body"]);
@@ -97,6 +104,7 @@ if (!empty($_POST["params-body"]))
 		'</div>';
 	}
 }
+
 if (strpos($request->url, "?") > 1)
 {
 	parse_str(substr(strstr($request->url, "?"), 1), $urlParams);
