@@ -4,7 +4,6 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-/** @noinspection PhpUndefinedClassInspection */
 class EyeRequest
 {
 	public static $expires = 600;
@@ -118,10 +117,10 @@ else
 if ($signRequest)
 {
 	$urlParams = array_merge($urlParams, array(
-		"key" => Request::$key,
-		"expires" => time() + Request::$expires
+		"key" => EyeRequest::$key,
+		"expires" => time() + EyeRequest::$expires
 	));
-	Request::checksum($urlParams);
+	EyeRequest::checksum($urlParams);
 }
 
 if (!empty($urlParams))
