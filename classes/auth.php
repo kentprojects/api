@@ -97,19 +97,31 @@ final class Auth
 			$this->application = $this->applications[$this->request->query("key")];
 
 			$query = $this->request->getQueryData();
-			unset($query["signature"]);
-
-			// Ensure all keys and values are sorted & strings.
-			ksort($query);
-			array_walk($query, function (&$v)
 			{
-				$v = (string)$v;
-			});
-
+				unset($query["signature"]);
+				ksort($query);
+				array_walk(
+					$query,
+					function (&$v)
+					{
+						$v = (string)$v;
+					}
+				);
+			}
 			$local = md5(config("checksum", "salt") . $this->application->secret . json_encode($query));
 
 			if ($local !== $this->request->query("signature"))
 			{
+				/*
+				error_log(json_encode(array(
+					"INVALID" => "SIGNATURE",
+					"local" => $local,
+					"remote" => $this->request->query("signature"),
+					"get" => $this->request->getQueryData(),
+					"app" => $this->application,
+					"sum" => config("checksum", "salt") . $this->application->secret . json_encode($query)
+				)));
+				*/
 				throw new HttpStatusException(400, "Invalid signature.");
 			}
 

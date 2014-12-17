@@ -4,11 +4,23 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-/** @noinspection PhpUndefinedClassInspection */
 class EyeRequest
 {
+	/**
+	 * @var int
+	 */
 	public static $expires = 600;
+	/**
+	 * @var string
+	 */
 	public static $key;
+	/**
+	 * @var string
+	 */
+	public static $salt;
+	/**
+	 * @var string
+	 */
 	public static $secret;
 
 	/**
@@ -17,24 +29,42 @@ class EyeRequest
 	 */
 	public static function checksum(array &$params)
 	{
-		unset($params["sig"]);
+		unset($params["signature"]);
 		ksort($params);
 		array_walk($params, function (&$v)
 		{
 			$v = (string)$v;
 		});
-		$params["signature"] = md5(static::$secret . serialize($params));
+		$params["signature"] = md5(static::$salt . static::$secret . json_encode($params));
 	}
 
+	/**
+	 * @var string
+	 */
 	public $body = "";
+	/**
+	 * @var array
+	 */
 	public $headers = array(
 		"Accept" => "application/json",
 		"Content-Type" => "application/json"
 	);
+	/**
+	 * @var string
+	 */
 	public $method = "GET";
+	/**
+	 * @var array
+	 */
 	public $params = array();
+	/**
+	 * @var string
+	 */
 	public $url;
 
+	/**
+	 * @return string[]
+	 */
 	public function getHeaders()
 	{
 		$headers = array();
@@ -46,18 +76,40 @@ class EyeRequest
 	}
 }
 
+/**
+ * @var array
+ */
+$config = (file_exists(__DIR__ . "/config.production.ini"))
+	? parse_ini_file(__DIR__ . "/config.production.ini", true)
+	: parse_ini_file(__DIR__ . "/config.ini", true);
+
+/**
+ * @var EyeRequest
+ */
 $request = new EyeRequest;
+/**
+ * @var bool
+ */
 $signRequest = true;
+/**
+ * @var array
+ */
 $urlParams = array();
 
 if (!empty($_POST["method"]))
 {
 	$request->method = strtoupper($_POST["method"]);
 }
+
 if (!empty($_POST["url"]))
 {
 	$request->url = $_POST["url"];
 }
+
+EyeRequest::$salt = (stripos($request->url, "api.dev") === false)
+	? $config["live-api"]["salt"]
+	: $config["dev-api"]["salt"];
+
 if (!empty($_POST["params-keys"]))
 {
 	for ($i = 0; $i < count($_POST["params-keys"]); $i++)
@@ -68,6 +120,7 @@ if (!empty($_POST["params-keys"]))
 		}
 	}
 }
+
 if (!empty($_POST["key"]))
 {
 	/**
@@ -87,6 +140,7 @@ if (!empty($_POST["key"]))
 		$request::$secret = $applications[$_POST["key"]]["secret"];
 	}
 }
+
 if (!empty($_POST["params-body"]))
 {
 	$request->body = json_decode($_POST["params-body"]);
@@ -98,6 +152,7 @@ if (!empty($_POST["params-body"]))
 		'</div>';
 	}
 }
+
 if (strpos($request->url, "?") > 1)
 {
 	parse_str(substr(strstr($request->url, "?"), 1), $urlParams);
@@ -105,6 +160,7 @@ if (strpos($request->url, "?") > 1)
 }
 
 $urlParams = array_merge($urlParams, $request->params);
+
 if (!empty($request->body))
 {
 	$request->body = json_encode($request->body);
@@ -118,10 +174,10 @@ else
 if ($signRequest)
 {
 	$urlParams = array_merge($urlParams, array(
-		"key" => Request::$key,
-		"expires" => time() + Request::$expires
+		"key" => EyeRequest::$key,
+		"expires" => time() + EyeRequest::$expires
 	));
-	Request::checksum($urlParams);
+	EyeRequest::checksum($urlParams);
 }
 
 if (!empty($urlParams))
@@ -129,7 +185,9 @@ if (!empty($urlParams))
 	$request->url = sprintf("%s?%s", $request->url, http_build_query($urlParams, "", "&"));
 }
 
-// Initiate the CURL object.
+/**
+ * Initiate the CURL object.
+ */
 $ch = curl_init();
 $fh = null;
 
@@ -162,7 +220,11 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 curl_setopt($ch, CURLOPT_URL, $request->url);
 
-// Run the CURL request.
+/**
+ * Run the CURL request.
+ *
+ * @var array
+ */
 $response = array(
 	"body" => curl_exec($ch),
 	"info" => curl_getinfo($ch),
@@ -178,15 +240,20 @@ $response["info"] = print_r($response["info"], true);
 $response["json"] = json_decode($response["body"]);
 if (!empty($response["json"]))
 {
-	$response["body"] = json_encode($response["json"], JSON_PRETTY_PRINT);
+	/**
+	 * @var array|stdClass|null
+	 */
+	$response["body"] = json_encode($response["json"], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+}
+else
+{
+	$response["body"] = $response["json"];
 }
 
 echo <<<EOT
-
 	<hr/>
 
 	<p><pre><a href="{$request->url}" target="_blank">{$request->url}</a></pre></p>
-	<pre>{$response["body"]}</pre>
+	<pre><code>{$response["body"]}</code></pre>
 	<pre>{$response["info"]}</pre>
-
 EOT;

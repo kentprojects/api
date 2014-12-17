@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-class Model_Project extends Model_Abstract
+class Model_Project extends Model
 {
 	/**
 	 * Get the relevant Project by it's ID.

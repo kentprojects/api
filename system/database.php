@@ -5,7 +5,11 @@
  * @link: http://kentprojects.com
  */
 
-/** @noinspection PhpUndefinedClassInspection */
+if (!defined("USE_DATABASE_STUB"))
+{
+	define("USE_DATABASE_STUB", false);
+}
+
 abstract class Database
 {
 	/**
@@ -26,18 +30,27 @@ abstract class Database
 	 * @param string $types The types of any variables
 	 * @param string $format The format of the results
 	 * @throws DatabaseException
-	 * @return _Database_Query
+	 * @return DatabaseStub|_Database_Query
 	 */
 	public static function prepare($query, $types = "", $format = null)
 	{
 		if (empty(static::$mysqli))
 		{
-			static::$mysqli = new mysqli(
+			static::$mysqli = @new mysqli(
 				config("database", "hostname"),
 				config("database", "username"),
 				config("database", "password"),
 				config("database", "database")
 			);
+
+			if (static::$mysqli->connect_error)
+			{
+				throw new DatabaseException(
+					static::$mysqli->connect_error, static::$mysqli->connect_errno,
+					$query, $types
+				);
+			}
+
 			static::$mysqli->set_charset("utf8");
 		}
 
@@ -62,7 +75,6 @@ abstract class Database
 	}
 }
 
-/** @noinspection PhpUndefinedClassInspection */
 class _Database_Query
 {
 	/**
@@ -157,7 +169,6 @@ class _Database_Query
 	}
 }
 
-/** @noinspection PhpUndefinedClassInspection */
 class _Database_Result implements Countable
 {
 	/**
@@ -281,9 +292,8 @@ class _Database_Result implements Countable
 
 	/**
 	 * Return single values from a single result.
-	 * If there are multiple results, NULL will be returned.
 	 *
-	 * @return mixed
+	 * @return mixed[]
 	 */
 	public function singlevals()
 	{
@@ -299,7 +309,6 @@ class _Database_Result implements Countable
 	}
 }
 
-/** @noinspection PhpUndefinedClassInspection */
 class _Database_State
 {
 	/**

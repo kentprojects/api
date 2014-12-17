@@ -4,12 +4,12 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-class SomeModelTest extends KentProjects_Model_TestBase
+class ProjectModelTest extends KentProjects_Model_TestBase
 {
-	public function testSomething()
+	public function testGetById()
 	{
-		$project = Model_Project::getById(3);
+		$project = Model_Project::getById(2);
 		$this->assertNotEmpty($project, "Project doesn't exist.");
-		$this->assertEquals(3, $project->getId());
+		$this->assertEquals(2, $project->getId());
 	}
 }

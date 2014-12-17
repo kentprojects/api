@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-abstract class Model_Abstract implements JsonSerializable
+abstract class Model implements JsonSerializable
 {
 	/**
 	 * An array of the allowed fields.
@@ -19,7 +19,7 @@ abstract class Model_Abstract implements JsonSerializable
 	 * @param array|stdClass $data
 	 * @param string $idField
 	 * @throws InvalidArgumentException
-	 * @return Model_Abstract
+	 * @return Model
 	 */
 	public static function build($data, $idField)
 	{
@@ -38,7 +38,7 @@ abstract class Model_Abstract implements JsonSerializable
 
 		$class = get_called_class();
 
-		/** @var Model_Abstract $object */
+		/** @var Model $object */
 		$object = new $class;
 
 		foreach ($data as $key => $value)

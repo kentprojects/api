@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-abstract class Model_Staff extends Model_Abstract
+abstract class Model_Staff extends Model
 {
 	/**
 	 * Get a staff by their Email.

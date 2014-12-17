@@ -27,18 +27,26 @@ spl_autoload_register(
 		$filename = null;
 
 		/**
-		 * If the word "Controller_" exists in this class, handle it.
+		 * If the word "Controller_" exists at the beginning of this class, handle it.
 		 */
 		if (strpos($class, "Controller_") === 0)
 		{
 			$filename = APPLICATION_PATH . "/controllers/" . str_replace("controller/", "", $file);
 		}
 		/**
-		 * If the word "Model_" exists in this class, handle it.
+		 * If the word "Model_" exists at the beginning of this class, handle it.
 		 */
 		elseif (strpos($class, "Model_") === 0)
 		{
 			$filename = APPLICATION_PATH . "/models/" . str_replace("model/", "", $file);
+		}
+		/**
+		 * If the word "_Map" exists in this class, handle it.
+		 * Checking to see if "Map" exists in general will make this function quicker for other classes!
+		 */
+		elseif ((strpos($class, "Map") !== false) && (strpos($class, "Map") === (strlen($class) - 3)))
+		{
+			$filename = APPLICATION_PATH . "/models/maps/" . str_replace("_", "", strtolower($class)) . ".php";
 		}
 		/**
 		 * Else this is a generic class in a folder, so go find it!

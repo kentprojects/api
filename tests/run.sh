@@ -9,7 +9,12 @@ CURRENT_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 BASE_PATH=$(dirname $CURRENT_PATH)
 OUT_CODE=0
 
-source "$BASE_PATH/scripts/helper/functions.sh"
+FAIL=" \033[0;31;49m[==]\033[0m "
+GOOD=" \033[0;32;49m[==]\033[0m "
+WARN=" \033[0;33;49m[==]\033[0m "
+TASK=" \033[0;34;49m[==]\033[0m "
+USER=" \033[1;1;49m[==]\033[0m "
+
 pushd "$CURRENT_PATH"
 
 #
@@ -24,6 +29,12 @@ function runPhpUnit
 	return $?
 }
 
+OUTPUT=$(php functions.php)
+if [ $? -gt 0 ]; then
+	printf "$FAIL $OUTPUT\n"
+	exit 1;
+fi
+
 if [ -n "$1" ]; then
 	runPhpUnit $1
 	OUT_CODE=$?
@@ -36,14 +47,13 @@ else
 		OUTPUT=$(runPhpUnit $DIR)
 		CODE=$?
 
-		OUT_CODE=$(($OUT_CODE + $CODE))
-
 		if [ $CODE -eq 0 ]; then
-			printf "$GOOD "
+			printf "$GOOD $OUTPUT\n"
 		else
-			printf "$FAIL "
+			printf "$FAIL $OUTPUT\n"
 		fi
-		echo $OUTPUT"\n"
+
+		OUT_CODE=$(($OUT_CODE + $CODE))
 	done
 fi
 
