@@ -122,7 +122,7 @@ final class Controller_Auth extends Controller
 	{
 		$this->validateMethods(Request::GET, Request::POST);
 
-		session_name("KentProjectsAuthentication");
+		// session_name("KentProjectsAuthentication");
 		session_start();
 
 		if (!empty($_SERVER["HTTP_REFERER"]) && empty($_SESSION["incoming-url"]))
