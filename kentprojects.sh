@@ -1,8 +1,6 @@
 #!/bin/sh
 
-CURRENT_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-BASE_PATH=$(dirname $(dirname $CURRENT_PATH))
-
+BASE_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 pushd "$BASE_PATH"
 
 FAIL=" \033[0;31;49m[==]\033[0m "
@@ -152,5 +150,4 @@ case "$1" in
 		printf "test: Run the KentProjects tests.\n"
 		;;
 esac
-
 popd
