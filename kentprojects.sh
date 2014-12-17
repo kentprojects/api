@@ -98,7 +98,7 @@ function hotfix()
 {
 	CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-	if [ "$CURRENT_BRANCH" != "master" ] || [[ $CURRENT_BRANCH != hotfix* ]]; then
+	if [ "$CURRENT_BRANCH" != "master" ] && [[ $CURRENT_BRANCH != hotfix* ]]; then
 		printf "$FAIL The current working directory at $BASE_PATH isn't at the 'master' branch.\n"
 		exit 2
 	fi
