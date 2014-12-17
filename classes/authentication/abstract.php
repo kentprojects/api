@@ -6,9 +6,6 @@
  */
 abstract class Authentication_Abstract
 {
-	/**
-	 * @var Model_Application
-	 */
 	protected $application;
 	/**
 	 * @var Auth
@@ -50,18 +47,21 @@ abstract class Authentication_Abstract
 	/**
 	 * The action to create a new API token.
 	 *
+	 * @param Model_User $user
+	 * @throws DatabaseException
 	 * @return string
 	 */
 	protected function createApiToken(Model_User $user)
 	{
 		$break = false;
+		$token = null;
 		$statement = Database::prepare("INSERT INTO `Token` (`user_id`, `token`) VALUES (?,?)", "is");
 		while(!$break)
 		{
 			$token = md5(uniqid());
 			try
 			{
-				$result = $statement->execute($user->getId(), $token);
+				$statement->execute($user->getId(), $token);
 				$break = true;
 			}
 			catch (DatabaseException $e)
@@ -80,18 +80,22 @@ abstract class Authentication_Abstract
 	 * The action to create a new Auth token.
 	 *
 	 * Auth Tokens are small arbitrary pieces of information, used to log people in.
+	 *
+	 * @param Model_User $user
+	 * @throws DatabaseException
 	 * @return string
 	 */
 	protected function generateAuthToken(Model_User $user)
 	{
 		$break = false;
+		$token = null;
 		$statement = Database::prepare("INSERT INTO `Authentication` (`user_id`, `token`) VALUES (?,?)", "is");
 		while(!$break)
 		{
 			$token = md5(uniqid());
 			try
 			{
-				$result = $statement->execute($user->getId(), $token);
+				$statement->execute($user->getId(), $token);
 				$break = true;
 			}
 			catch (DatabaseException $e)
