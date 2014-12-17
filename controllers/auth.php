@@ -147,6 +147,13 @@ final class Controller_Auth extends Controller
 		}
 		else
 		{
+			/**
+			 * @require The external SimpleSAML2 library.
+			 */
+			/** @noinspection PhpIncludeInspection */
+			/** @noinspection SpellCheckingInspection */
+			require_once "/var/www/simplesaml/lib/_autoload.php";
+
 			/** @noinspection PhpUndefinedClassInspection */
 			$provider = new SimpleSAML_Auth_Simple("default-sp");
 			/** @noinspection PhpUndefinedMethodInspection */
