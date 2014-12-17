@@ -120,7 +120,7 @@ final class Controller_Auth extends Controller
 	 */
 	public function action_sso()
 	{
-		$this->validateMethods(Request::GET);
+		$this->validateMethods(Request::GET, Request::POST);
 
 		session_name("KentProjectsAuthentication");
 		session_start();
