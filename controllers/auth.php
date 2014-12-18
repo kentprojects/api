@@ -10,6 +10,10 @@ final class Controller_Auth extends Controller
 	 * @var string
 	 */
 	protected $authentication = Auth::NONE;
+	/**
+	 * @var string
+	 */
+	protected $prefixCacheKey = "auth.confirm.";
 
 	/**
 	 * GET /auth/confirm
@@ -30,7 +34,6 @@ final class Controller_Auth extends Controller
 		{
 			throw new HttpStatusException(400, "Invalid authentication token.");
 		}
-		$this->clearCode($this->request->post("code"));
 
 		$output = array(
 			"token" => $this->createApiToken($user),
@@ -122,8 +125,8 @@ final class Controller_Auth extends Controller
 	{
 		$this->validateMethods(Request::GET, Request::POST);
 
-		// session_name("KentProjectsAuthentication");
 		session_start();
+		$prefixDevCacheKey = Cache::PREFIX . "auth.sso-dev.";
 
 		if (!empty($_SERVER["HTTP_REFERER"]) && empty($_SESSION["incoming-url"]))
 		{
@@ -138,7 +141,7 @@ final class Controller_Auth extends Controller
 			}
 			else
 			{
-				$attributes = $this->getCacheData($this->request->query("data"));
+				$attributes = Cache::getOnce($prefixDevCacheKey . $this->request->query("data"));
 				if (empty($attributes))
 				{
 					throw new HttpStatusException(400, "Empty data back from live SSO.");
@@ -164,14 +167,16 @@ final class Controller_Auth extends Controller
 
 			if (true)
 			{
+				header("Content-type: text/plain");
 				print_r($attributes);
 				exit(1);
 			}
 
 			if ($this->request->query("return") === "dev")
 			{
+				Cache::init("kentprojects-dev");
 				$key = md5(uniqid());
-				$this->setCacheData($key, $attributes);
+				Cache::set($prefixDevCacheKey . $key, $attributes, 10 * Cache::MINUTE);
 				throw new HttpRedirectException(302, "http://api.dev.kentprojects.com/auth/sso?data=" . $key);
 			}
 		}
@@ -190,15 +195,6 @@ final class Controller_Auth extends Controller
 		session_destroy();
 
 		throw $this->generateAuthUrl($url, $user);
-	}
-
-	/**
-	 * @param string $code
-	 * @return void
-	 */
-	private function clearCode($code)
-	{
-		Database::prepare("DELETE FROM `Authentication` WHERE `token` = ?", "s")->execute($code);
 	}
 
 	/**
@@ -234,30 +230,16 @@ final class Controller_Auth extends Controller
 	/**
 	 * @param array $url
 	 * @param Model_User $user
-	 * @throws DatabaseException
 	 * @return HttpRedirectException
 	 */
-	protected function generateAuthUrl($url, Model_User $user)
+	protected function generateAuthUrl(array $url, Model_User $user)
 	{
 		$break = false;
 		$token = null;
-		$statement = Database::prepare("INSERT INTO `Authentication` (`user_id`, `token`) VALUES (?,?)", "is");
 		while (!$break)
 		{
 			$token = md5(uniqid());
-			try
-			{
-				$statement->execute($user->getId(), $token);
-				$break = true;
-			}
-			catch (DatabaseException $e)
-			{
-				// Work out if this is a duplicate key issue. If so, let it loop again. Else, throw the exception.
-				if (true)
-				{
-					throw $e;
-				}
-			}
+			$break = Cache::add(Cache::PREFIX . $this->$prefixCacheKey . $token, $user->getId());
 		}
 
 		return new HttpRedirectException(
@@ -267,33 +249,12 @@ final class Controller_Auth extends Controller
 	}
 
 	/**
-	 * @param string $key
-	 * @return array
-	 */
-	protected function getCacheData($key)
-	{
-		$key = "auth/sso-dev/" . $key;
-		return null;
-	}
-
-	/**
-	 * @param string $key
-	 * @param array $data
-	 * @return void
-	 */
-	protected function setCacheData($key, array $data)
-	{
-		$key = "auth/sso-dev/" . $key;
-	}
-
-	/**
 	 * @param string $code
 	 * @return Model_User
 	 */
 	private function validateCode($code)
 	{
-		$user_id = Database::prepare("SELECT `user_id` FROM `Authentication` WHERE `token` = ?", "s")
-			->execute($code)->singleval();
+		$user_id = Cache::getOnce(Cache::PREFIX . $this->$prefixCacheKey . $code, null);
 		return (empty($user_id)) ? null : Model_User::getById($user_id);
 	}
 }
