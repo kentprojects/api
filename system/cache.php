@@ -193,9 +193,9 @@ final class Cache
 	 * @throws CacheException
 	 * @return void
 	 */
-	public static function init($key = null)
+	public static function init()
 	{
-		$memcached = new Memcached(coalesce($key, config("cache", "key")));
+		$memcached = new Memcached("kentprojects");
 
 		if ($memcached->addServer(config("cache", "host"), config("cache", "port")) === false)
 		{

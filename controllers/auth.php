@@ -126,7 +126,7 @@ final class Controller_Auth extends Controller
 		$this->validateMethods(Request::GET, Request::POST);
 
 		session_start();
-		$prefixDevCacheKey = Cache::PREFIX . "auth.sso-dev.";
+		$prefixDevCacheKey = Cache::PREFIX . "auth.dev.sso.";
 
 		if (!empty($_SERVER["HTTP_REFERER"]) && empty($_SESSION["incoming-url"]))
 		{
@@ -179,7 +179,6 @@ final class Controller_Auth extends Controller
 
 			if ($this->request->query("return") === "dev")
 			{
-				Cache::init("kentprojects-dev");
 				$key = md5(uniqid());
 				Cache::set($prefixDevCacheKey . $key, $attributes, 10 * Cache::MINUTE);
 				throw new HttpRedirectException(302, "http://api.dev.kentprojects.com/auth/sso?data=" . $key);
