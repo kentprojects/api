@@ -213,6 +213,13 @@ final class Controller_Auth extends Controller
 			throw new HttpStatusException(500, "Invalid format returned from the SSO.");
 		}
 
+		if (true)
+		{
+			header("Content-type: text/plain");
+			print_r($attributes);
+			exit(1);
+		}
+
 		$email = current($attributes["mail"]);
 		/** @noinspection SpellCheckingInspection */
 		$role = current($attributes["unikentaccountType"]);
@@ -280,16 +287,19 @@ final class Controller_Auth extends Controller
 	{
 		$break = false;
 		$token = null;
+
 		while (!$break)
 		{
 			$token = md5(uniqid());
 			$break = Cache::add(Cache::PREFIX . $this->prefixCacheKey . $token, $user->getId());
 		}
 
-		return new HttpRedirectException(
-			302, $url["scheme"] . "://" . $url["host"] . (!empty($url["port"]) ? ":" . $url["port"] : "") .
-			"/login.php?success=" . $token
-		);
+		$url = $url["scheme"] . "://" . $url["host"] . (!empty($url["port"]) ? ":" . $url["port"] : "") .
+			"/login.php?success=" . $token;
+
+		error_log("AuthURL is " . $url);
+
+		return new HttpRedirectException(302, $url);
 	}
 
 	/**
