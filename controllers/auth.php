@@ -213,13 +213,6 @@ final class Controller_Auth extends Controller
 			throw new HttpStatusException(500, "Invalid format returned from the SSO.");
 		}
 
-		if (true)
-		{
-			header("Content-type: text/plain");
-			print_r($attributes);
-			exit(1);
-		}
-
 		$email = current($attributes["mail"]);
 		/** @noinspection SpellCheckingInspection */
 		$role = current($attributes["unikentaccountType"]);
@@ -230,6 +223,13 @@ final class Controller_Auth extends Controller
 			error_log("Invalid data returned from the SSO: " .
 				json_encode(array("email" => $email, "role" => $role, "uid" => $uid)));
 			throw new HttpStatusException(500, "Invalid data returned from the SSO.");
+		}
+
+		if (true)
+		{
+			header("Content-type: text/plain");
+			var_dump($email, $role, $uid);
+			exit(1);
 		}
 
 		$user = Model_User::getByEmail($email);
