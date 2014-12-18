@@ -227,7 +227,7 @@ final class Controller_Auth extends Controller
 
 		$role = strtr($role, array("ugt" => "", "pgt" => ""));
 
-		if (true)
+		if (false)
 		{
 			header("Content-type: text/plain");
 			var_dump($email, $role, $uid);
@@ -246,6 +246,7 @@ final class Controller_Auth extends Controller
 		$url = parse_url(!empty($_SESSION["incoming-url"]) ? $_SESSION["incoming-url"] : $backupUrl);
 
 		session_destroy();
+		setcookie("SimpleSAMLAuthToken", "", -7889231, "/", "api.kentprojects.com", false, false);
 
 		throw $this->generateAuthUrl($url, $user);
 	}
@@ -293,24 +294,25 @@ final class Controller_Auth extends Controller
 		while (!$break)
 		{
 			$token = md5(uniqid());
-			$break = Cache::add(Cache::PREFIX . $this->prefixCacheKey . $token, $user->getId());
+			$break = Cache::add(Cache::PREFIX . $this->prefixCacheKey . $token, $user->getId(), 10 * Cache::MINUTE);
 		}
 
 		$url = $url["scheme"] . "://" . $url["host"] . (!empty($url["port"]) ? ":" . $url["port"] : "") .
 			"/login.php?success=" . $token;
 
+		error_log("Key is " . Cache::PREFIX . $this->prefixCacheKey . $token);
 		error_log("AuthURL is " . $url);
 
 		return new HttpRedirectException(302, $url);
 	}
 
 	/**
-	 * @param string $code
+	 * @param string $token
 	 * @return Model_User
 	 */
-	private function validateCode($code)
+	private function validateCode($token)
 	{
-		$user_id = Cache::getOnce(Cache::PREFIX . $this->prefixCacheKey . $code, null);
+		$user_id = Cache::getOnce(Cache::PREFIX . $this->prefixCacheKey . $token, null);
 		return (empty($user_id)) ? null : Model_User::getById($user_id);
 	}
 }
