@@ -101,8 +101,6 @@ final class Controller_Auth extends Controller
 
 		$authUser = $fakeCodes[$this->request->query("auth")];
 
-		// print_r($url); print_r($authUser); exit(1);
-
 		$user = Model_User::getByEmail($authUser["username"] . "@kent.ac.uk");
 		if (empty($user))
 		{
@@ -126,6 +124,7 @@ final class Controller_Auth extends Controller
 		$this->validateMethods(Request::GET, Request::POST);
 
 		session_start();
+		$backupUrl = "http://" . (config("environment") === "development" ? "dev." : "") . "kentprojects.com";
 		$prefixDevCacheKey = Cache::PREFIX . "auth.dev.sso.";
 
 		if (!empty($_SERVER["HTTP_REFERER"]) && empty($_SESSION["incoming-url"]))
@@ -224,6 +223,15 @@ final class Controller_Auth extends Controller
 			throw new HttpStatusException(500, "Invalid data returned from the SSO.");
 		}
 
+		$role = strtr($role, array("ugt" => "", "pgt" => ""));
+
+		if (false)
+		{
+			header("Content-type: text/plain");
+			var_dump($email, $role, $uid);
+			exit(1);
+		}
+
 		$user = Model_User::getByEmail($email);
 		if (empty($user))
 		{
@@ -233,9 +241,10 @@ final class Controller_Auth extends Controller
 			$user->save();
 		}
 
-		$url = parse_url(!empty($_SESSION["incoming-url"]) ? $_SESSION["incoming-url"] : $this->$backupUrl);
+		$url = parse_url(!empty($_SESSION["incoming-url"]) ? $_SESSION["incoming-url"] : $backupUrl);
 
 		session_destroy();
+		setcookie("SimpleSAMLAuthToken", "", -7889231, "/", "api.kentprojects.com", false, false);
 
 		throw $this->generateAuthUrl($url, $user);
 	}
@@ -279,25 +288,26 @@ final class Controller_Auth extends Controller
 	{
 		$break = false;
 		$token = null;
+
 		while (!$break)
 		{
 			$token = md5(uniqid());
-			$break = Cache::add(Cache::PREFIX . $this->$prefixCacheKey . $token, $user->getId());
+			$break = Cache::add(Cache::PREFIX . $this->prefixCacheKey . $token, $user->getId(), 10 * Cache::MINUTE);
 		}
 
-		return new HttpRedirectException(
-			302, $url["scheme"] . "://" . $url["host"] . (!empty($url["port"]) ? ":" . $url["port"] : "") .
-			"/login.php?success=" . $token
-		);
+		$url = $url["scheme"] . "://" . $url["host"] . (!empty($url["port"]) ? ":" . $url["port"] : "") .
+			"/login.php?success=" . $token;
+
+		return new HttpRedirectException(302, $url);
 	}
 
 	/**
-	 * @param string $code
+	 * @param string $token
 	 * @return Model_User
 	 */
-	private function validateCode($code)
+	private function validateCode($token)
 	{
-		$user_id = Cache::getOnce(Cache::PREFIX . $this->$prefixCacheKey . $code, null);
+		$user_id = Cache::getOnce(Cache::PREFIX . $this->prefixCacheKey . $token, null);
 		return (empty($user_id)) ? null : Model_User::getById($user_id);
 	}
 }
