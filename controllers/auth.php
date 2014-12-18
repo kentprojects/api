@@ -180,7 +180,12 @@ final class Controller_Auth extends Controller
 			if ($this->request->query("return") === "dev")
 			{
 				$key = md5(uniqid());
-				Cache::set($prefixDevCacheKey . $key, $attributes, 10 * Cache::MINUTE);
+				if (Cache::set($prefixDevCacheKey . $key, $attributes, 10 * Cache::MINUTE) === false)
+				{
+					trigger_error(
+						"Unable to save {$prefixDevCacheKey}{$key} => " . print_r($attributes, true), E_USER_ERROR
+					);
+				}
 				throw new HttpRedirectException(302, "http://api.dev.kentprojects.com/auth/sso?data=" . $key);
 			}
 		}
