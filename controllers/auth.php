@@ -142,10 +142,6 @@ final class Controller_Auth extends Controller
 			else
 			{
 				$attributes = Cache::getOnce($prefixDevCacheKey . $this->request->query("data"));
-				if (empty($attributes))
-				{
-					throw new HttpStatusException(400, "Empty data back from live SSO.");
-				}
 			}
 		}
 		else
@@ -165,7 +161,7 @@ final class Controller_Auth extends Controller
 			/** @noinspection PhpUndefinedMethodInspection */
 			$attributes = $provider->getAttributes();
 
-			if (true)
+			if (false)
 			{
 				header("Content-type: text/plain");
 				print_r($attributes);
@@ -181,12 +177,46 @@ final class Controller_Auth extends Controller
 			}
 		}
 
-		$user = Model_User::getByEmail($attributes["username"] . $this->$emailDomain);
+		if (empty($attributes))
+		{
+			throw new HttpStatusException(500, "Empty data back from live SSO.");
+		}
+		elseif (!is_array($attributes))
+		{
+			error_log("Invalid format returned from the SSO: " . json_encode($attributes));
+			throw new HttpStatusException(500, "Invalid format returned from the SSO.");
+		}
+		/** @noinspection SpellCheckingInspection */
+		elseif (empty($attributes["unikentaccountType"]) || empty($attributes["mail"]) || empty($attributes["uid"]))
+		{
+			error_log("Invalid format returned from the SSO: " . json_encode($attributes));
+			throw new HttpStatusException(500, "Invalid format returned from the SSO.");
+		}
+		/** @noinspection SpellCheckingInspection */
+		elseif (!is_array($attributes["unikentaccountType"]) || !is_array($attributes["mail"]) || !is_array($attributes["uid"]))
+		{
+			error_log("Invalid format returned from the SSO: " . json_encode($attributes));
+			throw new HttpStatusException(500, "Invalid format returned from the SSO.");
+		}
+
+		$email = current($attributes["mail"]);
+		/** @noinspection SpellCheckingInspection */
+		$role = current($attributes["unikentaccountType"]);
+		$uid = current($attributes["uid"]);
+
+		if (empty($email) || empty($role) || empty($uid))
+		{
+			error_log("Invalid data returned from the SSO: " .
+				json_encode(array("email" => $email, "role" => $role, "uid" => $uid)));
+			throw new HttpStatusException(500, "Invalid data returned from the SSO.");
+		}
+
+		$user = Model_User::getByEmail($email);
 		if (empty($user))
 		{
 			$user = new Model_User;
-			$user->setEmail($attributes["username"] . $this->$emailDomain);
-			$user->setRole($attributes["role"]);
+			$user->setEmail($email);
+			$user->setRole($role);
 			$user->save();
 		}
 
