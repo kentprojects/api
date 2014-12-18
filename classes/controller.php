@@ -53,7 +53,7 @@ abstract class Controller
 		$this->response->body(
 			json_encode(
 				$this->response->body(),
-				JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+				JSON_PRETTY_PRINT
 			)
 		);
 	}
