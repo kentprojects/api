@@ -6,6 +6,24 @@
  */
 
 /**
+ * Class CacheException
+ */
+final class CacheException extends Exception
+{
+	/**
+	 * Handle a cache exception.
+	 *
+	 * @param string $message
+	 * @param int $code
+	 * @param Exception $previous
+	 */
+	public function __construct($message, $code, Exception $previous = null)
+	{
+		parent::__construct("Cache Exception: " . $message, $code, $previous);
+	}
+}
+
+/**
  * Class DatabaseException
  */
 final class DatabaseException extends Exception
