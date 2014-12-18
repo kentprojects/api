@@ -283,7 +283,7 @@ final class Controller_Auth extends Controller
 		while (!$break)
 		{
 			$token = md5(uniqid());
-			$break = Cache::add(Cache::PREFIX . $this->$prefixCacheKey . $token, $user->getId());
+			$break = Cache::add(Cache::PREFIX . $this->prefixCacheKey . $token, $user->getId());
 		}
 
 		return new HttpRedirectException(
@@ -298,7 +298,7 @@ final class Controller_Auth extends Controller
 	 */
 	private function validateCode($code)
 	{
-		$user_id = Cache::getOnce(Cache::PREFIX . $this->$prefixCacheKey . $code, null);
+		$user_id = Cache::getOnce(Cache::PREFIX . $this->prefixCacheKey . $code, null);
 		return (empty($user_id)) ? null : Model_User::getById($user_id);
 	}
 }
