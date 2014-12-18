@@ -126,7 +126,7 @@ final class Controller_Auth extends Controller
 		$this->validateMethods(Request::GET, Request::POST);
 
 		session_start();
-		$backupUrl = "http://kentprojects.com";
+		$backupUrl = "http://" . (config("environment") === "development" ? "dev." : "") . "kentprojects.com";
 		$prefixDevCacheKey = Cache::PREFIX . "auth.dev.sso.";
 
 		if (!empty($_SERVER["HTTP_REFERER"]) && empty($_SESSION["incoming-url"]))
