@@ -225,6 +225,8 @@ final class Controller_Auth extends Controller
 			throw new HttpStatusException(500, "Invalid data returned from the SSO.");
 		}
 
+		$role = strtr($role, array("ugts" => "", "pgts" => ""));
+
 		if (true)
 		{
 			header("Content-type: text/plain");
