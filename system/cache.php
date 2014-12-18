@@ -189,7 +189,6 @@ final class Cache
 	/**
 	 * Initialise the cache.
 	 *
-	 * @param string $key
 	 * @throws CacheException
 	 * @return void
 	 */
@@ -254,3 +253,4 @@ if ($exit > 0)
 	error_log("Memcached is not installed on this server.");
 	throw new CacheException("Memcached is not installed on this server.", 1);
 }
+Cache::init();
