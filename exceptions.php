@@ -10,17 +10,6 @@
  */
 final class CacheException extends Exception
 {
-	/**
-	 * Handle a cache exception.
-	 *
-	 * @param string $message
-	 * @param int $code
-	 * @param Exception $previous
-	 */
-	public function __construct($message, $code, Exception $previous = null)
-	{
-		parent::__construct("Cache Exception: " . $message, $code, $previous);
-	}
 }
 
 /**
@@ -209,7 +198,7 @@ final class PHPException extends Exception
 	 */
 	public function __construct($error_no, $error_string, $error_file, $error_line, $error_context, Exception $previous = null)
 	{
-		parent::__construct('PHPException: '.$error_string, $error_no, $previous);
+		parent::__construct($error_string, $error_no, $previous);
 		$this->file = $error_file;
 		$this->line = $error_line;
 	}
