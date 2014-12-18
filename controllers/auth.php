@@ -101,8 +101,6 @@ final class Controller_Auth extends Controller
 
 		$authUser = $fakeCodes[$this->request->query("auth")];
 
-		// print_r($url); print_r($authUser); exit(1);
-
 		$user = Model_User::getByEmail($authUser["username"] . "@kent.ac.uk");
 		if (empty($user))
 		{
@@ -299,9 +297,6 @@ final class Controller_Auth extends Controller
 
 		$url = $url["scheme"] . "://" . $url["host"] . (!empty($url["port"]) ? ":" . $url["port"] : "") .
 			"/login.php?success=" . $token;
-
-		error_log("Key is " . Cache::PREFIX . $this->prefixCacheKey . $token);
-		error_log("AuthURL is " . $url);
 
 		return new HttpRedirectException(302, $url);
 	}
