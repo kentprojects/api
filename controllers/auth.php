@@ -142,6 +142,10 @@ final class Controller_Auth extends Controller
 			else
 			{
 				$attributes = Cache::getOnce($prefixDevCacheKey . $this->request->query("data"));
+				if (empty($attributes))
+				{
+					throw new HttpStatusException(500, "Empty data back from live SSO.");
+				}
 			}
 		}
 		else
@@ -168,6 +172,11 @@ final class Controller_Auth extends Controller
 				exit(1);
 			}
 
+			if (empty($attributes))
+			{
+				throw new HttpStatusException(500, "Empty data back from SSO.");
+			}
+
 			if ($this->request->query("return") === "dev")
 			{
 				Cache::init("kentprojects-dev");
@@ -179,7 +188,7 @@ final class Controller_Auth extends Controller
 
 		if (empty($attributes))
 		{
-			throw new HttpStatusException(500, "Empty data back from live SSO.");
+			throw new HttpStatusException(500, "Empty data back from the SSO.");
 		}
 		elseif (!is_array($attributes))
 		{
