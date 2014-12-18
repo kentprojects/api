@@ -50,7 +50,12 @@ abstract class Controller
 	public function after()
 	{
 		$this->response->header("Content-Type", "application/json");
-		$this->response->body(json_encode($this->response->body()));
+		$this->response->body(
+			json_encode(
+				$this->response->body(),
+				JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+			)
+		);
 	}
 
 	/**
