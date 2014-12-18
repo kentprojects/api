@@ -126,6 +126,7 @@ final class Controller_Auth extends Controller
 		$this->validateMethods(Request::GET, Request::POST);
 
 		session_start();
+		$backupUrl = "http://kentprojects.com";
 		$prefixDevCacheKey = Cache::PREFIX . "auth.dev.sso.";
 
 		if (!empty($_SERVER["HTTP_REFERER"]) && empty($_SESSION["incoming-url"]))
@@ -233,7 +234,7 @@ final class Controller_Auth extends Controller
 			$user->save();
 		}
 
-		$url = parse_url(!empty($_SESSION["incoming-url"]) ? $_SESSION["incoming-url"] : $this->$backupUrl);
+		$url = parse_url(!empty($_SESSION["incoming-url"]) ? $_SESSION["incoming-url"] : $backupUrl);
 
 		session_destroy();
 
