@@ -184,5 +184,6 @@ abstract class Model implements JsonSerializable
 	public function save()
 	{
 		$this->metadata->save(($this->getId() !== null) ? $this->getClassName() : null);
+		Cache::delete($this->getCacheName());
 	}
 }
