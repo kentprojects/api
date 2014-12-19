@@ -14,6 +14,7 @@ class Model_Project extends Model
 	 */
 	public static function getById($id)
 	{
+		/** @var Model_Project $project */
 		$project = parent::getById($id);
 		if (empty($project))
 		{
@@ -35,7 +36,7 @@ class Model_Project extends Model
 			$project = $statement->execute($id)->singleton();
 			if (!empty($project))
 			{
-				Cache::set($project);
+				Cache::set($project->getCacheName(), $project);
 			}
 		}
 		return $project;
