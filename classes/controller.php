@@ -15,6 +15,10 @@ abstract class Controller
 	 */
 	protected $authentication = Auth::APP;
 	/**
+	 * @var bool
+	 */
+	private $isHeadRequest = false;
+	/**
 	 * @var Request_Internal
 	 */
 	protected $request;
@@ -32,6 +36,12 @@ abstract class Controller
 	{
 		$this->request = $request;
 		$this->response = $response;
+
+		if ($this->request->getMethod() === Request::HEAD)
+		{
+			$this->isHeadRequest = true;
+			$this->request->setMethod(Request::GET);
+		}
 
 		$this->auth = new Auth($request, $response, $this->authentication);
 	}
@@ -56,6 +66,13 @@ abstract class Controller
 				JSON_PRETTY_PRINT
 			)
 		);
+
+		$this->response->header("Content-Length", strlen($this->response->body()));
+
+		if ($this->isHeadRequest)
+		{
+			$this->response->body("");
+		}
 	}
 
 	/**

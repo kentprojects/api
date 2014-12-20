@@ -16,6 +16,7 @@ abstract class Request
 	const POST = "request:post";
 	const PUT = "request:put";
 	const DELETE = "request:delete";
+	const HEAD = "request:head";
 
 	/**
 	 * A list of allowed methods built using the constants above.
@@ -235,6 +236,12 @@ abstract class Request
 	public function setHeaders(array $headers)
 	{
 		$this->headers = array_merge($this->headers, $headers);
+		return $this;
+	}
+
+	public function setMethod($method)
+	{
+		$this->method = $method;
 		return $this;
 	}
 
