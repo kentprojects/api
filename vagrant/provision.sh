@@ -4,7 +4,7 @@
 # @license: Copyright KentProjects
 # @link: http://kentprojects.com
 #
-if FALSE; then
+if TRUE; then
 	locale-gen en_GB.UTF-8
 
 	apt-get update
