@@ -1,7 +1,7 @@
 #!/bin/sh
 
 BASE_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-pushd "$BASE_PATH"
+pushd "$BASE_PATH" > /dev/null
 
 FAIL=" \033[0;31;49m[==]\033[0m "
 GOOD=" \033[0;32;49m[==]\033[0m "
@@ -150,4 +150,4 @@ case "$1" in
 		printf "test: Run the KentProjects tests.\n"
 		;;
 esac
-popd
+popd > /dev/null
