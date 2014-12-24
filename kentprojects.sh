@@ -75,7 +75,7 @@ function deploy()
 
 	git pull &&
 	git checkout $DESTINATION_BRANCH &&
-	git merge --no-ff $SOURCE_BRANCH -m "Merging develop branch with master branch." &&
+	git merge --no-ff $SOURCE_BRANCH -m "Merging develop into master for deployment." &&
 	git push origin $DESTINATION_BRANCH &&
 	git checkout $SOURCE_BRANCH
 
