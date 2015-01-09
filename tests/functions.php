@@ -27,7 +27,10 @@ require_once __DIR__ . "/../functions.php";
 
 try
 {
-	Database::prepare("SELECT 1");
+	if (config("testing", "checkDatabase"))
+	{
+		Database::prepare("SELECT 1");
+	}
 }
 catch (DatabaseException $e)
 {

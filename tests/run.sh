@@ -29,12 +29,6 @@ function runPhpUnit
 	return $?
 }
 
-OUTPUT=$(php functions.php)
-if [ $? -gt 0 ]; then
-	printf "$FAIL $OUTPUT\n"
-	exit 1;
-fi
-
 if [ -n "$1" ]; then
 	runPhpUnit $1
 	OUT_CODE=$?
