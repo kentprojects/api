@@ -126,7 +126,7 @@ final class Model_User extends Model
 	 */
 	public function isStaff()
 	{
-		return $this->role === "student";
+		return $this->role === "staff";
 	}
 
 	/**
