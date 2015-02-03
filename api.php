@@ -4,20 +4,18 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-require_once __DIR__."/functions.php";
+require_once __DIR__ . "/functions.php";
 
 /** @noinspection PhpParamsInspection */
 $request = Request::factory(Request::stringToMethod($_SERVER["REQUEST_METHOD"]), $_SERVER["PATH_INFO"]);
 
 if (!($request instanceof Request_Internal))
 {
-	exit(
-		(string) new RequestException(sprintf(
-			"Request %s:%s did not return an internal request.",
-			strtoupper($_SERVER["REQUEST_METHOD"]),
-			empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"]
-		))
-	);
+	exit((string)new RequestException(sprintf(
+		"Request %s:%s did not return an internal request.",
+		strtoupper($_SERVER["REQUEST_METHOD"]),
+		empty($_SERVER["PATH_INFO"]) ? "/" : $_SERVER["PATH_INFO"]
+	)));
 }
 
 /**
