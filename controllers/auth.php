@@ -257,8 +257,8 @@ final class Controller_Auth extends Controller
 	protected function createApiToken(Model_User $user)
 	{
 		$break = false;
-		$token = new stdClass;
 		$statement = Database::prepare("CALL usp_GetApplicationUserToken", "ii");
+		$token = new stdClass;
 		while (!$break)
 		{
 			try

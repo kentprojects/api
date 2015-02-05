@@ -31,7 +31,8 @@ $config = parse_ini_file($configFile, true);
 $files = array_merge(
 	glob(__DIR__ . "/tables/*/*.sql"),
 	glob(__DIR__ . "/tables/*.sql"),
-	glob(__DIR__ . "/alterations/*.sql")
+	glob(__DIR__ . "/alterations/*.sql"),
+	glob(__DIR__ . "/procedures/*.sql")
 );
 
 if (in_array("--sample", $argv))
