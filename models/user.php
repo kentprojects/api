@@ -21,6 +21,7 @@ final class Model_User extends Model
 	{
 		$statement = Database::prepare("SELECT `user_id` FROM `User` WHERE `email` = ? AND `status` = 1", "s");
 		$user_id = $statement->execute($email)->singleval();
+
 		return (empty($user_id)) ? null : Model_User::getById($user_id);
 	}
 
@@ -32,7 +33,7 @@ final class Model_User extends Model
 	 */
 	public static function getById($id)
 	{
-		$statement = Database::prepare(
+		return Database::prepare(
 			"SELECT
 				`user_id` AS 'id',
 				`email`,
@@ -46,8 +47,38 @@ final class Model_User extends Model
 			 FROM `User`
 			 WHERE `user_id` = ?",
 			"i", __CLASS__
-		);
-		return $statement->execute($id)->singleton();
+		)->execute($id)->singleton();
+	}
+
+	/**
+	 * Get the relevant User by their token.
+	 *
+	 * @param string $token
+	 * @return Model_User
+	 */
+	public static function getByToken($token)
+	{
+		if (empty($token))
+		{
+			return null;
+		}
+
+		return Database::prepare(
+			"SELECT
+				u.`user_id` AS 'id',
+				u.`email`,
+				u.`first_name`,
+				u.`last_name`,
+				u.`role`,
+				u.`created`,
+				u.`lastlogin`,
+				u.`updated`,
+				u.`status`
+			 FROM `User` u
+			 JOIN `Token` t USING (`user_id`)
+			 WHERE t.`token` = ? AND u.`status` = 1",
+			"s", __CLASS__
+		)->execute($token)->singleton();
 	}
 
 	/**
@@ -88,6 +119,11 @@ final class Model_User extends Model
 	protected $status;
 
 	/**
+	 * @var UserYearMap
+	 */
+	public $years;
+
+	/**
 	 * @return int
 	 */
 	public function getId()
@@ -103,22 +139,14 @@ final class Model_User extends Model
 		return trim($this->first_name . " " . $this->last_name);
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function isConvener()
+	public function initYearMap()
 	{
-		$state = $this->metadata->convenerstate;
-		return !empty($state);
-	}
+		if (empty($this->years))
+		{
+			$this->years = new UserYearMap($this);
+		}
 
-	/**
-	 * @return bool
-	 */
-	public function isSecondMarker()
-	{
-		$state = $this->metadata->secondmarkerstate;
-		return !empty($state);
+		return $this->years;
 	}
 
 	/**
@@ -138,15 +166,6 @@ final class Model_User extends Model
 	}
 
 	/**
-	 * @return bool
-	 */
-	public function isSupervisor()
-	{
-		$state = $this->metadata->supervisorstate;
-		return !empty($state);
-	}
-
-	/**
 	 * @return array
 	 */
 	public function jsonSerialize()
@@ -160,16 +179,7 @@ final class Model_User extends Model
 				"last_name" => $this->last_name,
 				"role" => $this->role
 			),
-			($this->isStaff()
-				? array(
-					"is" => array(
-						"convenor" => $this->isConvener(),
-						"secondmarker" => $this->isSecondMarker(),
-						"supervisor" => $this->isSupervisor()
-					)
-				)
-				: array()
-			),
+			(!empty($this->years) ? $this->years : array()),
 			array(
 				"created" => $this->created,
 				"lastlogin" => $this->lastlogin,

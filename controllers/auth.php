@@ -257,14 +257,13 @@ final class Controller_Auth extends Controller
 	protected function createApiToken(Model_User $user)
 	{
 		$break = false;
-		$token = null;
-		$statement = Database::prepare("INSERT INTO `Token` (`user_id`, `token`) VALUES (?,?)", "is");
+		$token = new stdClass;
+		$statement = Database::prepare("CALL usp_GetApplicationUserToken", "ii");
 		while (!$break)
 		{
-			$token = md5(uniqid());
 			try
 			{
-				$statement->execute($user->getId(), $token);
+				$token = $statement->execute($this->auth->getApplication()->getId(), $user->getId())->singleton();
 				$break = true;
 			}
 			catch (DatabaseException $e)
@@ -276,7 +275,12 @@ final class Controller_Auth extends Controller
 				}
 			}
 		}
-		return $token;
+		if (empty($token) || empty($token->token))
+		{
+			throw new LogicException("Failed to create token.");
+		}
+
+		return $token->token;
 	}
 
 	/**

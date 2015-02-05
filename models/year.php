@@ -7,17 +7,6 @@
 class Model_Year extends Model
 {
 	/**
-	 * @return Model_Year
-	 */
-	public static function create()
-	{
-		$result = Database::prepare("INSERT INTO `Year` (`year`) VALUES (DEFAULT(`year`))")->execute();
-		$year = new Model_Year;
-		$year->id = $result->insert_id;
-		return $year;
-	}
-
-	/**
 	 * @return Model_Year[]
 	 */
 	public static function getAll()
@@ -38,6 +27,17 @@ class Model_Year extends Model
 	{
 		$statement = Database::prepare("SELECT `year` AS 'id' FROM `Year` WHERE `year` = ?", "i", __CLASS__);
 		return $statement->execute($id)->singleton();
+	}
+
+	/**
+	 * @return Model_Year
+	 */
+	public static function getCurrentYear()
+	{
+		$statement = Database::prepare("SELECT `year` FROM `Year` ORDER BY `year` DESC LIMIT 1");
+		$year_id = $statement->execute()->singleval();
+
+		return !empty($year_id) ? static::getById($year_id) : null;
 	}
 
 	/**

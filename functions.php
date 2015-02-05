@@ -49,6 +49,14 @@ spl_autoload_register(
 			$filename = APPLICATION_PATH . "/models/maps/" . str_replace("_", "", strtolower($class)) . ".php";
 		}
 		/**
+		 * If the word "Permissions" exists in this class, handle it.
+		 * Checking to see if "Permissions" exists in general will make this function quicker for other classes!
+		 */
+		elseif ((strpos($class, "Permissions") !== false) && (strpos($class, "Permissions") === (strlen($class) - 11)))
+		{
+			$filename = APPLICATION_PATH . "/models/permissions/" . str_replace("_", "", strtolower($class)) . ".php";
+		}
+		/**
 		 * Else this is a generic class in a folder, so go find it!
 		 */
 		else

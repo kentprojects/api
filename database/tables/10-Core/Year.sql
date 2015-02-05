@@ -4,6 +4,6 @@
  * @link: http://kentprojects.com
  */
 CREATE TABLE IF NOT EXISTS `Year` (
-	`year` INT(4) UNSIGNED AUTO_INCREMENT NOT NULL,
+	`year` INT(4) UNSIGNED NOT NULL,
 	PRIMARY KEY (`year`)
-) ENGINE = InnoDB AUTO_INCREMENT = 2014 CHARACTER SET utf8;
+) ENGINE = InnoDB CHARACTER SET utf8;

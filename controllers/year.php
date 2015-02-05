@@ -24,21 +24,14 @@ final class Controller_Year extends Controller
 			 * Used to create a new year!
 			 * Happy new year! ^_^
 			 */
+			$year = Model_Year::getById(
+				Database::prepare("CALL usp_CreateNewAcademicYear(?)", "i")
+					->execute($this->auth->getUser()->getId())->singleval()
+			);
 
-			if ($this->auth->getUser() === null)
-			{
-				throw new HttpStatusException(401, "You must be a user to do this.");
-			}
-
-			$user = $this->auth->getUser();
-			if (!$user->isConvener())
-			{
-				throw new HttpStatusException(401, "You must be a convener to do this.");
-			}
-
-			$year = Model_Year::create();
 			$this->response->status(201);
 			$this->response->body($year);
+
 			return;
 		}
 
@@ -63,7 +56,6 @@ final class Controller_Year extends Controller
 	}
 
 	/**
-	 * /year/staff
 	 * /year/:id/staff
 	 *
 	 * @throws HttpStatusException
@@ -144,5 +136,29 @@ final class Controller_Year extends Controller
 
 		$this->response->status(200);
 		$this->response->body($year->getStaff());
+	}
+
+	/**
+	 * /year/:id/stats
+	 *
+	 * @throws HttpStatusException
+	 * @return void
+	 */
+	public function action_stats()
+	{
+		$this->validateMethods(Request::GET);
+
+		if ($this->request->param("id") === null)
+		{
+			throw new HttpStatusException(400, "No year provided.");
+		}
+		$year = Model_Year::getById($this->request->param("id"));
+		if (empty($year))
+		{
+			throw new HttpStatusException(404, "Year not found.");
+		}
+
+		$this->response->status(200);
+		$this->response->body(Model_Stats::getForYear($year));
 	}
 }

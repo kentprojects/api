@@ -13,7 +13,7 @@ abstract class Controller
 	/**
 	 * @var string
 	 */
-	protected $authentication = Auth::APP;
+	protected $authentication = Auth::USER;
 	/**
 	 * @var bool
 	 */

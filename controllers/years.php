@@ -21,7 +21,9 @@ final class Controller_Years extends Controller
 			throw new HttpStatusException(400, "No id required.");
 		}
 
+		$years = new UserYearMap($this->auth->getUser());
+
 		$this->response->status(200);
-		$this->response->body(Model_Year::getAll());
+		$this->response->body($years);
 	}
 }
