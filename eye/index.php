@@ -80,7 +80,7 @@ $applications = parse_ini_file(__DIR__ . "/../applications.ini", true);
 
 </div>
 <script id="js-jquery" src="js/jquery.min.js"></script>
-<script id="js-pretty" src="js/ace/ace.js"></script>
+<script id="js-pretty" src="vendor/ace/ace.js"></script>
 <script id="js-pretty" src="js/pretty.js"></script>
 </body>
 </html>
