@@ -35,12 +35,9 @@ final class Controller_Auth extends Controller
 			throw new HttpStatusException(400, "Invalid authentication token.");
 		}
 
-		$output = array(
-			"token" => $this->createApiToken($user),
-			"user" => $user
-		);
+		$token = Model_Token::generate($this->auth->getApplication(), $user);
 		$this->response->status(200);
-		$this->response->body(json_encode($output));
+		$this->response->body($token);
 	}
 
 	/**
