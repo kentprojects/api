@@ -28,6 +28,11 @@ abstract class Model_Stats extends Model
 			"WHERE u.`role` = 'student' AND u.`status` = 1",
 			"AND uym.`year` = ?"
 		),
+		"total_groups_with_projects" => array(
+			"SELECT COUNT(g.`group_id`)", "FROM `Group` g",
+			"JOIN `Project` p USING (`group_id`)",
+			"AND g.`year` = ?"
+		),
 		"total_staff" => array(
 			"SELECT COUNT(u.`user_id`)", "FROM `User` u",
 			"JOIN `User_Year_Map` uym USING (`user_id`)",
