@@ -251,6 +251,9 @@ exec("which memcached", $output, $exit);
 if ($exit > 0)
 {
 	error_log("Memcached is not installed on this server.");
-	throw new CacheException("Memcached is not installed on this server.", 1);
+	// throw new CacheException("Memcached is not installed on this server.", 1);
 }
-Cache::init();
+else
+{
+	Cache::init();
+}

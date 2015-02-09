@@ -4,7 +4,23 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-$applications = parse_ini_file(__DIR__ . "/../applications.ini", true);
+require_once __DIR__."/../functions.php";
+/**
+ * @var Model_Application[] $applications
+ */
+$applications = array(
+	Model_Application::getById(1),
+	Model_Application::getById(2)
+);
+
+/**
+ * @var Model_User[] $users
+ */
+$users = array(
+	Model_User::getByEmail("J.C.Hernandez-Castro@kent.ac.uk"),
+	Model_User::getByEmail("mh471@kent.ac.uk"),
+	Model_User::getByEmail("supervisor2@kent.ac.uk")
+);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,10 +70,19 @@ $applications = parse_ini_file(__DIR__ . "/../applications.ini", true);
 			</div>
 			<div class="offset2 span4">
 				<select class="pretty-key" name="key">
-					<?php foreach ($applications as $name => $data)
+					<?php foreach ($applications as $application)
 					{
 						?>
-						<option value="<?php echo $name; ?>"><?php echo ucfirst($name); ?> Key</option>
+						<option value="<?php echo $application->getKey(); ?>"><?php echo ucfirst($application->getName()); ?> Key</option>
+					<?php } ?>
+					<option value="">None</option>
+				</select>
+
+				<select class="pretty-user" name="user">
+					<?php foreach ($users as $user)
+					{
+						?>
+						<option value="<?php echo $user->getId(); ?>"><?php echo $user->getName(); ?></option>
 					<?php } ?>
 					<option value="">None</option>
 				</select>

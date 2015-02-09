@@ -22,6 +22,10 @@ class EyeRequest
 	 * @var string
 	 */
 	public static $secret;
+	/**
+	 * @var Model_Token
+	 */
+	public static $userToken;
 
 	/**
 	 * @param array $params
@@ -76,12 +80,31 @@ class EyeRequest
 	}
 }
 
+require_once __DIR__."/../functions.php";
+
 /**
  * @var array
  */
 $config = (file_exists(__DIR__ . "/config.production.ini"))
 	? parse_ini_file(__DIR__ . "/config.production.ini", true)
 	: parse_ini_file(__DIR__ . "/config.ini", true);
+
+/**
+ * @var Model_Application[] $applications
+ */
+$applications = array(
+	Model_Application::getById(1),
+	Model_Application::getById(2)
+);
+
+/**
+ * @var Model_User[] $users
+ */
+$users = array(
+	Model_User::getByEmail("J.C.Hernandez-Castro@kent.ac.uk"),
+	Model_User::getByEmail("mh471@kent.ac.uk"),
+	Model_User::getByEmail("supervisor2@kent.ac.uk")
+);
 
 /**
  * @var EyeRequest
@@ -123,11 +146,16 @@ if (!empty($_POST["params-keys"]))
 
 if (!empty($_POST["key"]))
 {
-	/**
-	 * Grab the correct keys from the application.ini file.
-	 */
-	$applications = parse_ini_file(__DIR__ . "/../applications.ini", true);
-	if (empty($applications[$_POST["key"]]))
+	$application = null;
+	foreach($applications as $app)
+	{
+		if ($app->getKey() === $_POST["key"])
+		{
+			$application = $app;
+		}
+	}
+
+	if (empty($application))
 	{
 		echo '<div class="alert alert-danger">',
 		'<strong>There was an error with your API key</strong><br/>',
@@ -136,8 +164,32 @@ if (!empty($_POST["key"]))
 	}
 	else
 	{
-		$request::$key = $applications[$_POST["key"]]["key"];
-		$request::$secret = $applications[$_POST["key"]]["secret"];
+		$request::$key = $application->getKey();
+		$request::$secret = $application->getSecret();
+	}
+}
+
+if (!empty($_POST["user"]))
+{
+	$user = null;
+	foreach($users as $u)
+	{
+		if ($u->getId() == $_POST["user"])
+		{
+			$user = $u;
+		}
+	}
+
+	if (empty($user))
+	{
+		echo '<div class="alert alert-danger">',
+		'<strong>There was an error with your User ID</strong><br/>',
+		'The User ID was not found in the list of users.',
+		'</div>';
+	}
+	else
+	{
+		$request::$userToken = Model_Token::generate($application, $user);
 	}
 }
 
@@ -177,6 +229,12 @@ if ($signRequest)
 		"key" => EyeRequest::$key,
 		"expires" => time() + EyeRequest::$expires
 	));
+	if (!empty($request::$userToken))
+	{
+		$urlParams = array_merge($urlParams, array(
+			"user" => $request::$userToken->getToken()
+		));
+	}
 	EyeRequest::checksum($urlParams);
 }
 

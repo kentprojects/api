@@ -161,4 +161,28 @@ final class Controller_Year extends Controller
 		$this->response->status(200);
 		$this->response->body(Model_Stats::getForYear($year));
 	}
+
+	/**
+	 * /year/:id/supervisors
+	 *
+	 * @throws HttpStatusException
+	 * @return void
+	 */
+	public function action_supervisors()
+	{
+		$this->validateMethods(Request::GET);
+
+		if ($this->request->param("id") === null)
+		{
+			throw new HttpStatusException(400, "No year provided.");
+		}
+		$year = Model_Year::getById($this->request->param("id"));
+		if (empty($year))
+		{
+			throw new HttpStatusException(404, "Year not found.");
+		}
+
+		$this->response->status(200);
+		$this->response->body(Model_Staff::getSupervisorsForYear($year));
+	}
 }

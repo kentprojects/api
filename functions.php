@@ -4,7 +4,6 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-
 define("APPLICATION_PATH", __DIR__);
 date_default_timezone_set("Etc/UTC");
 setlocale(LC_ALL, "en_GB.UTF8");
