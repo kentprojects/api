@@ -27,9 +27,9 @@ final class Auth
 	 */
 	protected $response;
 	/**
-	 * @var Model_User
+	 * @var Model_Token
 	 */
-	protected $user;
+	protected $token;
 
 	/**
 	 * @param Request_Internal $request
@@ -88,7 +88,6 @@ final class Auth
 					}
 				);
 			}
-
 			$local = md5(config("checksum", "salt") . $this->application->getSecret() . json_encode($query));
 			if ($local !== $this->request->query("signature"))
 			{
@@ -106,11 +105,11 @@ final class Auth
 				throw new HttpStatusException(400, "Invalid signature.");
 			}
 
-			$this->user = Model_User::getByToken($this->request->query("user", null));
+			$this->token = Model_Token::getByToken($this->request->query("user", null));
 			/**
 			 * If we require user authentication, and we don't have a user, then throw an exception!
 			 */
-			if (($this->level === self::USER))
+			if (($this->level === self::USER) && empty($this->token))
 			{
 				throw new HttpStatusException(400, "Invalid user.");
 			}
@@ -124,7 +123,7 @@ final class Auth
 				{
 					throw new HttpStatusException(400, "Invalid application.");
 				}
-				$this->user = Model_User::getByToken($this->request->query("user", null));
+				$this->token = Model_Token::getByToken($this->request->query("user", null));
 			}
 		}
 	}
@@ -142,6 +141,6 @@ final class Auth
 	 */
 	public function getUser()
 	{
-		return $this->user;
+		return $this->token->getUser();
 	}
 }

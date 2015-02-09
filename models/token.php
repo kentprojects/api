@@ -55,6 +55,11 @@ class Model_Token extends Model
 	 */
 	public static function getByToken($token)
 	{
+		if (empty($token))
+		{
+			return null;
+		}
+
 		return Database::prepare(
 			"SELECT
 				t.`application_id` AS 'application',
@@ -125,9 +130,42 @@ class Model_Token extends Model
 		return sprintf("application:%d/user:%d", $this->application->getId(), $this->user->getId());
 	}
 
+	/**
+	 * @return Model_Application
+	 */
+	public function getApplication()
+	{
+		return $this->application;
+	}
+
+	/**
+	 * @return string
+	 */
 	public function getToken()
 	{
 		return $this->token;
+	}
+
+	/**
+	 * @return Model_User
+	 */
+	public function getUser()
+	{
+		return $this->user;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function jsonSerialize()
+	{
+		return array(
+			"application" => $this->application,
+			"user" => $this->user,
+			"token" => $this->token,
+			"created" => $this->created,
+			"updated" => $this->updated
+		);
 	}
 
 	/**

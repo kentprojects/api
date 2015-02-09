@@ -7,21 +7,17 @@
 class EyeRequest
 {
 	/**
+	 * @var Model_Application
+	 */
+	public static $application;
+	/**
 	 * @var int
 	 */
 	public static $expires = 600;
 	/**
 	 * @var string
 	 */
-	public static $key;
-	/**
-	 * @var string
-	 */
 	public static $salt;
-	/**
-	 * @var string
-	 */
-	public static $secret;
 	/**
 	 * @var Model_Token
 	 */
@@ -39,7 +35,21 @@ class EyeRequest
 		{
 			$v = (string)$v;
 		});
-		$params["signature"] = md5(static::$salt . static::$secret . json_encode($params));
+
+		$local = md5(config("checksum", "salt") . static::$application->getSecret() . json_encode($params));
+
+		if (false)
+		{
+			error_log(json_encode(array(
+				"INVALIDATED" => "SIGNATURE",
+				"local" => $local,
+				"get" => $params,
+				"app" => static::$application,
+				"sum" => config("checksum", "salt") . static::$application->getSecret() . json_encode($params)
+			)));
+		}
+
+		$params["signature"] = $local;
 	}
 
 	/**
@@ -129,10 +139,6 @@ if (!empty($_POST["url"]))
 	$request->url = $_POST["url"];
 }
 
-EyeRequest::$salt = (stripos($request->url, "api.dev") === false)
-	? $config["live-api"]["salt"]
-	: $config["dev-api"]["salt"];
-
 if (!empty($_POST["params-keys"]))
 {
 	for ($i = 0; $i < count($_POST["params-keys"]); $i++)
@@ -164,8 +170,7 @@ if (!empty($_POST["key"]))
 	}
 	else
 	{
-		$request::$key = $application->getKey();
-		$request::$secret = $application->getSecret();
+		$request::$application = $application;
 	}
 }
 
@@ -226,8 +231,8 @@ else
 if ($signRequest)
 {
 	$urlParams = array_merge($urlParams, array(
-		"key" => EyeRequest::$key,
-		"expires" => time() + EyeRequest::$expires
+		"key" => $request::$application->getKey(),
+		"expires" => time() + $request::$expires
 	));
 	if (!empty($request::$userToken))
 	{

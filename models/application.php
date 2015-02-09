@@ -91,6 +91,7 @@ class Model_Application extends Model
 	 */
 	public function __construct($name = null, $contact_email = null)
 	{
+		parent::__construct();
 		if ($this->getId() !== null)
 		{
 			return;

@@ -51,37 +51,6 @@ final class Model_User extends Model
 	}
 
 	/**
-	 * Get the relevant User by their token.
-	 *
-	 * @param string $token
-	 * @return Model_User
-	 */
-	public static function getByToken($token)
-	{
-		if (empty($token))
-		{
-			return null;
-		}
-
-		return Database::prepare(
-			"SELECT
-				u.`user_id` AS 'id',
-				u.`email`,
-				u.`first_name`,
-				u.`last_name`,
-				u.`role`,
-				u.`created`,
-				u.`lastlogin`,
-				u.`updated`,
-				u.`status`
-			 FROM `User` u
-			 JOIN `Token` t USING (`user_id`)
-			 WHERE t.`token` = ? AND u.`status` = 1",
-			"s", __CLASS__
-		)->execute($token)->singleton();
-	}
-
-	/**
 	 * @var int
 	 */
 	protected $id;
