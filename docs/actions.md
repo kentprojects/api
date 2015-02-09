@@ -46,3 +46,4 @@ Please make sure you have read the following pages before attempting to communic
 - [Get years](/endpoint/year)
 - [Get a year](/endpoint/year/#get-a-year)
 - [Create a year](/endpoint/year/#creating-a-year)
+- [Get a list of supervisors for a year](/endpoint/year/#supervisors-for-a-year)

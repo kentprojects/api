@@ -47,9 +47,7 @@ abstract class Model_Staff extends Model
 	public static function getSupervisorsForYear(Model_Year $year)
 	{
 		$statement = Database::prepare(
-			"SELECT `user_id`
-			 FROM `User_Year_Map` uym
-			 WHERE `year_id` = ? AND `role_supervisor` = TRUE", "i"
+			"SELECT `user_id` FROM `User_Year_Map` WHERE `year` = ? AND `role_supervisor` = TRUE", "i"
 		);
 		$results = $statement->execute($year->getId());
 
