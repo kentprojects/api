@@ -115,6 +115,18 @@ final class Auth
 				throw new HttpStatusException(400, "Invalid user.");
 			}
 		}
+		else
+		{
+			if ($this->request->query("key", null) !== null)
+			{
+				$this->application = Model_Application::getByKey($this->request->query("key"));
+				if (empty($this->application))
+				{
+					throw new HttpStatusException(400, "Invalid application.");
+				}
+				$this->user = Model_User::getByToken($this->request->query("user", null));
+			}
+		}
 	}
 
 	/**

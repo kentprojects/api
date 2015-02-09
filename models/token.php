@@ -18,7 +18,6 @@ class Model_Token extends Model
 		{
 			$token = new Model_Token($application, $user);
 		}
-		$token->regenerate();
 		$token->save();
 
 		return $token;

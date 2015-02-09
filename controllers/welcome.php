@@ -16,7 +16,9 @@ final class Controller_Welcome extends Controller
 	 */
 	public function action_index()
 	{
+		$user = $this->auth->getUser();
+
 		$this->response->status(200);
-		$this->response->body("Welcome to the KentProjects API!");
+		$this->response->body("Welcome to the KentProjects API" . (!empty($user) ? ", " . $user->getName() : "!"));
 	}
 }
