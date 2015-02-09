@@ -88,7 +88,7 @@ final class Controller_Staff extends Controller
 			 */
 			$query->join(array(
 				"table" => "User_Year_Map",
-				"how" => "USING",
+				"how" => Query::USING,
 				"field" => "user_id"
 			));
 			$query->where(array(
@@ -109,7 +109,7 @@ final class Controller_Staff extends Controller
 			{
 				$query->join(array(
 					"table" => "User_Year_Map",
-					"how" => "USING",
+					"how" => Query::USING,
 					"field" => "user_id"
 				));
 			}
