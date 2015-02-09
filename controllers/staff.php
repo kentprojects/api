@@ -99,6 +99,27 @@ final class Controller_Staff extends Controller
 			));
 		}
 
+		if ($this->request->query("supervisor", false) === true)
+		{
+			/**
+			 * JOIN `User_Year_Map` USING (`user_id`)
+			 * WHERE `User_Year_Map`.`year` = ?
+			 */
+			if ($this->request->query("year") === null)
+			{
+				$query->join(array(
+					"table" => "User_Year_Map",
+					"how" => "USING",
+					"field" => "user_id"
+				));
+			}
+			$query->where(array(
+				"table" => "User_Year_Map",
+				"field" => "role_supervisor",
+				"value" => "TRUE"
+			));
+		}
+
 		$users = $query->execute()->singlevals();
 		foreach ($users as $k => $user_id)
 		{

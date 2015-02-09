@@ -37,31 +37,4 @@ abstract class Model_Staff extends Model
 
 		return (empty($user_id)) ? null : Model_User::getById($user_id);
 	}
-
-	/**
-	 * @param Model_Year $year
-	 * @return Model_User[]
-	 * @throws DatabaseException
-	 * @throws Exception
-	 */
-	public static function getSupervisorsForYear(Model_Year $year)
-	{
-		$statement = Database::prepare(
-			"SELECT `user_id` FROM `User_Year_Map` WHERE `year` = ? AND `role_supervisor` = TRUE", "i"
-		);
-		$results = $statement->execute($year->getId());
-
-		if (count($results) == 0)
-		{
-			return array();
-		}
-
-		return array_map(
-			function ($user_id)
-			{
-				return Model_User::getById($user_id);
-			},
-			$results->singlevals()
-		);
-	}
 }
