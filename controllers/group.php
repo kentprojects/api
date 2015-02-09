@@ -24,6 +24,11 @@ final class Controller_Group extends Controller
 				throw new HttpStatusException(400, "You cannot create a group using an existing ID.");
 			}
 
+			if (!$this->acl->validate("group/1", ACL::DELETE))
+			{
+				throw new HttpStatusException(400, "You do not have permission to create a group.");
+			}
+
 			/**
 			 * POST /group
 			 */

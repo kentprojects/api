@@ -141,6 +141,6 @@ final class Auth
 	 */
 	public function getUser()
 	{
-		return $this->token->getUser();
+		return empty($this->token) ? null : $this->token->getUser();
 	}
 }

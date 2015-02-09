@@ -7,6 +7,10 @@
 abstract class Controller
 {
 	/**
+	 * @var ACL
+	 */
+	protected $acl;
+	/**
 	 * @var Auth
 	 */
 	protected $auth;
@@ -44,6 +48,7 @@ abstract class Controller
 		}
 
 		$this->auth = new Auth($request, $response, $this->authentication);
+		$this->acl = new ACL($this->auth->getUser());
 	}
 
 	/**
