@@ -31,7 +31,7 @@ abstract class Model_Stats extends Model
 		"total_groups_with_projects" => array(
 			"SELECT COUNT(g.`group_id`)", "FROM `Group` g",
 			"JOIN `Project` p USING (`group_id`)",
-			"AND g.`year` = ?"
+			"WHERE g.`year` = ? AND g.`status` = 1"
 		),
 		"total_staff" => array(
 			"SELECT COUNT(u.`user_id`)", "FROM `User` u",
