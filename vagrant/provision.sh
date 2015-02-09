@@ -41,3 +41,8 @@ rm /etc/apache2/sites-enabled/*
 ln -s /vagrant/vagrant/apache.conf /etc/apache2/sites-enabled/10-KentProjects.conf
 # And restart Apache.
 service apache2 restart
+#
+# Make a folder for the Log class to store it's logs.
+mkdir -p /var/www/logs
+# And ensure that the web can write to it.
+chown www-data:www-data logs

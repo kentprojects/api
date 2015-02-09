@@ -94,6 +94,7 @@ spl_autoload_register(
 set_error_handler(
 	function ($error_no, $error_string, $error_file, $error_line, $error_context)
 	{
+		Log::log_error($error_no, "{$error_string} in {$error_file}:{$error_line}");
 		throw new PHPException($error_no, $error_string, $error_file, $error_line, $error_context);
 	}
 );
