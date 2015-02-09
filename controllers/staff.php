@@ -99,7 +99,7 @@ final class Controller_Staff extends Controller
 			));
 		}
 
-		if ($this->request->query("supervisor", false) === true)
+		if ($this->request->query("supervisor") !== null)
 		{
 			/**
 			 * JOIN `User_Year_Map` USING (`user_id`)
