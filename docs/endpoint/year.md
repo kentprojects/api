@@ -46,6 +46,29 @@ HTTP/1.1 200 OK
 }
 ```
 
+## Statistics For A Year
+
+```http
+GET /year/:id/stats HTTP/1.1
+```
+
+Returns:
+
+```http
+HTTP/1.1 200 OK
+```
+
+```json
+{
+    "total_students": 3,
+    "total_students_in_groups": 3,
+    "total_students_in_projects": 3,
+    "total_staff": 3,
+    "total_supervisors": 2,
+    "total_secondmarkers": 2
+}
+```
+
 ## Supervisors For A Year
 
 ```http

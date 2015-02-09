@@ -66,7 +66,7 @@ class Model_Year extends Model
 	 */
 	public function __toString()
 	{
-		return $this->getId();
+		return (string) $this->getId();
 	}
 
 	/**

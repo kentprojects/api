@@ -63,7 +63,7 @@ abstract class Model_Stats extends Model
 		}
 		$statement = Database::prepare(
 			"SELECT " . implode(", ", $queries),
-			implode(",", array_pad(array(), count($queries), "i"))
+			implode("", array_pad(array(), count($queries), "i"))
 		);
 		$results = call_user_func_array(array($statement, "execute"), array_pad(array(), count($queries), (string)$year));
 
