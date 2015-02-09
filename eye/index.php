@@ -79,12 +79,12 @@ $users = array(
 				</select>
 
 				<select class="pretty-user" name="user">
+					<option value="">None</option>
 					<?php foreach ($users as $user)
 					{
 						?>
 						<option value="<?php echo $user->getId(); ?>"><?php echo $user->getName(); ?></option>
 					<?php } ?>
-					<option value="">None</option>
 				</select>
 			</div>
 		</div>
