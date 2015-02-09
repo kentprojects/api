@@ -103,7 +103,7 @@ final class Controller_Staff extends Controller
 		{
 			/**
 			 * JOIN `User_Year_Map` USING (`user_id`)
-			 * WHERE `User_Year_Map`.`year` = ?
+			 * WHERE `User_Year_Map`.`role_supervisor` = TRUE
 			 */
 			if ($this->request->query("year") === null)
 			{
@@ -116,7 +116,7 @@ final class Controller_Staff extends Controller
 			$query->where(array(
 				"table" => "User_Year_Map",
 				"field" => "role_supervisor",
-				"value" => "TRUE"
+				"value" => 1
 			));
 		}
 
