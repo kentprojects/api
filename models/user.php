@@ -108,6 +108,14 @@ final class Model_User extends Model
 		return trim($this->first_name . " " . $this->last_name);
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getRole()
+	{
+		return $this->role;
+	}
+
 	public function initYearMap()
 	{
 		if (empty($this->years))

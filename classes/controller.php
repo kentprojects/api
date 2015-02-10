@@ -118,4 +118,49 @@ abstract class Controller
 		}
 		return $data;
 	}
+
+	/**
+	 * This is a clever function to handle all the user permissions.
+	 * Uses an array to set various requirements for an action.
+	 *
+	 * @param array $requirements An array of requirements to check against.
+	 * @throws HttpStatusException
+	 * @throws InvalidArgumentException
+	 * @return bool
+	 */
+	protected function validateUser(array $requirements)
+	{
+		if (empty($requirements["entity"]) || empty($requirements["action"]))
+		{
+			throw new InvalidArgumentException("Missing 'entity' and/or 'action' key for requirements.");
+		}
+
+		$user = $this->auth->getUser();
+
+		if (empty($requirements["message"]))
+		{
+			$requirements["message"] = "You aren't allowed to do this action.";
+		}
+
+		$requirements["missing-user-message"] = "No user found to authenticate this action against.";
+
+		if (!empty($requirements["role"]))
+		{
+			if (empty($user))
+			{
+				throw new HttpStatusException(400, $requirements["missing-user-message"]);
+			}
+			if ($user->getRole() !== $requirements["role"])
+			{
+				throw new HttpStatusException(
+					400, "You must be the role of '{$requirements["role"]}' to do this action."
+				);
+			}
+		}
+
+		if (!$this->acl->validate($requirements["entity"], $requirements["action"]))
+		{
+			throw new HttpStatusException(400, $requirements["message"]);
+		}
+	}
 }

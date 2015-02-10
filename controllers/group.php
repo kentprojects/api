@@ -24,10 +24,11 @@ final class Controller_Group extends Controller
 				throw new HttpStatusException(400, "You cannot create a group using an existing ID.");
 			}
 
-			if (!$this->acl->validate("group/1", ACL::DELETE))
-			{
-				throw new HttpStatusException(400, "You do not have permission to create a group.");
-			}
+			$this->validateUser(array(
+				"entity" => "group",
+				"action" => ACL::CREATE,
+				"message" => "You do not have permission to create this group."
+			));
 
 			/**
 			 * POST /group
@@ -55,6 +56,7 @@ final class Controller_Group extends Controller
 
 			$this->response->status(201);
 			$this->response->body($group);
+
 			return;
 		}
 
@@ -75,6 +77,11 @@ final class Controller_Group extends Controller
 			 * PUT /group/:id
 			 * Update a group.
 			 */
+			$this->validateUser(array(
+				"entity" => "group/" . $group->getId(),
+				"action" => ACL::UPDATE,
+				"message" => "You do not have permission to update this group."
+			));
 			throw new HttpStatusException(501, "Updating a group is coming soon.");
 		}
 		elseif ($this->request->getMethod() === Request::DELETE)
@@ -83,6 +90,11 @@ final class Controller_Group extends Controller
 			 * DELETE /group/:id
 			 * Update a group.
 			 */
+			$this->validateUser(array(
+				"entity" => "group/" . $group->getId(),
+				"action" => ACL::DELETE,
+				"message" => "You do not have permission to delete this group."
+			));
 			throw new HttpStatusException(501, "Deleting a group is coming soon.");
 		}
 
@@ -90,6 +102,11 @@ final class Controller_Group extends Controller
 		 * GET /group/:id
 		 * Get a group.
 		 */
+		$this->validateUser(array(
+			"entity" => "group/" . $group->getId(),
+			"action" => ACL::READ,
+			"message" => "You do not have permission to read this group."
+		));
 		$this->response->status(200);
 		$this->response->body($group);
 	}
@@ -115,6 +132,13 @@ final class Controller_Group extends Controller
 		{
 			throw new HttpStatusException(404, "Group not found.");
 		}
+
+		$this->validateUser(array(
+			"entity" => "group/" . $group->getId(),
+			"action" => ACL::UPDATE,
+			"message" => "You do not have permission to update this groups' students.",
+			"role" => "staff"
+		));
 
 		if ($this->request->getMethod() === Request::POST)
 		{
@@ -155,6 +179,13 @@ final class Controller_Group extends Controller
 		{
 			throw new HttpStatusException(404, "Group not found.");
 		}
+
+		$this->validateUser(array(
+			"entity" => "group/" . $group->getId(),
+			"action" => ACL::UPDATE,
+			"message" => "You do not have permission to update this groups' supervisors.",
+			"role" => "staff"
+		));
 
 		if ($this->request->getMethod() === Request::POST)
 		{
