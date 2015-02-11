@@ -29,6 +29,15 @@ final class Controller_Project extends Controller
 				throw new HttpStatusException(400, "You cannot create a project using an existing project ID.");
 			}
 
+			/**
+			 * Validate that the user can create a project.
+			 */
+			$this->validateUser(array(
+				"entity" => "project",
+				"action" => ACL::CREATE,
+				"message" => "You do not have permission to create a project."
+			));
+
 			$params = $this->validateParams(array(
 				"year" => $this->request->post("year", false),
 				"name" => $this->request->post("name", false),
@@ -79,6 +88,16 @@ final class Controller_Project extends Controller
 			 * PUT /project/:id
 			 * Used to update a project!
 			 */
+
+			/**
+			 * Validate that the user can update this project.
+			 */
+			$this->validateUser(array(
+				"entity" => "project/" . $project->getId(),
+				"action" => ACL::UPDATE,
+				"message" => "You do not have permission to update this project."
+			));
+
 			throw new HttpStatusException(501, "Updating a project is coming soon.");
 		}
 		elseif ($this->request->getMethod() === Request::DELETE)
@@ -87,6 +106,16 @@ final class Controller_Project extends Controller
 			 * DELETE /project/:id
 			 * Used to delete a project.
 			 */
+
+			/**
+			 * Validate that the user can delete this project.
+			 */
+			$this->validateUser(array(
+				"entity" => "project/" . $project->getId(),
+				"action" => ACL::DELETE,
+				"message" => "You do not have permission to delete this project."
+			));
+
 			throw new HttpStatusException(501, "Deleting a project is coming soon.");
 		}
 
@@ -125,6 +154,15 @@ final class Controller_Project extends Controller
 			throw new HttpStatusException(404, "Project not found.");
 		}
 
+		/**
+		 * Validate that the user can update this project.
+		 */
+		$this->validateUser(array(
+			"entity" => "project/" . $project->getId(),
+			"action" => ACL::UPDATE,
+			"message" => "You do not have permission to update this project."
+		));
+
 		throw new HttpStatusException(501, "Adding a group to a project is coming soon.");
 	}
 
@@ -153,6 +191,16 @@ final class Controller_Project extends Controller
 		{
 			throw new HttpStatusException(404, "Project not found.");
 		}
+
+		/**
+		 * Validate that the user is a member of staff & can update this project.
+		 */
+		$this->validateUser(array(
+			"entity" => "project/" . $project->getId(),
+			"action" => ACL::READ,
+			"message" => "You do not have permission to update this project.",
+			"role" => "staff"
+		));
 
 		throw new HttpStatusException(501, "Rolling over a project is coming soon.");
 	}

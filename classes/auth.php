@@ -143,4 +143,13 @@ final class Auth
 	{
 		return empty($this->token) ? null : $this->token->getUser();
 	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasUser()
+	{
+		$user = $this->getUser();
+		return !empty($user) && ($user instanceof Model_User);
+	}
 }

@@ -24,6 +24,21 @@ final class Controller_Year extends Controller
 			 * Used to create a new year!
 			 * Happy new year! ^_^
 			 */
+
+			if (!$this->auth->hasUser())
+			{
+				throw new HttpStatusException(401, "You must be authorized as a user to do this.");
+			}
+
+			/**
+			 * Validate that the user can create a new year.
+			 */
+			$this->validateUser(array(
+				"entity" => "year",
+				"action" => ACL::CREATE,
+				"message" => "You do not have permission to create a new year."
+			));
+
 			$year = Model_Year::getById(
 				Database::prepare("CALL usp_CreateNewAcademicYear(?)", "i")
 					->execute($this->auth->getUser()->getId())->singleval()
@@ -82,6 +97,17 @@ final class Controller_Year extends Controller
 			 * POST|DELETE /year/:id/staff
 			 * Adding / removing staff to a year!
 			 */
+
+			/**
+			 * Validate that the user can update this year.
+			 */
+			$this->validateUser(array(
+				"entity" => "year/" . $year->getId(),
+				"action" => ACL::UPDATE,
+				"message" => "You do not have permission to update this year.",
+				"role" => "staff"
+			));
+
 			if (is_array($_POST) || empty($_POST))
 			{
 				throw new InvalidArgumentException("POST is an ARRAY/EMPTY not a STRING.");

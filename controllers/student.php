@@ -34,6 +34,16 @@ final class Controller_Student extends Controller
 			 * PUT /student/:id
 			 * Used to update the student profile.
 			 */
+
+			/**
+			 * Validate that the user can update this student profile.
+			 */
+			$this->validateUser(array(
+				"entity" => "user/" . $user->getId(),
+				"action" => ACL::UPDATE,
+				"message" => "You do not have permission to update this user profile."
+			));
+
 			throw new HttpStatusException(501, "Updating student profiles is coming soon.");
 		}
 		elseif ($this->request->getMethod() === Request::DELETE)
@@ -42,6 +52,16 @@ final class Controller_Student extends Controller
 			 * DELETE /student/:id
 			 * Used to delete the student.
 			 */
+
+			/**
+			 * Validate that the user can update this student profile.
+			 */
+			$this->validateUser(array(
+				"entity" => "user/" . $user->getId(),
+				"action" => ACL::DELETE,
+				"message" => "You do not have permission to delete this user profile."
+			));
+
 			throw new HttpStatusException(501, "Deleting student profiles is coming soon.");
 		}
 

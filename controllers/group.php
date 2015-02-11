@@ -24,6 +24,9 @@ final class Controller_Group extends Controller
 				throw new HttpStatusException(400, "You cannot create a group using an existing ID.");
 			}
 
+			/**
+			 * Validate that the user can create a group.
+			 */
 			$this->validateUser(array(
 				"entity" => "group",
 				"action" => ACL::CREATE,
@@ -77,6 +80,10 @@ final class Controller_Group extends Controller
 			 * PUT /group/:id
 			 * Update a group.
 			 */
+
+			/**
+			 * Validate that the user can update this group.
+			 */
 			$this->validateUser(array(
 				"entity" => "group/" . $group->getId(),
 				"action" => ACL::UPDATE,
@@ -88,7 +95,11 @@ final class Controller_Group extends Controller
 		{
 			/**
 			 * DELETE /group/:id
-			 * Update a group.
+			 * Delete a group.
+			 */
+
+			/**
+			 * Validate that the user can delete this group.
 			 */
 			$this->validateUser(array(
 				"entity" => "group/" . $group->getId(),
@@ -102,11 +113,6 @@ final class Controller_Group extends Controller
 		 * GET /group/:id
 		 * Get a group.
 		 */
-		$this->validateUser(array(
-			"entity" => "group/" . $group->getId(),
-			"action" => ACL::READ,
-			"message" => "You do not have permission to read this group."
-		));
 		$this->response->status(200);
 		$this->response->body($group);
 	}
@@ -133,11 +139,13 @@ final class Controller_Group extends Controller
 			throw new HttpStatusException(404, "Group not found.");
 		}
 
+		/**
+		 * Validate that this user is allowed to update this group's students.
+		 */
 		$this->validateUser(array(
 			"entity" => "group/" . $group->getId(),
 			"action" => ACL::UPDATE,
-			"message" => "You do not have permission to update this groups' students.",
-			"role" => "staff"
+			"message" => "You do not have permission to update this groups' students."
 		));
 
 		if ($this->request->getMethod() === Request::POST)
@@ -180,6 +188,9 @@ final class Controller_Group extends Controller
 			throw new HttpStatusException(404, "Group not found.");
 		}
 
+		/**
+		 * Validate that this user is a member of staff and is allowed to update this group's supervisors.
+		 */
 		$this->validateUser(array(
 			"entity" => "group/" . $group->getId(),
 			"action" => ACL::UPDATE,
