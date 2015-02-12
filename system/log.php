@@ -143,7 +143,7 @@ final class Log
 		}
 	}
 }
-if ($_SERVER["VAGRANT_ENV"])
+if (!empty($_SERVER["VAGRANT_ENV"]))
 {
 	Log::$directory = "/var/www/logs/";
 }
