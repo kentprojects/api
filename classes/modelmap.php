@@ -113,7 +113,7 @@ abstract class ModelMap implements IteratorAggregate, JsonSerializable
 	 */
 	public function getIterator()
 	{
-		return $this->data;
+		return array_values($this->data);
 	}
 
 	/**
@@ -123,7 +123,7 @@ abstract class ModelMap implements IteratorAggregate, JsonSerializable
 	 */
 	public function jsonSerialize()
 	{
-		return $this->data;
+		return array_values($this->data);
 	}
 
 	/**

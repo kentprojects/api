@@ -109,6 +109,8 @@ final class Controller_Group extends Controller
 			throw new HttpStatusException(501, "Deleting a group is coming soon.");
 		}
 
+		Log::debug($group);
+
 		/**
 		 * GET /group/:id
 		 * Get a group.

@@ -62,7 +62,7 @@ class Model_Group extends Model
 	/**
 	 * @var GroupStudentMap
 	 */
-	private $students;
+	protected $students;
 
 	/**
 	 * The reason for the @noinspection lines is because when the Database builds the model, the other 'Model' values
@@ -80,7 +80,6 @@ class Model_Group extends Model
 			$this->year = Model_Year::getById($this->year);
 			/** @noinspection PhpParamsInspection */
 			$this->creator = Model_User::getById($this->creator);
-			return;
 		}
 		else
 		{

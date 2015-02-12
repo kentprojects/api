@@ -40,10 +40,17 @@ spl_autoload_register(
 			$filename = APPLICATION_PATH . "/models/" . str_replace("model/", "", $file);
 		}
 		/**
+		 * If the word "Intent_" exists at the beginning of this class, handle it.
+		 */
+		elseif (strpos($class, "Intent_") === 0)
+		{
+			$filename = APPLICATION_PATH . "/intents/" . str_replace("intent/", "", $file);
+		}
+		/**
 		 * If the word "_Map" exists in this class, handle it.
 		 * Checking to see if "Map" exists in general will make this function quicker for other classes!
 		 */
-		elseif ((strpos($class, "Map") !== false) && (strpos($class, "Map") === (strlen($class) - 3)))
+		elseif (($class != "ModelMap") && (strpos($class, "Map") !== false) && (strpos($class, "Map") === (strlen($class) - 3)))
 		{
 			$filename = APPLICATION_PATH . "/models/maps/" . str_replace("_", "", strtolower($class)) . ".php";
 		}
@@ -83,6 +90,7 @@ spl_autoload_register(
 
 		/** @noinspection PhpIncludeInspection */
 		require_once $filename;
+
 		return class_exists($class, false);
 	}
 );
@@ -116,6 +124,7 @@ function coalesce($a, $b)
 			return $a;
 		}
 	}
+
 	return null;
 }
 
@@ -140,6 +149,7 @@ function config($section = null, $key = null)
 		else
 		{
 			trigger_error("No config file found.", E_USER_ERROR);
+
 			return null;
 		}
 		$GLOBALS["config.ini"] = parse_ini_file($configFile, true);
@@ -259,6 +269,7 @@ function getHttpStatusForCode($code)
 		748 => "Confounded by ponies",
 		749 => "Reserved for Chuck Norris"
 	);
+
 	return (isset($codes[$code])) ? $codes[$code] : "";
 }
 

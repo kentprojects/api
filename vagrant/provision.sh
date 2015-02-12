@@ -29,7 +29,7 @@ patch /etc/mysql/my.cnf < /vagrant/vagrant/my.cnf.patch
 sudo service mysql restart
 #
 # Build the development database.
-mysql -u root -ppassword < /vagrant/vagrant/database.setup.sql
+mysql -u root -ppassword < /vagrant/vagrant/database.sql
 #   And it's structure.
 php /vagrant/database/update.php
 #   And then import some sample data.
@@ -45,4 +45,4 @@ service apache2 restart
 # Make a folder for the Log class to store it's logs.
 mkdir -p /var/www/logs
 # And ensure that the web can write to it.
-chown www-data:www-data logs
+chown www-data:www-data /var/www/logs
