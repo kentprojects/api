@@ -109,7 +109,10 @@ final class Controller_Group extends Controller
 			throw new HttpStatusException(501, "Deleting a group is coming soon.");
 		}
 
-		Log::debug($group);
+		/**
+		 * Fetch additional assets to display for a read.
+		 */
+		$group->getProject();
 
 		/**
 		 * GET /group/:id

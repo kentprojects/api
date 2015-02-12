@@ -7,6 +7,36 @@
 class Model_Project extends Model
 {
 	/**
+	 * Get the relevant Project by it's group.
+	 *
+	 * @param Model_Group $group
+	 * @return Model_Project
+	 */
+	public static function getByGroup(Model_Group $group)
+	{
+		if ($group->getId() === null)
+		{
+			return null;
+		}
+
+		return Database::prepare(
+			"SELECT
+				`project_id` AS 'id',
+				`year`,
+				`group_id` AS 'group',
+				`name`,
+				`slug`,
+				`creator_id` AS 'creator',
+				`created`,
+				`updated`,
+				`status`
+			 FROM `Project`
+			 WHERE `group_id` = ?",
+			"i", __CLASS__
+		)->execute($group->getId())->singleton();
+	}
+
+	/**
 	 * Get the relevant Project by it's ID.
 	 *
 	 * @param int $id

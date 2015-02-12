@@ -27,6 +27,7 @@ class Model_Group extends Model
 			 WHERE `group_id` = ?",
 			"i", __CLASS__
 		);
+
 		return $statement->execute($id)->singleton();
 	}
 
@@ -59,6 +60,10 @@ class Model_Group extends Model
 	 */
 	protected $status;
 
+	/**
+	 * @var Model_Project
+	 */
+	protected $project;
 	/**
 	 * @var GroupStudentMap
 	 */
@@ -137,6 +142,16 @@ class Model_Group extends Model
 		return $this->name;
 	}
 
+	public function getProject()
+	{
+		if (empty($this->project))
+		{
+			$this->project = Model_Project::getByGroup($this);
+		}
+
+		return $this->project;
+	}
+
 	/**
 	 * @return int
 	 */
@@ -170,7 +185,10 @@ class Model_Group extends Model
 			parent::jsonSerialize(),
 			array(
 				"year" => (string)$this->year,
-				"name" => $this->name,
+				"name" => $this->name
+			),
+			(!empty($this->project) ? array("project" => $this->project) : array()),
+			array(
 				"students" => $this->students,
 				"creator" => $this->creator,
 				"created" => $this->created,
