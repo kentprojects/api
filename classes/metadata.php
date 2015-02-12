@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-class Metadata implements ArrayAccess
+class Metadata implements ArrayAccess, JsonSerializable
 {
 	protected $data = array();
 	protected $root;
@@ -35,6 +35,27 @@ class Metadata implements ArrayAccess
 	public function __set($key, $value)
 	{
 		$this->data[$key] = array($value);
+	}
+
+	/**
+	 * @return array
+	 */
+	function jsonSerialize()
+	{
+		$data = array();
+		foreach ($this->data as $key => $value)
+		{
+			if (is_array($value) && (count($value) === 0))
+			{
+				$data[$key] = array_shift($value);
+			}
+			else
+			{
+				$data[$key] = $value;
+			}
+		}
+
+		return $data;
 	}
 
 	public function offsetCount($key)
