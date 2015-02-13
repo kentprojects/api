@@ -125,13 +125,23 @@ class Model_Project extends Model
 	{
 		if ($this->getId() !== null)
 		{
-			return;
+			/** @noinspection PhpParamsInspection */
+			$this->year = Model_Year::getById($this->year);
+			if (!empty($this->group))
+			{
+				/** @noinspection PhpParamsInspection */
+				$this->group = Model_Year::getById($this->group);
+			}
+			/** @noinspection PhpParamsInspection */
+			$this->creator = Model_User::getById($this->creator);
 		}
-
-		$this->year = $year;
-		$this->name = $name;
-		$this->slug = $slug;
-		$this->creator = $creator;
+		else
+		{
+			$this->year = $year;
+			$this->name = $name;
+			$this->slug = $slug;
+			$this->creator = $creator;
+		}
 	}
 
 	/**
