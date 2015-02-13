@@ -36,7 +36,7 @@ final class Controller_Intent extends Controller
 			/** @var Intent $class */
 			$class = Intent::getHandlerClassName($params["handler"]);
 			/** @var Intent $intent */
-			$intent = new $class(new Model_Intent($this->auth->getUser(), $params["handler"]));
+			$intent = new $class(new Model_Intent($this->auth->getUser(), Intent::formatHandler($params["handler"])));
 			$intent->create($params["data"]);
 
 			$this->response->status(201);

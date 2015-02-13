@@ -40,12 +40,19 @@ abstract class Intent implements JsonSerializable
 				{
 					return ucfirst($h);
 				},
-				explode(
-					"_", strtolower(
-						str_replace("-", "_", $handler)
-					)
-				)
+				explode("_", static::formatHandler($handler))
 			)
+		);
+	}
+
+	/**
+	 * @param string $handler
+	 * @return string
+	 */
+	public static function formatHandler($handler)
+	{
+		return strtolower(
+			str_replace("-", "_", $handler)
 		);
 	}
 

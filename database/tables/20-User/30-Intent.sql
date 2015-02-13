@@ -4,7 +4,7 @@
  * @link: http://kentprojects.com
  */
 CREATE TABLE IF NOT EXISTS `Intent` (
-	`intent_id` INT UNSIGNED NOT NULL COMMENT 'Intent Identifier',
+	`intent_id` INT UNSIGNED AUTO_INCREMENT NOT NULL COMMENT 'Intent Identifier',
 	`user_id` INT UNSIGNED NOT NULL COMMENT 'Intent User Identifier',
 	`handler` CHAR(32) NOT NULL COMMENT 'Intent Handler',
 	`created` TIMESTAMP NOT NULL DEFAULT '2014-01-01' COMMENT 'Intent Created Date',
