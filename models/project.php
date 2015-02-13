@@ -64,6 +64,7 @@ class Model_Project extends Model
 				"i", __CLASS__
 			);
 			$project = $statement->execute($id)->singleton();
+			Log::debug($project);
 			if (!empty($project))
 			{
 				Cache::set($project->getCacheName(), $project);
