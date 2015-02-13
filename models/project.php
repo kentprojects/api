@@ -45,7 +45,7 @@ class Model_Project extends Model
 	public static function getById($id)
 	{
 		/** @var Model_Project $project */
-		// $project = parent::getById($id);
+		$project = parent::getById($id);
 		if (empty($project))
 		{
 			$statement = Database::prepare(
@@ -64,10 +64,9 @@ class Model_Project extends Model
 				"i", __CLASS__
 			);
 			$project = $statement->execute($id)->singleton();
-			Log::debug($project);
 			if (!empty($project))
 			{
-				Cache::set($project->getCacheName(), $project);
+				// Cache::set($project->getCacheName(), $project);
 			}
 		}
 		return $project;
@@ -131,7 +130,7 @@ class Model_Project extends Model
 			if (!empty($this->group))
 			{
 				/** @noinspection PhpParamsInspection */
-				$this->group = Model_Year::getById($this->group);
+				$this->group = Model_Group::getById($this->group);
 			}
 			/** @noinspection PhpParamsInspection */
 			$this->creator = Model_User::getById($this->creator);
