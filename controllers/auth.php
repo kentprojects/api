@@ -133,7 +133,7 @@ final class Controller_Auth extends Controller
 		{
 			if ($this->request->query("data") === null)
 			{
-				throw new HttpRedirectException(302, "http://api.kentprojects.com/auth/sso?return=dev");
+				throw new HttpRedirectException(302, "https://api.kentprojects.com/auth/sso?return=dev");
 			}
 			else
 			{
