@@ -45,7 +45,7 @@ class Model_Project extends Model
 	public static function getById($id)
 	{
 		/** @var Model_Project $project */
-		$project = parent::getById($id);
+		// $project = parent::getById($id);
 		if (empty($project))
 		{
 			$statement = Database::prepare(
