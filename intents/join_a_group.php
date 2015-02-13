@@ -38,7 +38,7 @@ final class Intent_Join_A_Group extends Intent
 		/**
 		 * This is where one would mail out, or at least add to a queue!
 		 */
-		$mail = new Mail();
+		$mail = new Mail;
 		$mail->setTo("developers@kentprojects.com", "KentProject Developers");
 		$mail->setSubject("New INTENT");
 		$mail->setBody(array(

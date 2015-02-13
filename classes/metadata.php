@@ -110,13 +110,13 @@ class Metadata implements ArrayAccess, JsonSerializable
 		}
 
 		Database::prepare("DELETE FROM `Metadata` WHERE `root` = ?", "s")->execute($this->root);
-		$statement = Database::prepare("INSERT INTO Metadata (`root`, `key`, `value`) VALUES (?, ?, ?)", "sss");
 
 		foreach($this->data as $key => $values)
 		{
 			foreach($values as $value)
 			{
-				$statement->execute($this->root, $key, $value);
+				Database::prepare("INSERT INTO Metadata (`root`, `key`, `value`) VALUES (?, ?, ?)", "sss")
+					->execute($this->root, $key, $value);
 			}
 		}
 	}
