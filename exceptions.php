@@ -184,6 +184,13 @@ class HttpStatusException extends Exception
 }
 
 /**
+ * Class IntentException
+ */
+final class IntentException extends Exception
+{
+}
+
+/**
  * Class PHPException
  */
 final class PHPException extends Exception

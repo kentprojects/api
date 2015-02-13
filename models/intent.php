@@ -48,19 +48,38 @@ final class Model_Intent extends Model
 	 * @var string
 	 */
 	protected $updated;
-	/**
-	 * @var int
-	 */
-	protected $status;
 
 	/**
 	 * Build a new Intent Model
+	 *
+	 * @param Model_User $user
+	 * @param string $handler
+	 * @throws InvalidArgumentException
 	 */
-	public function __construct()
+	public function __construct(Model_User $user = null, $handler = null)
 	{
 		/**
-		 * We are deliberately avoiding a Metadata class.
+		 * We are deliberately avoiding a Metadata class by not calling `parent`.
 		 */
+		if ($this->getId() === null)
+		{
+			if (empty($user))
+			{
+				throw new InvalidArgumentException("Missing Model_User argument for Model_Intent.");
+			}
+			if (empty($handler))
+			{
+				throw new InvalidArgumentException("Missing handler argument for Model_Intent.");
+			}
+
+			$this->handler = $handler;
+			$this->user = $user;
+		}
+		else
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->user = Model_User::getById($this->user);
+		}
 	}
 
 	/**
@@ -117,41 +136,27 @@ final class Model_Intent extends Model
 	 */
 	public function save()
 	{
-		if (empty($this->id))
+		if ($this->getId() === null)
 		{
-			if (empty($this->email))
-			{
-				throw new InvalidArgumentException("No email provided for the student.");
-			}
-			if (empty($this->role))
-			{
-				throw new InvalidArgumentException("No role provided for the student.");
-			}
-
 			/** @var _Database_State $result */
 			$result = Database::prepare(
-				"INSERT INTO `User` (`email`, `first_name`, `last_name`, `role`, `created`)
-				 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)",
+				"INSERT INTO `Intent` (`user_id`, `handler`, `created`)
+				 VALUES (?, ?, CURRENT_TIMESTAMP)",
 				"ssss"
 			)->execute(
-				$this->email, $this->first_name, $this->last_name, $this->role
+				$this->user->getId(), $this->handler
 			);
 			$this->id = $result->insert_id;
 			$this->created = $this->updated = Date::format(Date::TIMESTAMP, time());
 		}
 		else
 		{
-			Database::prepare(
-				"UPDATE `User`
-				 SET `email` = ?, `first_name` = ?, `last_name` = ?
-				 WHERE `user_id` = ?",
-				"sssi"
-			)->execute(
-				$this->email, $this->first_name, $this->last_name,
-				$this->id
-			);
-			$this->updated = Date::format(Date::TIMESTAMP, time());
+			throw new LogicException("You cannot save an intent.");
 		}
-		parent::save();
+	}
+
+	public function setUser(Model_User $user)
+	{
+		$this->user = $user;
 	}
 }

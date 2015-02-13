@@ -113,7 +113,7 @@ abstract class Controller
 		{
 			if ($value === false)
 			{
-				throw new HttpStatusException(400, "Missing parameter {$key} for this request.");
+				throw new HttpStatusException(400, "Missing parameter '{$key}' for this request.");
 			}
 		}
 		return $data;
