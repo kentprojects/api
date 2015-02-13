@@ -44,6 +44,13 @@ class Mail
 		$this->mailer->Username = config("mail", "username");
 		$this->mailer->Password = config("mail", "password");
 
+		/** @noinspection SpellCheckingInspection */
+		if ($this->mailer->Host === "smtp.gmail.com")
+		{
+			$this->mailer->Port = 587;
+			$this->mailer->SMTPSecure = 'tls';
+		}
+
 		$this->mailer->setFrom(config("mail", "from-email"), config("mail", "from-name"));
 		$this->mailer->addReplyTo(config("mail", "reply-to-email"), config("mail", "reply-to-name"));
 	}
@@ -63,7 +70,13 @@ class Mail
 			throw new InvalidArgumentException("No body has been set.");
 		}
 
-		return $this->mailer->send();
+		$send = $this->mailer->send();
+		if (!$send)
+		{
+			error_log("That failed to send. Totally.");
+		}
+
+		return $send;
 	}
 
 	/**
