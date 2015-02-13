@@ -44,7 +44,7 @@ spl_autoload_register(
 		 */
 		elseif (strpos($class, "Intent_") === 0)
 		{
-			$filename = APPLICATION_PATH . "/intents/" . str_replace("intent/", "", $file);
+			$filename = APPLICATION_PATH . "/intents/" . str_replace("intent_", "", strtolower($class)) . ".php";
 		}
 		/**
 		 * If the word "_Map" exists in this class, handle it.

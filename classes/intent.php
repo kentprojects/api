@@ -34,12 +34,18 @@ abstract class Intent implements JsonSerializable
 	 */
 	public static function getHandlerClassName($handler)
 	{
-		return "Intent_" . implode("_", array_map(
+		return "Intent_" . implode(
+			"_", array_map(
 				function ($h)
 				{
 					return ucfirst($h);
 				},
-				explode("_", strtolower($handler)))
+				explode(
+					"_", strtolower(
+						str_replace("-", "_", $handler)
+					)
+				)
+			)
 		);
 	}
 
