@@ -124,6 +124,8 @@ final class Controller_Project extends Controller
 		 * Used to get a project.
 		 */
 
+		Log::debug($project);
+
 		$this->response->status(200);
 		$this->response->body($project);
 	}
