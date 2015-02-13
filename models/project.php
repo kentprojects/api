@@ -127,11 +127,8 @@ class Model_Project extends Model
 		{
 			/** @noinspection PhpParamsInspection */
 			$this->year = Model_Year::getById($this->year);
-			if (!empty($this->group))
-			{
-				/** @noinspection PhpParamsInspection */
-				$this->group = Model_Group::getById($this->group);
-			}
+			/** @noinspection PhpParamsInspection */
+			$this->group = Model_Group::getById($this->group);
 			/** @noinspection PhpParamsInspection */
 			$this->creator = Model_User::getById($this->creator);
 		}

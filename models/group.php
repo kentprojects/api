@@ -14,6 +14,11 @@ class Model_Group extends Model
 	 */
 	public static function getById($id)
 	{
+		if (empty($id))
+		{
+			return null;
+		}
+
 		$statement = Database::prepare(
 			"SELECT
 				`group_id` AS 'id',
