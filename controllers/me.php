@@ -51,8 +51,6 @@ final class Controller_Me extends Controller
 			);
 		}
 
-		ksort($details);
-
 		$this->response->status(200);
 		$this->response->body($details);
 	}
