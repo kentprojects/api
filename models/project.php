@@ -293,7 +293,7 @@ class Model_Project extends Model
 				"UPDATE `Project`
 				 SET `year` = ?, `group_id` = ?, `name` = ?, `slug` = ?, `creator_id` = ?
 				 WHERE `project_id` = ?",
-				"iissi"
+				"iissii"
 			)->execute(
 				(string)$this->year, $group_id, $this->name, $this->slug, $this->creator->getId(),
 				$this->id
