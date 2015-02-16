@@ -186,4 +186,16 @@ abstract class Model implements JsonSerializable
 		$this->metadata->save(($this->getId() !== null) ? $this->getClassName() : null);
 		Cache::delete($this->getCacheName());
 	}
+
+	/**
+	 * This will be a really cheeky function to update models.
+	 * Please remember to save after using this function!
+	 *
+	 * @param array $data
+	 * @throws InvalidArgumentException
+	 * @return void
+	 */
+	public function update(array $data)
+	{
+	}
 }

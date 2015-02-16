@@ -98,7 +98,8 @@ final class Controller_Project extends Controller
 				"message" => "You do not have permission to update this project."
 			));
 
-			throw new HttpStatusException(501, "Updating a project is coming soon.");
+			$project->update($this->request->getPostData());
+			$project->save();
 		}
 		elseif ($this->request->getMethod() === Request::DELETE)
 		{

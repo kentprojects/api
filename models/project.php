@@ -294,4 +294,17 @@ class Model_Project extends Model
 	{
 		$this->metadata->description = $description;
 	}
+
+	/**
+	 * @param array $data
+	 * @throws InvalidArgumentException
+	 * @return void
+	 */
+	public function update(array $data)
+	{
+		if (!empty($data["description"]))
+		{
+			$this->setDescription($data["description"]);
+		}
+	}
 }
