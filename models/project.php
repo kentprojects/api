@@ -158,6 +158,8 @@ class Model_Project extends Model
 			}
 			$this->creator = $creator;
 		}
+
+		parent::__construct();
 	}
 
 	/**

@@ -112,6 +112,8 @@ class Model_Group extends Model
 			$this->creator = $creator;
 		}
 
+		parent::__construct();
+
 		$this->students = new GroupStudentMap($this);
 	}
 
