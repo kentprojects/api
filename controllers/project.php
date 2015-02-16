@@ -119,6 +119,10 @@ final class Controller_Project extends Controller
 
 			throw new HttpStatusException(501, "Deleting a project is coming soon.");
 		}
+		else
+		{
+			$project->getGroup();
+		}
 
 		/**
 		 * GET /project/:id

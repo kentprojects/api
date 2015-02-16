@@ -128,8 +128,6 @@ class Model_Project extends Model
 			/** @noinspection PhpParamsInspection */
 			$this->year = Model_Year::getById($this->year);
 			/** @noinspection PhpParamsInspection */
-			$this->group = Model_Group::getById($this->group);
-			/** @noinspection PhpParamsInspection */
 			$this->creator = Model_User::getById($this->creator);
 		}
 		else
@@ -184,6 +182,17 @@ class Model_Project extends Model
 	public function getDescription()
 	{
 		return $this->metadata->description;
+	}
+
+	public function getGroup()
+	{
+		if (!empty($this->group) && is_numeric($this->group))
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->group = Model_Group::getById($this->group);
+		}
+
+		return $this->group;
 	}
 
 	/**
