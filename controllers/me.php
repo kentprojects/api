@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-final class Controller_User extends Controller
+final class Controller_Me extends Controller
 {
 	/**
 	 * @var string
