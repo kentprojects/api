@@ -35,6 +35,11 @@ final class ACL
 	 */
 	public function checkMatch($entity)
 	{
+		if (empty($this->user))
+		{
+			return array();
+		}
+
 		$range = explode("/", $entity);
 		$rangeString = "";
 		$values = array();
