@@ -49,6 +49,11 @@ abstract class Controller
 
 		$this->auth = new Auth($request, $response, $this->authentication);
 		$this->acl = new ACL($this->auth->getUser());
+
+		/**
+		 * Set some global ACL information.
+		 */
+		KentProjects::$acl =& $this->acl;
 	}
 
 	/**

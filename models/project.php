@@ -257,6 +257,9 @@ class Model_Project extends Model
 				"slug" => $this->slug,
 				"description" => $this->getDescription(),
 				"creator" => $this->creator,
+			),
+			$this->jsonPermissions(),
+			array(
 				"created" => $this->created,
 				"updated" => $this->updated
 			)

@@ -206,6 +206,9 @@ class Model_Group extends Model
 			array(
 				"students" => $this->students,
 				"creator" => $this->creator,
+			),
+			$this->jsonPermissions(),
+			array(
 				"created" => $this->created,
 				"updated" => $this->updated
 			)

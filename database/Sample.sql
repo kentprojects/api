@@ -64,6 +64,12 @@ VALUES
 	(1, 2)
 ON DUPLICATE KEY UPDATE `project_id` = `project_id`, `user_id` = `user_id`;
 
+INSERT INTO `ACL` (`user_id`, `entity`, `create`, `read`, `update`, `delete`)
+VALUES
+	(1, `group`, 1, 1, 1, 1),
+	(1, `project`, 1, 1, 1, 1),
+	(1, `user`, 1, 1, 1, 1);
+
 INSERT INTO `Metadata` (`root`, `key`, `value`) VALUES
 	('Model/Application/1', 'contact_email', 'developers@kentprojects.com'),
 	('Model/Application/2', 'contact_email', 'developers@kentprojects.com')

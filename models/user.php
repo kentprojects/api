@@ -167,6 +167,9 @@ final class Model_User extends Model
 			(!empty($this->years) ? $this->years : array()),
 			array(
 				"bio" => $this->getDescription(),
+			),
+			$this->jsonPermissions(),
+			array(
 				"created" => $this->created,
 				"lastlogin" => $this->lastlogin,
 				"updated" => $this->updated

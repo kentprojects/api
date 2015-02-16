@@ -54,6 +54,7 @@ abstract class Model implements JsonSerializable
 		}
 
 		$object->__construct();
+
 		return $object;
 	}
 
@@ -65,7 +66,7 @@ abstract class Model implements JsonSerializable
 		return Cache::PREFIX . ".model." . (config("environment") === "development" ? "dev." : "") .
 		strtolower(str_replace("/", ".", static::classname()));
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -73,7 +74,7 @@ abstract class Model implements JsonSerializable
 	{
 		return str_replace("_", "/", get_called_class());
 	}
-	
+
 	/**
 	 * Get the relevant Model by it's ID.
 	 *
@@ -107,12 +108,12 @@ abstract class Model implements JsonSerializable
 	{
 		self::$limitFields[get_called_class()] = array_merge(array("id"), $fields);
 	}
-	
+
 	/**
 	 * @var Metadata
 	 */
 	protected $metadata;
-	
+
 	/**
 	 * Build a new Model
 	 */
@@ -120,30 +121,30 @@ abstract class Model implements JsonSerializable
 	{
 		$this->metadata = new Metadata(($this->getId() !== null) ? $this->getClassName() : null);
 	}
-	
+
 	/**
 	 * @return string
 	 */
 	public function getCacheName()
 	{
-		return static::cachename().".".$this->getId();
+		return static::cachename() . "." . $this->getId();
 	}
-	
+
 	/**
 	 * @return string
 	 */
 	public function getClassName()
 	{
-		return static::classname()."/".$this->getId();
+		return static::classname() . "/" . $this->getId();
 	}
-	
+
 	/**
 	 * Get the ID of a Model.
 	 *
 	 * @return int|string
 	 */
 	public abstract function getId();
-	
+
 	/**
 	 * @return array
 	 */
@@ -151,6 +152,19 @@ abstract class Model implements JsonSerializable
 	{
 		return array(
 			"id" => $this->getId()
+		);
+	}
+
+	/**
+	 * @param string|null $entity
+	 * @return array
+	 */
+	protected function jsonPermissions($entity = null)
+	{
+		return array(
+			"permissions" => KentProjects::ACL(
+				strtolower(empty($entity) ? str_replace("Model/", "", $this->getClassName()) : $entity)
+			)
 		);
 	}
 
@@ -172,9 +186,10 @@ abstract class Model implements JsonSerializable
 				}
 			}
 		}
+
 		return $jsonSerialized;
 	}
-	
+
 	/**
 	 * Save the Model.
 	 *

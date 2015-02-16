@@ -33,7 +33,7 @@ final class ACL
 	 * @param string $entity
 	 * @return array
 	 */
-	protected function checkMatch($entity)
+	public function checkMatch($entity)
 	{
 		$range = explode("/", $entity);
 		$rangeString = "";
