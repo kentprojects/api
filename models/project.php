@@ -309,7 +309,7 @@ class Model_Project extends Model
 	 */
 	public function setDescription($description)
 	{
-		$this->metadata->description = $description;
+		$this->metadata->description = strip_tags($description);
 	}
 
 	/**
