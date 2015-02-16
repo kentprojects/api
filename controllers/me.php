@@ -39,7 +39,10 @@ final class Controller_Me extends Controller
 			);
 
 			$details["group"] = Model_Group::getByUser($user);
-			$details["project"] = Model_Project::getByGroup($details["group"]);
+			if (!empty($details["group"]))
+			{
+				$details["project"] = Model_Project::getByGroup($details["group"]);
+			}
 		}
 		else
 		{
