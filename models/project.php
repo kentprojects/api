@@ -281,14 +281,22 @@ class Model_Project extends Model
 		}
 		else
 		{
+			if (!empty($this->group))
+			{
+				$group_id = ($this->group instanceof Model_Group) ? $this->group->getId() : $this->group;
+			}
+			else
+			{
+				$group_id = null;
+			}
 			Database::prepare(
 				"UPDATE `Project`
 				 SET `year` = ?, `group_id` = ?, `name` = ?, `slug` = ?, `creator_id` = ?
 				 WHERE `project_id` = ?",
 				"iissi"
 			)->execute(
-				(string)$this->year, (!empty($this->group) ? $this->group->getId() : null), $this->name,
-				$this->slug, $this->creator->getId(), $this->id
+				(string)$this->year, $group_id, $this->name, $this->slug, $this->creator->getId(),
+				$this->id
 			);
 			$this->updated = Date::format(Date::TIMESTAMP, time());
 		}
