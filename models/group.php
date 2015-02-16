@@ -132,6 +132,14 @@ class Model_Group extends Model
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getDescription()
+	{
+		return $this->metadata->description;
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getId()
@@ -210,19 +218,6 @@ class Model_Group extends Model
 	{
 		if (empty($this->id))
 		{
-			if (empty($this->year))
-			{
-				throw new InvalidArgumentException("No year has been set for the group.");
-			}
-			if (empty($this->name))
-			{
-				throw new InvalidArgumentException("No name has been set for the group.");
-			}
-			if (empty($this->creator))
-			{
-				throw new InvalidArgumentException("No creator has been set for the group.");
-			}
-
 			/** @var _Database_State $result */
 			$result = Database::prepare(
 				"INSERT INTO `Group` (`year`, `name`, `creator_id`, `created`)
@@ -251,21 +246,11 @@ class Model_Group extends Model
 	}
 
 	/**
-	 * @param Model_User $user
+	 * @param string $description
 	 * @return void
 	 */
-	public function setCreator(Model_User $user)
+	public function setDescription($description)
 	{
-		$this->creator = $user;
-	}
-
-	public function setName($name)
-	{
-		$this->name = $name;
-	}
-
-	public function setYear(Model_Year $year)
-	{
-		$this->year = $year;
+		$this->metadata->description = $description;
 	}
 }

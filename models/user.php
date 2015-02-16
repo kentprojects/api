@@ -93,6 +93,14 @@ final class Model_User extends Model
 	public $years;
 
 	/**
+	 * @return string
+	 */
+	public function getDescription()
+	{
+		return $this->metadata->description;
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getId()
@@ -158,6 +166,7 @@ final class Model_User extends Model
 			),
 			(!empty($this->years) ? $this->years : array()),
 			array(
+				"bio" => $this->getDescription(),
 				"created" => $this->created,
 				"lastlogin" => $this->lastlogin,
 				"updated" => $this->updated
@@ -207,6 +216,15 @@ final class Model_User extends Model
 			$this->updated = Date::format(Date::TIMESTAMP, time());
 		}
 		parent::save();
+	}
+
+	/**
+	 * @param string $description
+	 * @return void
+	 */
+	public function setDescription($description)
+	{
+		$this->metadata->description = $description;
 	}
 
 	public function setEmail($email)

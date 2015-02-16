@@ -134,9 +134,28 @@ class Model_Project extends Model
 		}
 		else
 		{
+			if (empty($year))
+			{
+				trigger_error("Missing YEAR passed to the PROJECT constructor", E_USER_ERROR);
+			}
 			$this->year = $year;
+
+			if (empty($name))
+			{
+				trigger_error("Missing NAME passed to the PROJECT constructor", E_USER_ERROR);
+			}
 			$this->name = $name;
+
+			if (empty($slug))
+			{
+				trigger_error("Missing SLUG passed to the PROJECT constructor", E_USER_ERROR);
+			}
 			$this->slug = $slug;
+
+			if (empty($creator))
+			{
+				trigger_error("Missing CREATOR passed to the PROJECT constructor", E_USER_ERROR);
+			}
 			$this->creator = $creator;
 		}
 	}
@@ -155,6 +174,14 @@ class Model_Project extends Model
 	public function getCreator()
 	{
 		return $this->creator;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDescription()
+	{
+		return $this->metadata->description;
 	}
 
 	/**
@@ -217,6 +244,7 @@ class Model_Project extends Model
 				"group" => $this->group,
 				"name" => $this->name,
 				"slug" => $this->slug,
+				"description" => $this->getDescription(),
 				"creator" => $this->creator,
 				"created" => $this->created,
 				"updated" => $this->updated
@@ -228,23 +256,6 @@ class Model_Project extends Model
 	{
 		if (empty($this->id))
 		{
-			if (empty($this->year))
-			{
-				throw new InvalidArgumentException("No year has been set for the project.");
-			}
-			if (empty($this->name))
-			{
-				throw new InvalidArgumentException("No name has been set for the project.");
-			}
-			if (empty($this->slug))
-			{
-				throw new InvalidArgumentException("No slug has been set for the project.");
-			}
-			if (empty($this->creator))
-			{
-				throw new InvalidArgumentException("No creator has been set for the project.");
-			}
-
 			/** @var _Database_State $result */
 			$result = Database::prepare(
 				"INSERT INTO `Project` (`year`, `group_id`, `name`, `slug`, `creator_id`, `created`)
@@ -274,27 +285,11 @@ class Model_Project extends Model
 	}
 
 	/**
-	 * @param Model_User $creator
+	 * @param string $description
+	 * @return void
 	 */
-	public function setCreator(Model_User $creator)
+	public function setDescription($description)
 	{
-		$this->creator = $creator;
-	}
-
-	/**
-	 * @param string $name
-	 */
-	public function setName($name)
-	{
-		$this->name = $name;
-		$this->slug = slugify($name);
-	}
-
-	/**
-	 * @param Model_Year $year
-	 */
-	public function setYear(Model_Year $year)
-	{
-		$this->year = $year;
+		$this->metadata->description = $description;
 	}
 }
