@@ -61,8 +61,6 @@ final class Controller_Intent extends Controller
 			/**
 			 * PUT /intent/:id
 			 */
-			throw new HttpStatusException(501, "Updating an intent is coming soon.");
-			/** @noinspection PhpUnreachableStatementInspection */
 			$intent->update($this->request->post("data", array()));
 		}
 

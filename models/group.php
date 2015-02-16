@@ -37,6 +37,37 @@ class Model_Group extends Model
 	}
 
 	/**
+	 * Get the relevant Group by a user.
+	 *
+	 * @param Model_User $user
+	 * @return Model_Group
+	 */
+	public static function getByUser(Model_User $user)
+	{
+		if (empty($user))
+		{
+			return null;
+		}
+
+		$statement = Database::prepare(
+			"SELECT
+				g.`group_id` AS 'id',
+				g.`year`,
+				g.`name`,
+				g.`creator_id` AS 'creator',
+				g.`created`,
+				g.`updated`,
+				g.`status`
+			 FROM `Group` g
+			 JOIN `Group_Student_Map` gsm USING (`group_id`)
+			 WHERE g.status = 1 AND gsm.`user_id` = ?",
+			"i", __CLASS__
+		);
+
+		return $statement->execute($user->getId())->singleton();
+	}
+
+	/**
 	 * @var int
 	 */
 	protected $id;
