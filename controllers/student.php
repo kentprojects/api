@@ -28,6 +28,8 @@ final class Controller_Student extends Controller
 			throw new HttpStatusException(404, "Student not found.");
 		}
 
+		$isSelf = ($this->auth->getUser() !== null) ? ($this->auth->getUser()->getId() == $user->getId()) : false;
+
 		if ($this->request->getMethod() === Request::PUT)
 		{
 			/**
@@ -38,13 +40,17 @@ final class Controller_Student extends Controller
 			/**
 			 * Validate that the user can update this student profile.
 			 */
-			$this->validateUser(array(
-				"entity" => "user/" . $user->getId(),
-				"action" => ACL::UPDATE,
-				"message" => "You do not have permission to update this user profile."
-			));
+			if (!$isSelf)
+			{
+				$this->validateUser(array(
+					"entity" => "user/" . $user->getId(),
+					"action" => ACL::UPDATE,
+					"message" => "You do not have permission to update this user profile."
+				));
+			}
 
-			throw new HttpStatusException(501, "Updating student profiles is coming soon.");
+			$user->update($this->request->getPostData());
+			$user->save();
 		}
 		elseif ($this->request->getMethod() === Request::DELETE)
 		{
@@ -56,11 +62,14 @@ final class Controller_Student extends Controller
 			/**
 			 * Validate that the user can update this student profile.
 			 */
-			$this->validateUser(array(
-				"entity" => "user/" . $user->getId(),
-				"action" => ACL::DELETE,
-				"message" => "You do not have permission to delete this user profile."
-			));
+			if (!$isSelf)
+			{
+				$this->validateUser(array(
+					"entity" => "user/" . $user->getId(),
+					"action" => ACL::DELETE,
+					"message" => "You do not have permission to delete this user profile."
+				));
+			}
 
 			throw new HttpStatusException(501, "Deleting student profiles is coming soon.");
 		}

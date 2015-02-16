@@ -28,13 +28,29 @@ final class Controller_Staff extends Controller
 				throw new HttpStatusException(404, "Staff member not found.");
 			}
 
+			$isSelf = ($this->auth->getUser() !== null) ? ($this->auth->getUser()->getId() == $user->getId()) : false;
+
 			if ($this->request->getMethod() === Request::PUT)
 			{
 				/**
 				 * PUT /staff/:id
 				 * Used to update staff!
 				 */
-				throw new HttpStatusException(501, "Updating a staff member is coming soon.");
+
+				/**
+				 * Validate that the user can update this staff profile.
+				 */
+				if (!$isSelf)
+				{
+					$this->validateUser(array(
+						"entity" => "user/" . $user->getId(),
+						"action" => ACL::UPDATE,
+						"message" => "You do not have permission to update this user profile."
+					));
+				}
+
+				$user->update($this->request->getPostData());
+				$user->save();
 			}
 			elseif ($this->request->getMethod() === Request::DELETE)
 			{
@@ -42,6 +58,19 @@ final class Controller_Staff extends Controller
 				 * DELETE /staff/:id
 				 * Used to delete staff!
 				 */
+
+				/**
+				 * Validate that the user can delete this staff profile.
+				 */
+				if (!$isSelf)
+				{
+					$this->validateUser(array(
+						"entity" => "user/" . $user->getId(),
+						"action" => ACL::DELETE,
+						"message" => "You do not have permission to delete this user profile."
+					));
+				}
+
 				throw new HttpStatusException(501, "Deleting a staff member is coming soon.");
 			}
 

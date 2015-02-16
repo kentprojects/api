@@ -251,4 +251,17 @@ final class Model_User extends Model
 		}
 		$this->role = $role;
 	}
+
+	/**
+	 * @param array $data
+	 * @throws InvalidArgumentException
+	 * @return void
+	 */
+	public function update(array $data)
+	{
+		if (!empty($data["bio"]))
+		{
+			$this->setDescription($data["bio"]);
+		}
+	}
 }
