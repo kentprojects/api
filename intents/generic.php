@@ -26,8 +26,8 @@ final class Intent_Generic extends Intent
 		 * This is where one would mail out, or at least add to a queue!
 		 */
 		$mail = new Postmark;
-		$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
-		// $mail->setTo("matt.house@kentprojects.com", "Matt House");
+		//$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
+		$mail->setTo("matt.house@kentprojects.com", "Matt House");
 		$mail->setSubject("New Generic Intent");
 		$mail->setBody(array(
 			"Hello there,\n",
@@ -57,8 +57,8 @@ final class Intent_Generic extends Intent
 		 * This would be where one would get a notification confirming that's all good!
 		 */
 		$mail = new Postmark;
-		$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
-		// $mail->setTo("matt.house@kentprojects.com", "Matt House");
+		//$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
+		$mail->setTo("matt.house@kentprojects.com", "Matt House");
 		$mail->setSubject("New Generic Intent");
 		$mail->setBody(array(
 			"Hello there,\n",
