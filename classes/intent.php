@@ -48,6 +48,7 @@ abstract class Intent implements JsonSerializable
 		{
 			trigger_error("Class not found: $className", E_USER_ERROR);
 		}
+		error_log($className);
 
 		return $className;
 	}
