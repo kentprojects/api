@@ -12,14 +12,16 @@ class Metadata implements ArrayAccess, JsonSerializable
 	public function __construct($root = null)
 	{
 		if ($root == null)
+		{
 			return;
+		}
 
 		$this->root = $root;
 
 		$statement = Database::prepare("SELECT `key`, `value` FROM `Metadata` WHERE `root` = ?", "s");
 		$results = $statement->execute($root)->all();
 
-		foreach($results as $result)
+		foreach ($results as $result)
 		{
 			$this->offsetSet($result->key, $result->value);
 		}
@@ -38,7 +40,7 @@ class Metadata implements ArrayAccess, JsonSerializable
 	}
 
 	/**
-	 * @return array
+	 * @return array|stdClass
 	 */
 	function jsonSerialize()
 	{
@@ -53,6 +55,11 @@ class Metadata implements ArrayAccess, JsonSerializable
 			{
 				$data[$key] = $value;
 			}
+		}
+
+		if (empty($data))
+		{
+			$data = new stdClass;
 		}
 
 		return $data;
@@ -78,6 +85,7 @@ class Metadata implements ArrayAccess, JsonSerializable
 		if (!$this->offsetExists($key))
 		{
 			$this->data[$key] = array($value);
+
 			return;
 		}
 
@@ -111,9 +119,9 @@ class Metadata implements ArrayAccess, JsonSerializable
 
 		Database::prepare("DELETE FROM `Metadata` WHERE `root` = ?", "s")->execute($this->root);
 
-		foreach($this->data as $key => $values)
+		foreach ($this->data as $key => $values)
 		{
-			foreach($values as $value)
+			foreach ($values as $value)
 			{
 				Database::prepare("INSERT INTO Metadata (`root`, `key`, `value`) VALUES (?, ?, ?)", "sss")
 					->execute($this->root, $key, $value);
