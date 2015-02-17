@@ -34,7 +34,8 @@ abstract class Intent implements JsonSerializable
 	 */
 	public static function getHandlerClassName($handler)
 	{
-		return "Intent_" . implode(
+		$className = "Intent_";
+		$className .= implode(
 			"_", array_map(
 				function ($h)
 				{
@@ -43,6 +44,10 @@ abstract class Intent implements JsonSerializable
 				explode("_", static::formatHandler($handler))
 			)
 		);
+		if (!class_exists($className))
+		{
+			trigger_error("Class not found: $className", E_USER_ERROR);
+		}
 	}
 
 	/**
