@@ -19,6 +19,7 @@ final class Model_Intent extends Model
 				`intent_id` AS 'id',
 				`user_id` AS 'user',
 				`handler`,
+				`state`,
 				`created`,
 				`updated`,
 				`status`
@@ -43,6 +44,10 @@ final class Model_Intent extends Model
 	/**
 	 * @var string
 	 */
+	protected $state;
+	/**
+	 * @var string
+	 */
 	protected $created;
 	/**
 	 * @var string
@@ -54,9 +59,10 @@ final class Model_Intent extends Model
 	 *
 	 * @param Model_User $user
 	 * @param string $handler
+	 * @param string $state
 	 * @throws InvalidArgumentException
 	 */
-	public function __construct(Model_User $user = null, $handler = null)
+	public function __construct(Model_User $user = null, $handler = null, $state = null)
 	{
 		/**
 		 * We are deliberately avoiding a Metadata class by not calling `parent`.
@@ -71,6 +77,12 @@ final class Model_Intent extends Model
 			{
 				throw new InvalidArgumentException("Missing handler argument for Model_Intent.");
 			}
+			if (empty($state))
+			{
+				throw new InvalidArgumentException("Missing state argument for Model_Intent.");
+			}
+
+			$this->setState($state);
 
 			$this->handler = $handler;
 			$this->user = $user;
@@ -117,6 +129,14 @@ final class Model_Intent extends Model
 	/**
 	 * @return string
 	 */
+	public function getState()
+	{
+		return $this->state;
+	}
+
+	/**
+	 * @return string
+	 */
 	public function getUpdated()
 	{
 		return $this->updated;
@@ -140,22 +160,33 @@ final class Model_Intent extends Model
 		{
 			/** @var _Database_State $result */
 			$result = Database::prepare(
-				"INSERT INTO `Intent` (`user_id`, `handler`, `created`)
-				 VALUES (?, ?, CURRENT_TIMESTAMP)", "is"
+				"INSERT INTO `Intent` (`user_id`, `handler`, `state`, `created`)
+				 VALUES (?, ?, ?, CURRENT_TIMESTAMP)", "iss"
 			)->execute(
-				$this->user->getId(), $this->handler
+				$this->user->getId(), $this->handler, $this->state
 			);
 			$this->id = $result->insert_id;
 			$this->created = $this->updated = Date::format(Date::TIMESTAMP, time());
 		}
 		else
 		{
-			throw new LogicException("You cannot save an intent.");
+			Database::prepare("UPDATE `Intent` SET `state` = ? WHERE `intent_id` = ?", "si")
+				->execute($this->state, $this->id);
 		}
 	}
 
-	public function setUser(Model_User $user)
+	/**
+	 * @param string $state
+	 */
+	public function setState($state)
 	{
-		$this->user = $user;
+		if (strpos($state, "intent:state:") !== 0)
+		{
+			throw new InvalidArgumentException("This state should be a valid Intent STATE constant.");
+		}
+		/**
+		 * Stripping off "intent:state:".
+		 */
+		$this->state = substr($this->state, 14);
 	}
 }

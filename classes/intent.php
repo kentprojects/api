@@ -117,9 +117,10 @@ abstract class Intent implements JsonSerializable
 	{
 		return array(
 			"id" => $this->model->getId(),
+			"user" => $this->model->getUser(),
 			"handler" => $this->getHandlerName(),
 			"data" => $this->data,
-			"user" => $this->model->getUser()
+			"state" => $this->model->getState()
 		);
 	}
 
@@ -150,11 +151,26 @@ abstract class Intent implements JsonSerializable
 	 */
 	public function save()
 	{
-		if ($this->model->getId() === null)
-		{
-			$this->model->save();
-		}
+		$this->model->save();
 		$this->data->save(($this->model->getId() !== null) ? $this->model->getClassName() : null);
+	}
+
+	/**
+	 * @param string $state
+	 * @return void
+	 */
+	public function state($state)
+	{
+		switch ($state)
+		{
+			case static::STATE_OPEN:
+			case static::STATE_ACCEPTED:
+			case static::STATE_REJECTED:
+				$this->model->setState($state);
+				break;
+			default:
+				throw new InvalidArgumentException("This state should be a valid Intent STATE constant.");
+		}
 	}
 
 	/**

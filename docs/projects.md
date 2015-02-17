@@ -102,6 +102,7 @@ This request is used to update a group. You can send the following data (in a JS
 update the project:
 
 | key | type | description |
+| --- | ---- | ----------- |
 | description | string | A project description |
 
 ```json

@@ -33,10 +33,14 @@ final class Controller_Intent extends Controller
 				"data" => $this->request->post("data", array())
 			));
 
-			/** @var Intent $class */
+			/**
+			 * @var Intent $class
+			 * @var Intent $intent
+			 */
 			$class = Intent::getHandlerClassName($params["handler"]);
-			/** @var Intent $intent */
-			$intent = new $class(new Model_Intent($this->auth->getUser(), Intent::formatHandler($params["handler"])));
+			$intent = new $class(new Model_Intent(
+				$this->auth->getUser(), Intent::formatHandler($params["handler"]), Intent::STATE_OPEN
+			));
 			$intent->create($params["data"]);
 
 			$this->response->status(201);
@@ -62,6 +66,10 @@ final class Controller_Intent extends Controller
 			 * PUT /intent/:id
 			 */
 			$intent->update($this->request->post("data", array()));
+			if ($this->request->post("state", null) !== null)
+			{
+				$intent->state("intent:state:" . strtolower($this->request->post("state")));
+			}
 		}
 
 		/**
