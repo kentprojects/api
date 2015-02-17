@@ -47,7 +47,7 @@ class Metadata implements ArrayAccess, JsonSerializable
 		$data = array();
 		foreach ($this->data as $key => $value)
 		{
-			if (is_array($value) && (count($value) === 0))
+			if (is_array($value) && (count($value) === 1))
 			{
 				$data[$key] = array_shift($value);
 			}
