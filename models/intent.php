@@ -21,8 +21,7 @@ final class Model_Intent extends Model
 				`handler`,
 				`state`,
 				`created`,
-				`updated`,
-				`status`
+				`updated`
 			 FROM `Intent`
 			 WHERE `intent_id` = ?",
 			"i", __CLASS__
