@@ -19,7 +19,20 @@ final class Intent_Generic extends Intent
 	{
 		parent::create($data);
 
-		$this->mergeData($data);
+		if (empty($data["user_id"]))
+		{
+			throw new HttpStatusException(400, "Missing parameter 'user_id' for this intent.");
+		}
+
+		$user = Model_User::getById($data["user_id"]);
+		if (empty($user))
+		{
+			throw new IntentException("Invalid user_id passed to intent.");
+		}
+
+		$this->mergeData(array_merge($data, array(
+			"user_id" => $user->getId()
+		)));
 		$this->save();
 
 		/**
@@ -38,6 +51,20 @@ final class Intent_Generic extends Intent
 			"Your beloved API"
 		));
 		$mail->send();
+	}
+
+	/**
+	 * @return array
+	 */
+	public function jsonSerialize()
+	{
+		$json = parent::jsonSerialize();
+
+		$json["data"] = array_merge($json["data"], array(
+			"user" => Model_User::getById($json["data"]["user_id"])
+		));
+
+		return $json;
 	}
 
 	/**

@@ -23,7 +23,8 @@ POST /intent HTTP/1.1
 {
     "handler": "generic",
     "data": {
-        "anything": "Some Value"
+        "anything": "Some Value",
+        "user_id": 2
     }
 }
 ```
@@ -43,7 +44,13 @@ HTTP/1.1 201 Created
     },
     "handler": "generic",
     "data": {
-        "anything": "Some Value"
+        "anything": "Some Value",
+        "user_id": 2,
+        "user": {
+            "id": 2,
+            "email": "mh472@kent.ac.uk",
+            "...": "..."
+        }
     },
     "state": "open
 }
@@ -72,7 +79,13 @@ HTTP/1.1 200 OK
     },
     "handler": "generic",
     "data": {
-        "anything": "Some Value"
+        "anything": "Some Value",
+        "user_id": 2,
+        "user": {
+            "id": 2,
+            "email": "mh472@kent.ac.uk",
+            "...": "..."
+        }
     },
     "state": "open"
 }
@@ -115,6 +128,12 @@ HTTP/1.1 200 OK
     "handler": "generic",
     "data": {
         "this": "will be merged",
+        "user_id": 2,
+        "user": {
+            "id": 2,
+            "email": "mh472@kent.ac.uk",
+            "...": "..."
+        },
         "with": "the existing data object"
     },
     "state": "accepted"

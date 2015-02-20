@@ -117,6 +117,8 @@ class Metadata implements ArrayAccess, JsonSerializable
 			return;
 		}
 
+		ksort($this->data);
+
 		Database::prepare("DELETE FROM `Metadata` WHERE `root` = ?", "s")->execute($this->root);
 
 		foreach ($this->data as $key => $values)

@@ -149,7 +149,14 @@ abstract class Intent implements JsonSerializable
 			{
 				throw new InvalidArgumentException("Only key->value pairs can be passed to Intent::mergeData.");
 			}
-			$this->data->$key = $value;
+			elseif ($value === null)
+			{
+				unset($this->data[$key]);
+			}
+			else
+			{
+				$this->data->$key = $value;
+			}
 		}
 	}
 
