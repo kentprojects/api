@@ -126,7 +126,7 @@ abstract class Intent implements JsonSerializable
 			"id" => $this->model->getId(),
 			"user" => $this->model->getUser(),
 			"handler" => $this->getHandlerName(),
-			"data" => $this->data,
+			"data" => $this->data->jsonSerialize(),
 			"state" => $this->model->getState()
 		);
 	}
