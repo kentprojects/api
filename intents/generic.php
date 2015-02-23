@@ -10,6 +10,29 @@
 final class Intent_Generic extends Intent
 {
 	/**
+	 * @param Model_Intent $model
+	 * @throws IntentException
+	 */
+	public function __construct(Model_Intent $model)
+	{
+		if (config("environment") !== "development")
+		{
+			throw new IntentException("Generic intents are only available to the development environment.");
+		}
+
+		parent::__construct($model);
+	}
+
+	/**
+	 * @param Model_User $user
+	 * @return bool
+	 */
+	public function canUpdate(Model_User $user)
+	{
+		return ($this->data->user_id == $user->getId());
+	}
+
+	/**
 	 * @param array $data
 	 * @throws HttpStatusException
 	 * @throws IntentException

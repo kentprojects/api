@@ -7,6 +7,11 @@
 final class Controller_Intent extends Controller
 {
 	/**
+	 * @var string
+	 */
+	protected $authentication = Auth::USER;
+
+	/**
 	 * /intent
 	 * /intent/:id
 	 *
@@ -41,6 +46,10 @@ final class Controller_Intent extends Controller
 			$intent = new $class(new Model_Intent(
 				$this->auth->getUser(), Intent::formatHandler($params["handler"]), Intent::STATE_OPEN
 			));
+			if (!$intent->canCreate($this->auth->getUser()))
+			{
+				throw new HttpStatusException(400, "You do not have permission to create this intent.");
+			}
 			$intent->create($params["data"]);
 
 			$this->response->status(201);
@@ -60,22 +69,35 @@ final class Controller_Intent extends Controller
 			throw new HttpStatusException(404, "Intent not found.");
 		}
 
+		if (!$intent->canRead($this->auth->getUser()))
+		{
+			throw new HttpStatusException(400, "You do not have permission to read this intent.");
+		}
+
 		if ($this->request->getMethod() === Request::PUT)
 		{
 			/**
 			 * PUT /intent/:id
 			 */
-			$intent->update($this->request->post("data", array()));
+
+			if (!$intent->canUpdate($this->auth->getUser()))
+			{
+				throw new HttpStatusException(400, "You do not have permission to update this intent.");
+			}
+
 			if ($this->request->post("state", null) !== null)
 			{
 				$intent->state("intent:state:" . strtolower($this->request->post("state")));
 			}
+			$intent->update($this->request->post("data", array()));
 		}
+
+		Log::debug($intent);
 
 		/**
 		 * GET /intent/:id
 		 */
 		$this->response->status(200);
-		$this->response->body($intent);
+		$this->response->body("Poo.");
 	}
 }

@@ -85,6 +85,43 @@ abstract class Intent implements JsonSerializable
 	}
 
 	/**
+	 * Can this particular user create an intent of this kind?
+	 *
+	 * @param Model_User $user
+	 * @return bool
+	 */
+	public function canCreate(Model_User $user)
+	{
+		return true;
+	}
+
+	/**
+	 * Can this particular user read this intent?
+	 *
+	 * @param Model_User $user
+	 * @return bool
+	 */
+	public function canRead(Model_User $user)
+	{
+		if ($this->canUpdate($user) === true)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Can this particular user update this intent?
+	 *
+	 * @param Model_User $user
+	 * @return bool
+	 */
+	public function canUpdate(Model_User $user)
+	{
+		return false;
+	}
+
+	/**
 	 * Run some pre-requisite stuff.
 	 *
 	 * @param array $data
@@ -127,7 +164,7 @@ abstract class Intent implements JsonSerializable
 			"user" => $this->model->getUser(),
 			"handler" => $this->getHandlerName(),
 			"data" => $this->data->jsonSerialize(),
-			"state" => $this->model->getState()
+			"state" => $this->model->getCleanState()
 		);
 	}
 
@@ -136,7 +173,7 @@ abstract class Intent implements JsonSerializable
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */
-	protected function mergeData(array $data)
+	protected final function mergeData(array $data)
 	{
 		if (!empty($data[0]))
 		{
@@ -170,10 +207,10 @@ abstract class Intent implements JsonSerializable
 	}
 
 	/**
-	 * @param string $state
-	 * @return void
+	 * @param string|null $state
+	 * @return null|string
 	 */
-	public function state($state)
+	public final function state($state = null)
 	{
 		switch ($state)
 		{
@@ -181,7 +218,9 @@ abstract class Intent implements JsonSerializable
 			case static::STATE_ACCEPTED:
 			case static::STATE_REJECTED:
 				$this->model->setState($state);
-				break;
+			return null;
+			case null:
+				return $this->model->getState();
 			default:
 				throw new InvalidArgumentException("This state should be a valid Intent STATE constant.");
 		}
@@ -197,6 +236,10 @@ abstract class Intent implements JsonSerializable
 		if ($this->model->getId() === null)
 		{
 			throw new IntentException("You can't update an intent without an existing intent model.");
+		}
+		if ($this->model->getState() !== static::STATE_OPEN)
+		{
+			throw new IntentException("You can't update an intent that isn't OPEN.");
 		}
 	}
 }
