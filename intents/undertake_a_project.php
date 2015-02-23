@@ -7,7 +7,7 @@
  * Class Intent_Undertake_Project
  * Represents a group wanting to undertake a project.
  */
-final class Intent_Undertake_Project extends Intent
+final class Intent_Undertake_A_Project extends Intent
 {
 	/**
 	 * Can this particular user create an intent of this kind?
