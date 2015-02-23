@@ -269,7 +269,7 @@ class Model_Project extends Model
 			$result = Database::prepare(
 				"INSERT INTO `Project` (`year`, `group_id`, `name`, `creator_id`, `created`)
 				 VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
-				"iissi"
+				"iisii"
 			)->execute(
 				(string)$this->year, (!empty($this->group) ? $this->group->getId() : null), $this->name,
 				$this->creator->getId()
@@ -291,7 +291,7 @@ class Model_Project extends Model
 				"UPDATE `Project`
 				 SET `year` = ?, `group_id` = ?, `name` = ?, `creator_id` = ?
 				 WHERE `project_id` = ?",
-				"iissii"
+				"iisii"
 			)->execute(
 				(string)$this->year, $group_id, $this->name, $this->creator->getId(),
 				$this->id
