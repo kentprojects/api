@@ -7,7 +7,7 @@
  * Class ModelMap
  * This class is designed to bring two objects together by way of a map table.
  */
-abstract class ModelMap implements IteratorAggregate, JsonSerializable
+abstract class ModelMap implements Countable, IteratorAggregate, JsonSerializable
 {
 	protected $data = array();
 	protected $foreignClass;
@@ -77,6 +77,11 @@ abstract class ModelMap implements IteratorAggregate, JsonSerializable
 	public function clear()
 	{
 		$this->data = array();
+	}
+
+	public function count()
+	{
+		return count($this->data);
 	}
 
 	/**
