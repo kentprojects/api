@@ -88,6 +88,10 @@ final class Model_User extends Model
 	protected $status;
 
 	/**
+	 * @var StudentGroupMap
+	 */
+	public $groups;
+	/**
 	 * @var UserYearMap
 	 */
 	public $years;
@@ -98,6 +102,26 @@ final class Model_User extends Model
 	public function getDescription()
 	{
 		return $this->metadata->description;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getFirstName()
+	{
+		return $this->first_name;
+	}
+
+	/**
+	 * @return StudentGroupMap
+	 */
+	public function getGroups()
+	{
+		if (empty($this->groups))
+		{
+			$this->groups = new StudentGroupMap($this);
+		}
+		return $this->groups;
 	}
 
 	/**
@@ -165,6 +189,7 @@ final class Model_User extends Model
 				"role" => $this->role
 			),
 			(!empty($this->years) ? $this->years : array()),
+			(!empty($this->groups) ? $this->groups : array()),
 			array(
 				"bio" => $this->getDescription(),
 			),

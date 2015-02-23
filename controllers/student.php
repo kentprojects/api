@@ -73,6 +73,10 @@ final class Controller_Student extends Controller
 
 			throw new HttpStatusException(501, "Deleting student profiles is coming soon.");
 		}
+		else
+		{
+			$user->getGroups();
+		}
 
 		/**
 		 * GET /student/:id
