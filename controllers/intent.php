@@ -48,7 +48,7 @@ final class Controller_Intent extends Controller
 			));
 			if (!$intent->canCreate($this->auth->getUser()))
 			{
-				throw new HttpStatusException(400, "You do not have permission to create this intent.");
+				throw new HttpStatusException(403, "You do not have permission to create this intent.");
 			}
 			$intent->create($params["data"]);
 
@@ -71,7 +71,7 @@ final class Controller_Intent extends Controller
 
 		if (!$intent->canRead($this->auth->getUser()))
 		{
-			throw new HttpStatusException(400, "You do not have permission to read this intent.");
+			throw new HttpStatusException(403, "You do not have permission to read this intent.");
 		}
 
 		if ($this->request->getMethod() === Request::PUT)
@@ -87,7 +87,7 @@ final class Controller_Intent extends Controller
 
 			if (!$intent->canUpdate($this->auth->getUser()))
 			{
-				throw new HttpStatusException(400, "You do not have permission to update this intent.");
+				throw new HttpStatusException(403, "You do not have permission to update this intent.");
 			}
 
 			if ($this->request->post("state", null) !== null)
