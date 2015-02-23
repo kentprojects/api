@@ -65,6 +65,11 @@ final class Intent_Undertake_A_Project extends Intent
 		{
 			throw new IntentException("Missing project.");
 		}
+		$projectGroup = $project->getGroup();
+		if (!empty($projectGroup))
+		{
+			throw new IntentException("This group already has a project :(");
+		}
 
 		return $project->getSupervisor()->getId() == $user->getId();
 	}
@@ -140,7 +145,7 @@ final class Intent_Undertake_A_Project extends Intent
 	public function jsonSerialize()
 	{
 		$json = parent::jsonSerialize();
-		$json["group"] = Model_Group::getById($this->data->group_id);
+		$json["group"] = $this->model->getUser()->getCurrentGroup();
 		return $json;
 	}
 
