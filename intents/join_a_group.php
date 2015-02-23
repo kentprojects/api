@@ -129,6 +129,16 @@ final class Intent_Join_A_Group extends Intent
 	}
 
 	/**
+	 * @return array
+	 */
+	public function jsonSerialize()
+	{
+		$json = parent::jsonSerialize();
+		$json["group"] = Model_Group::getById($this->data->group_id);
+		return $json;
+	}
+
+	/**
 	 * @param array $data
 	 * @throws HttpStatusException
 	 * @throws IntentException

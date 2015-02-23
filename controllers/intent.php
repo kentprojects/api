@@ -80,6 +80,11 @@ final class Controller_Intent extends Controller
 			 * PUT /intent/:id
 			 */
 
+			if ($intent->state() !== Intent::STATE_OPEN)
+			{
+				throw new HttpStatusException(500, "You can't update an intent that isn't OPEN.");
+			}
+
 			if (!$intent->canUpdate($this->auth->getUser()))
 			{
 				throw new HttpStatusException(400, "You do not have permission to update this intent.");

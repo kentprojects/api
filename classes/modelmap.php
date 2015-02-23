@@ -157,7 +157,8 @@ abstract class ModelMap implements Countable, IteratorAggregate, JsonSerializabl
 			throw new InvalidArgumentException("Missing clearSQL for " . get_called_class());
 		}
 
-		Database::prepare($this->clearSQL, "i")->execute($this->source->getId());
+		$sourceId = $this->source->getId();
+		Database::prepare($this->clearSQL, "i")->execute($sourceId);
 
 		if (empty($this->data))
 		{
@@ -174,7 +175,7 @@ abstract class ModelMap implements Countable, IteratorAggregate, JsonSerializabl
 			{
 				$query[] = "(?,?)";
 				$types .= "ii";
-				$values[] = $id;
+				array_push($values, $sourceId, $id);
 			}
 
 			$this->clear();

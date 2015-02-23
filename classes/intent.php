@@ -237,9 +237,5 @@ abstract class Intent implements JsonSerializable
 		{
 			throw new IntentException("You can't update an intent without an existing intent model.");
 		}
-		if ($this->model->getState() !== static::STATE_OPEN)
-		{
-			throw new IntentException("You can't update an intent that isn't OPEN.");
-		}
 	}
 }

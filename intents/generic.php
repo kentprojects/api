@@ -82,11 +82,7 @@ final class Intent_Generic extends Intent
 	public function jsonSerialize()
 	{
 		$json = parent::jsonSerialize();
-
-		$json["data"] = array_merge($json["data"], array(
-			"user" => Model_User::getById($json["data"]["user_id"])
-		));
-
+		$json["user"] = Model_User::getById($json["data"]["user_id"]);
 		return $json;
 	}
 
