@@ -98,6 +98,6 @@ final class Controller_Intent extends Controller
 		 * GET /intent/:id
 		 */
 		$this->response->status(200);
-		$this->response->body("Poo.");
+		$this->response->body($intent);
 	}
 }

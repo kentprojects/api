@@ -93,13 +93,6 @@ class EyeRequest
 require_once __DIR__."/../functions.php";
 
 /**
- * @var array
- */
-$config = (file_exists(__DIR__ . "/config.production.ini"))
-	? parse_ini_file(__DIR__ . "/config.production.ini", true)
-	: parse_ini_file(__DIR__ . "/config.ini", true);
-
-/**
  * @var Model_Application[] $applications
  */
 $applications = array(
@@ -219,7 +212,7 @@ if (strpos($request->url, "?") > 1)
 
 $urlParams = array_merge($urlParams, $request->params);
 
-if (!empty($request->body))
+if (!empty($request->body) && ($request->method != "GET"))
 {
 	$request->body = json_encode($request->body);
 	$request->headers["Content-Length"] = strlen($request->body);

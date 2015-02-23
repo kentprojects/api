@@ -81,9 +81,8 @@ final class Model_Intent extends Model
 				throw new InvalidArgumentException("Missing state argument for Model_Intent.");
 			}
 
-			$this->setState($state);
-
 			$this->handler = $handler;
+			$this->setState($state);
 			$this->user = $user;
 		}
 		else
@@ -99,6 +98,14 @@ final class Model_Intent extends Model
 	public function getClassName()
 	{
 		return str_replace("Model_", "", get_called_class()) . "/" . $this->getId();
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCleanState()
+	{
+		return $this->state;
 	}
 
 	/**
@@ -130,7 +137,7 @@ final class Model_Intent extends Model
 	 */
 	public function getState()
 	{
-		return $this->state;
+		return "intent:state:" . $this->state;
 	}
 
 	/**
@@ -186,6 +193,6 @@ final class Model_Intent extends Model
 		/**
 		 * Stripping off "intent:state:".
 		 */
-		$this->state = substr($this->state, 14);
+		$this->state = str_replace("intent:state:", "", $state);
 	}
 }

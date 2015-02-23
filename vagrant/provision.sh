@@ -46,3 +46,6 @@ service apache2 restart
 mkdir -p /var/www/logs
 # And ensure that the web can write to it.
 chown www-data:www-data /var/www/logs
+#
+# Add `api.dev.kentprojects.com` to the hosts file.
+echo "127.0.0.1 api.kentprojects.local" >> /etc/hosts
