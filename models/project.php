@@ -102,10 +102,6 @@ class Model_Project extends Model
 	 */
 	protected $name;
 	/**
-	 * @var string
-	 */
-	protected $slug;
-	/**
 	 * @var Model_User
 	 */
 	protected $creator;
@@ -126,7 +122,7 @@ class Model_Project extends Model
 	 */
 	protected $status;
 
-	public function __construct(Model_Year $year = null, $name = null, $slug = null, Model_User $creator = null)
+	public function __construct(Model_Year $year = null, $name = null, Model_User $creator = null)
 	{
 		if ($this->getId() !== null)
 		{
@@ -150,12 +146,6 @@ class Model_Project extends Model
 				trigger_error("Missing NAME passed to the PROJECT constructor", E_USER_ERROR);
 			}
 			$this->name = $name;
-
-			if (empty($slug))
-			{
-				trigger_error("Missing SLUG passed to the PROJECT constructor", E_USER_ERROR);
-			}
-			$this->slug = $slug;
 
 			if (empty($creator))
 			{
@@ -219,14 +209,6 @@ class Model_Project extends Model
 	}
 
 	/**
-	 * @return string
-	 */
-	public function getSlug()
-	{
-		return $this->slug;
-	}
-
-	/**
 	 * @return int
 	 */
 	public function getStatus()
@@ -261,7 +243,6 @@ class Model_Project extends Model
 				"year" => (string)$this->year,
 				"group" => $this->group,
 				"name" => $this->name,
-				"slug" => $this->slug,
 				"description" => $this->getDescription(),
 				"creator" => $this->creator,
 				"supervisor" => $this->supervisor
@@ -280,12 +261,12 @@ class Model_Project extends Model
 		{
 			/** @var _Database_State $result */
 			$result = Database::prepare(
-				"INSERT INTO `Project` (`year`, `group_id`, `name`, `slug`, `creator_id`, `created`)
+				"INSERT INTO `Project` (`year`, `group_id`, `name`, `creator_id`, `created`)
 				 VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
 				"iissi"
 			)->execute(
 				(string)$this->year, (!empty($this->group) ? $this->group->getId() : null), $this->name,
-				$this->slug, $this->creator->getId()
+				$this->creator->getId()
 			);
 			$this->id = $result->insert_id;
 			$this->created = $this->updated = Date::format(Date::TIMESTAMP, time());

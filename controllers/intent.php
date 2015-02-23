@@ -103,6 +103,7 @@ final class Controller_Intent extends Controller
 		 * GET /intent/:id
 		 */
 		$this->response->status(200);
+		$this->response->header("KP-Intent-Hash", $intent->getHash());
 		$this->response->body($intent);
 	}
 }

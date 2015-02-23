@@ -56,14 +56,7 @@ final class Controller_Project extends Controller
 				throw new HttpStatusException(400, "Invalid user id entered for the project's creator.");
 			}
 
-			$slug = slugify($params["name"]);
-
-			if (!Model_Project::validate($year, $slug))
-			{
-				throw new HttpStatusException(400, "This year already has a project with that name '" . $params["name"] . "'.");
-			}
-
-			$project = new Model_Project($year, $params["name"], $slug, $creator);
+			$project = new Model_Project($year, $params["name"], $creator);
 			$project->save();
 
 			$this->response->status(201);

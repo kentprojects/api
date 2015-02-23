@@ -92,6 +92,10 @@ final class Intent_Join_A_Group extends Intent
 			throw new IntentException("Invalid group_id passed to intent.");
 		}
 
+		$this->deduplicate(array(
+			"group_id" => $group->getId()
+		));
+
 		$this->mergeData(array(
 			"group_id" => $group->getId()
 		));

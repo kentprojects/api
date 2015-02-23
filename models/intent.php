@@ -19,6 +19,7 @@ final class Model_Intent extends Model
 				`intent_id` AS 'id',
 				`user_id` AS 'user',
 				`handler`,
+				`hash`,
 				`state`,
 				`created`,
 				`updated`
@@ -26,6 +27,24 @@ final class Model_Intent extends Model
 			 WHERE `intent_id` = ?",
 			"i", __CLASS__
 		)->execute($id)->singleton();
+	}
+
+	/**
+	 * Get the relevant Intent by it's hash.
+	 *
+	 * @param Model_User $user
+	 * @param string $handler
+	 * @param string $hash
+	 * @return Model_Intent
+	 */
+	public static function findByHash(Model_User $user, $handler, $hash)
+	{
+		return Database::prepare(
+			"SELECT `intent_id`
+			 FROM `Intent`
+			 WHERE `handler` = ? AND `user_id` = ? AND `hash` = ?",
+			"sis"
+		)->execute($handler, $user->getId(), $hash)->singleval();
 	}
 
 	/**
@@ -40,6 +59,10 @@ final class Model_Intent extends Model
 	 * @var string
 	 */
 	protected $handler;
+	/**
+	 * @var string
+	 */
+	protected $hash;
 	/**
 	 * @var string
 	 */
@@ -124,6 +147,11 @@ final class Model_Intent extends Model
 		return $this->handler;
 	}
 
+	public function getHash()
+	{
+		return $this->hash;
+	}
+
 	/**
 	 * @return int
 	 */
@@ -166,10 +194,10 @@ final class Model_Intent extends Model
 		{
 			/** @var _Database_State $result */
 			$result = Database::prepare(
-				"INSERT INTO `Intent` (`user_id`, `handler`, `state`, `created`)
-				 VALUES (?, ?, ?, CURRENT_TIMESTAMP)", "iss"
+				"INSERT INTO `Intent` (`user_id`, `handler`, `hash`, `state`, `created`)
+				 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)", "iss"
 			)->execute(
-				$this->user->getId(), $this->handler, $this->state
+				$this->user->getId(), $this->hash, $this->handler, $this->state
 			);
 			$this->id = $result->insert_id;
 			$this->created = $this->updated = Date::format(Date::TIMESTAMP, time());
@@ -179,6 +207,15 @@ final class Model_Intent extends Model
 			Database::prepare("UPDATE `Intent` SET `state` = ? WHERE `intent_id` = ?", "si")
 				->execute($this->state, $this->id);
 		}
+	}
+
+	/**
+	 * @param string $hash
+	 * @return void
+	 */
+	public function setHash($hash)
+	{
+		$this->hash = $hash;
 	}
 
 	/**

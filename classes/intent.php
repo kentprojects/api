@@ -138,6 +138,22 @@ abstract class Intent implements JsonSerializable
 
 	/**
 	 * @param array $data
+	 * @throws IntentException
+	 * @return string
+	 */
+	public final function deduplicate(array $data)
+	{
+		$hash = md5(json_encode($data));
+		$this->model->setHash(md5(json_encode($data)));
+		$intent = Model_Intent::findByHash($this->model->getUser(), $this->model->getHandler(), $hash);
+		if ($intent !== null)
+		{
+			throw new IntentException("An intent similar to this already exists with ID " . $intent->getId());
+		}
+	}
+
+	/**
+	 * @param array $data
 	 * @throws Exception
 	 * @return void
 	 */
@@ -152,6 +168,14 @@ abstract class Intent implements JsonSerializable
 	protected final function getHandlerName()
 	{
 		return strtolower(str_replace("Intent_", "", get_called_class()));
+	}
+
+	/**
+	 * @return string
+	 */
+	public final function getHash()
+	{
+		return $this->model->getHash();
 	}
 
 	/**
