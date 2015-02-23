@@ -404,7 +404,7 @@ class Request_Internal extends Request
 				throw new RequestException("Method $controller::$action was not found.");
 			}
 
-			// print_r($this); var_dump($controller, $action); exit();
+			//Log::debug($this, $controller, $action);
 
 			$response = new Response($this);
 
@@ -453,6 +453,8 @@ class Request_Internal extends Request
 				 */
 				$response->body((string)$e);
 			}
+
+			Log::error($e);
 
 			return $response;
 		}
