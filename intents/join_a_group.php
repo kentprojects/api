@@ -89,7 +89,7 @@ final class Intent_Join_A_Group extends Intent
 		$group = Model_Group::getById($data["group_id"]);
 		if (empty($group))
 		{
-			throw new IntentException("Invalid group_id passed to intent.");
+			throw new HttpStatusException(404, "Group with `group_id` is not found.");
 		}
 
 		$data = array_merge($data, array(
