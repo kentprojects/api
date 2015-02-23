@@ -195,7 +195,7 @@ final class Model_Intent extends Model
 			/** @var _Database_State $result */
 			$result = Database::prepare(
 				"INSERT INTO `Intent` (`user_id`, `handler`, `hash`, `state`, `created`)
-				 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)", "iss"
+				 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)", "isss"
 			)->execute(
 				$this->user->getId(), $this->hash, $this->handler, $this->state
 			);
