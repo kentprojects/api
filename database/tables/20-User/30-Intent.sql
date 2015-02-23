@@ -13,6 +13,6 @@ CREATE TABLE IF NOT EXISTS `Intent` (
 	`updated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Intent Updated Date',
 	PRIMARY KEY (`intent_id`),
 	FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`) ON UPDATE CASCADE ON DELETE CASCADE,
-	UNIQUE KEY `intent_hash` (`handler`, `user_id`, `hash`)
+	UNIQUE KEY `intent_hash` (`handler`, `user_id`, `hash`),
 	INDEX `intent_state` (`state`)
 ) ENGINE = InnoDB CHARACTER SET utf8;
