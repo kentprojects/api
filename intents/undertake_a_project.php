@@ -146,7 +146,7 @@ final class Intent_Undertake_A_Project extends Intent
 	{
 		$json = parent::jsonSerialize();
 		$json["group"] = $this->model->getUser()->getCurrentGroup();
-		$json["project"] = Model_Group::getById($this->data->project_id);
+		$json["project"] = Model_Project::getById($this->data->project_id);
 		return $json;
 	}
 
