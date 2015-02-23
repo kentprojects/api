@@ -189,7 +189,7 @@ final class Model_User extends Model
 				"role" => $this->role
 			),
 			(!empty($this->years) ? $this->years->jsonSerialize() : array()),
-			(!empty($this->groups) ? array("groups" => $this->groups->jsonSerialize()) : array()),
+			(!empty($this->groups) ? array("group" => $this->groups->getCurrentGroupWithProject()) : array()),
 			array(
 				"bio" => $this->getDescription(),
 			),

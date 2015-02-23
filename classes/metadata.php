@@ -27,6 +27,10 @@ class Metadata implements ArrayAccess, JsonSerializable
 		}
 	}
 
+	/**
+	 * @param string $key
+	 * @return mixed
+	 */
 	public function __get($key)
 	{
 		return $this->offsetExists($key)
@@ -34,6 +38,20 @@ class Metadata implements ArrayAccess, JsonSerializable
 			: null;
 	}
 
+	/**
+	 * @param string $key
+	 * @return bool
+	 */
+	public function __isset($key)
+	{
+		return $this->offsetExists($key);
+	}
+
+	/**
+	 * @param string $key
+	 * @param mixed $value
+	 * @return void
+	 */
 	public function __set($key, $value)
 	{
 		$this->data[$key] = array($value);
