@@ -37,7 +37,7 @@ final class Intent_Undertake_A_Project extends Intent
 		/**
 		 * Are you the creator ID?
 		 */
-		return ($group->getCreator()->getId() != $user->getId());
+		return ($group->getCreator()->getId() == $user->getId());
 	}
 
 	/**
