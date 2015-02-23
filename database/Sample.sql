@@ -49,15 +49,16 @@ VALUES
 	(1, 3), (1, 4), (1, 5)
 ON DUPLICATE KEY UPDATE `group_id` = `group_id`, `user_id` = `user_id`;
 
-INSERT INTO `Project` (`project_id`, `year`, `group_id`, `name`, `slug`, `creator_id`, `created`)
+INSERT INTO `Project` (`project_id`, `year`, `group_id`, `name`, `slug`, `creator_id`, `supervisor_id`, `created`)
 VALUES
-	(1, 2014, 1, 'Student Project Support System', 'student-project-support-system', 3, CURRENT_TIMESTAMP),
-	(2, 2014, NULL, 'Kettle Project', 'kettle-project', 1, CURRENT_TIMESTAMP),
-	(3, 2014, NULL, 'Flying Helicopter Drones', 'flying-helicopter-drones', 1, CURRENT_TIMESTAMP),
-	(4, 2014, NULL, 'Clever Dashboard', 'clever-dashboard', 1, CURRENT_TIMESTAMP),
-	(5, 2014, NULL, 'CS Kent Website Improvements', 'cs-kent-website-improvements', 1, CURRENT_TIMESTAMP)
+	(1, 2014, 1, 'Student Project Support System', 'student-project-support-system', 3, 2, CURRENT_TIMESTAMP),
+	(2, 2014, NULL, 'Kettle Project', 'kettle-project', 1, 2, CURRENT_TIMESTAMP),
+	(3, 2014, NULL, 'Flying Helicopter Drones', 'flying-helicopter-drones', 1, 6, CURRENT_TIMESTAMP),
+	(4, 2014, NULL, 'Clever Dashboard', 'clever-dashboard', 1, 6, CURRENT_TIMESTAMP),
+	(5, 2014, NULL, 'CS Kent Website Improvements', 'cs-kent-website-improvements', 1, 6, CURRENT_TIMESTAMP)
 ON DUPLICATE KEY UPDATE `group_id` = `group_id`, `year` = VALUES(`year`), `name` = VALUES(`name`),
-	`slug` = VALUES(`slug`), `creator_id` = VALUES(`creator_id`), `created` = VALUES(`created`);
+	`slug` = VALUES(`slug`), `creator_id` = VALUES(`creator_id`), `supervisor_id` = VALUES(`supervisor_id`),
+	`created` = VALUES(`created`);
 
 INSERT INTO `Project_Supervisor_Map` (`project_id`, `user_id`)
 VALUES
@@ -66,9 +67,9 @@ ON DUPLICATE KEY UPDATE `project_id` = `project_id`, `user_id` = `user_id`;
 
 INSERT INTO `ACL` (`user_id`, `entity`, `create`, `read`, `update`, `delete`)
 VALUES
-	(1, `group`, 1, 1, 1, 1),
-	(1, `project`, 1, 1, 1, 1),
-	(1, `user`, 1, 1, 1, 1);
+	(1, 'group', 1, 1, 1, 1),
+	(1, 'project', 1, 1, 1, 1),
+	(1, 'user', 1, 1, 1, 1);
 
 INSERT INTO `Metadata` (`root`, `key`, `value`) VALUES
 	('Model/Application/1', 'contact_email', 'developers@kentprojects.com'),

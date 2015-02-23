@@ -56,6 +56,7 @@ class Model_Project extends Model
 					`name`,
 					`slug`,
 					`creator_id` AS 'creator',
+					`supervisor_id` AS 'supervisor',
 					`created`,
 					`updated`,
 					`status`
@@ -109,6 +110,10 @@ class Model_Project extends Model
 	 */
 	protected $creator;
 	/**
+	 * @var Model_User
+	 */
+	protected $supervisor;
+	/**
 	 * @var string
 	 */
 	protected $created;
@@ -129,6 +134,8 @@ class Model_Project extends Model
 			$this->year = Model_Year::getById($this->year);
 			/** @noinspection PhpParamsInspection */
 			$this->creator = Model_User::getById($this->creator);
+			/** @noinspection PhpParamsInspection */
+			$this->supervisor = Model_User::getById($this->supervisor);
 		}
 		else
 		{
@@ -257,6 +264,7 @@ class Model_Project extends Model
 				"slug" => $this->slug,
 				"description" => $this->getDescription(),
 				"creator" => $this->creator,
+				"supervisor" => $this->supervisor
 			),
 			$this->jsonPermissions(),
 			array(
