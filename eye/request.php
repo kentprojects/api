@@ -112,6 +112,7 @@ $applications = array(
  */
 $users = array(
 	Model_User::getByEmail("J.C.Hernandez-Castro@kent.ac.uk"),
+	Model_User::getByEmail("jsd24@kent.ac.uk"),
 	Model_User::getByEmail("mh471@kent.ac.uk"),
 	Model_User::getByEmail("supervisor2@kent.ac.uk")
 );
