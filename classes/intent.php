@@ -138,7 +138,7 @@ abstract class Intent implements JsonSerializable
 
 	/**
 	 * @param array $data
-	 * @throws IntentException
+	 * @throws HttpStatusException
 	 * @return string
 	 */
 	public final function deduplicate(array $data)
