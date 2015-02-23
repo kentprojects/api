@@ -97,6 +97,22 @@ final class Model_User extends Model
 	public $years;
 
 	/**
+	 * @return Model_Group
+	 */
+	public function getCurrentGroup()
+	{
+		if (empty($this->groups))
+		{
+			$this->groups = new StudentGroupMap($this);
+		}
+		if (count($this->groups) === 0)
+		{
+			return null;
+		}
+		return $this->groups->getCurrentGroup();
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getDescription()
@@ -154,7 +170,6 @@ final class Model_User extends Model
 		{
 			$this->years = new UserYearMap($this);
 		}
-
 		return $this->years;
 	}
 
@@ -260,14 +275,14 @@ final class Model_User extends Model
 		$this->email = $email;
 	}
 
-	public function setFirstName($firstname)
+	public function setFirstName($firstName)
 	{
-		$this->first_name = $firstname;
+		$this->first_name = $firstName;
 	}
 
-	public function setLastName($lastname)
+	public function setLastName($lastName)
 	{
-		$this->last_name = $lastname;
+		$this->last_name = $lastName;
 	}
 
 	public function setRole($role)

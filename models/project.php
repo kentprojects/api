@@ -215,6 +215,14 @@ class Model_Project extends Model
 	}
 
 	/**
+	 * @return Model_User
+	 */
+	public function getSupervisor()
+	{
+		return $this->supervisor;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getUpdated()
@@ -300,6 +308,15 @@ class Model_Project extends Model
 	public function setDescription($description)
 	{
 		$this->metadata->description = strip_tags($description);
+	}
+
+	/**
+	 * @param Model_Group $group
+	 * @return void
+	 */
+	public function setGroup(Model_Group $group)
+	{
+		$this->group = $group;
 	}
 
 	/**
