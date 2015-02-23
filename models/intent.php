@@ -40,8 +40,7 @@ final class Model_Intent extends Model
 	public static function findByHash(Model_User $user, $handler, $hash)
 	{
 		return Database::prepare(
-			"SELECT `intent_id`
-			 FROM `Intent`
+			"SELECT `intent_id` FROM `Intent`
 			 WHERE `handler` = ? AND `user_id` = ? AND `hash` = ?",
 			"sis"
 		)->execute($handler, $user->getId(), $hash)->singleval();
@@ -197,7 +196,7 @@ final class Model_Intent extends Model
 				"INSERT INTO `Intent` (`user_id`, `handler`, `hash`, `state`, `created`)
 				 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)", "isss"
 			)->execute(
-				$this->user->getId(), $this->hash, $this->handler, $this->state
+				$this->user->getId(), $this->handler, $this->hash, $this->state
 			);
 			$this->id = $result->insert_id;
 			$this->created = $this->updated = Date::format(Date::TIMESTAMP, time());
