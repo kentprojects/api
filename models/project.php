@@ -289,11 +289,11 @@ class Model_Project extends Model
 			}
 			Database::prepare(
 				"UPDATE `Project`
-				 SET `year` = ?, `group_id` = ?, `name` = ?, `slug` = ?, `creator_id` = ?
+				 SET `year` = ?, `group_id` = ?, `name` = ?, `creator_id` = ?
 				 WHERE `project_id` = ?",
 				"iissii"
 			)->execute(
-				(string)$this->year, $group_id, $this->name, $this->slug, $this->creator->getId(),
+				(string)$this->year, $group_id, $this->name, $this->creator->getId(),
 				$this->id
 			);
 			$this->updated = Date::format(Date::TIMESTAMP, time());
