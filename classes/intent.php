@@ -145,6 +145,7 @@ abstract class Intent implements JsonSerializable
 	{
 		$hash = md5(json_encode($data));
 		$intent = Model_Intent::findByHash($this->model->getUser(), $this->model->getHandler(), $hash);
+		Log::debug($hash, $intent);
 		if ($intent !== null)
 		{
 			throw new IntentException("An intent similar to this already exists with ID " . $intent);
