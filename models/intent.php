@@ -35,7 +35,7 @@ final class Model_Intent extends Model
 	 * @param Model_User $user
 	 * @param string $handler
 	 * @param string $hash
-	 * @return Model_Intent
+	 * @return int
 	 */
 	public static function findByHash(Model_User $user, $handler, $hash)
 	{

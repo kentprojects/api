@@ -144,12 +144,12 @@ abstract class Intent implements JsonSerializable
 	public final function deduplicate(array $data)
 	{
 		$hash = md5(json_encode($data));
-		$this->model->setHash(md5(json_encode($data)));
 		$intent = Model_Intent::findByHash($this->model->getUser(), $this->model->getHandler(), $hash);
 		if ($intent !== null)
 		{
-			throw new IntentException("An intent similar to this already exists with ID " . $intent->getId());
+			throw new IntentException("An intent similar to this already exists with ID " . $intent);
 		}
+		$this->model->setHash($hash);
 	}
 
 	/**
