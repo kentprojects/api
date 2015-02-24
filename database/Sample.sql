@@ -57,7 +57,7 @@ VALUES
 	(4, 2014, NULL, 'Clever Dashboard', 1, 6, CURRENT_TIMESTAMP),
 	(5, 2014, NULL, 'CS Kent Website Improvements', 1, 6, CURRENT_TIMESTAMP)
 ON DUPLICATE KEY UPDATE `group_id` = `group_id`, `year` = VALUES(`year`), `name` = VALUES(`name`),
-	`slug` = VALUES(`slug`), `creator_id` = VALUES(`creator_id`), `supervisor_id` = VALUES(`supervisor_id`),
+	`creator_id` = VALUES(`creator_id`), `supervisor_id` = VALUES(`supervisor_id`),
 	`created` = VALUES(`created`);
 
 INSERT INTO `Project_Supervisor_Map` (`project_id`, `user_id`)
