@@ -79,6 +79,9 @@ abstract class ModelMap implements Countable, IteratorAggregate, JsonSerializabl
 		$this->data = array();
 	}
 
+	/**
+	 * @return int
+	 */
 	public function count()
 	{
 		return count($this->data);
