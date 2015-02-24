@@ -49,13 +49,13 @@ VALUES
 	(1, 3), (1, 4), (1, 5)
 ON DUPLICATE KEY UPDATE `group_id` = `group_id`, `user_id` = `user_id`;
 
-INSERT INTO `Project` (`project_id`, `year`, `group_id`, `name`, `slug`, `creator_id`, `supervisor_id`, `created`)
+INSERT INTO `Project` (`project_id`, `year`, `group_id`, `name`, `creator_id`, `supervisor_id`, `created`)
 VALUES
-	(1, 2014, 1, 'Student Project Support System', 'student-project-support-system', 3, 2, CURRENT_TIMESTAMP),
-	(2, 2014, NULL, 'Kettle Project', 'kettle-project', 1, 2, CURRENT_TIMESTAMP),
-	(3, 2014, NULL, 'Flying Helicopter Drones', 'flying-helicopter-drones', 1, 6, CURRENT_TIMESTAMP),
-	(4, 2014, NULL, 'Clever Dashboard', 'clever-dashboard', 1, 6, CURRENT_TIMESTAMP),
-	(5, 2014, NULL, 'CS Kent Website Improvements', 'cs-kent-website-improvements', 1, 6, CURRENT_TIMESTAMP)
+	(1, 2014, 1, 'Student Project Support System', 3, 2, CURRENT_TIMESTAMP),
+	(2, 2014, NULL, 'Kettle Project', 1, 2, CURRENT_TIMESTAMP),
+	(3, 2014, NULL, 'Flying Helicopter Drones', 1, 6, CURRENT_TIMESTAMP),
+	(4, 2014, NULL, 'Clever Dashboard', 1, 6, CURRENT_TIMESTAMP),
+	(5, 2014, NULL, 'CS Kent Website Improvements', 1, 6, CURRENT_TIMESTAMP)
 ON DUPLICATE KEY UPDATE `group_id` = `group_id`, `year` = VALUES(`year`), `name` = VALUES(`name`),
 	`slug` = VALUES(`slug`), `creator_id` = VALUES(`creator_id`), `supervisor_id` = VALUES(`supervisor_id`),
 	`created` = VALUES(`created`);
