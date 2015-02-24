@@ -303,5 +303,5 @@ if ($exit > 0)
 }
 else
 {
-	// Cache::init();
+	Cache::init();
 }
