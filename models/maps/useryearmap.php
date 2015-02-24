@@ -8,7 +8,7 @@
  * This class is designed to bring two objects together by way of a map table.
  * This does not extend a ModelMap since it's a little... different...
  */
-class UserYearMap implements IteratorAggregate, JsonSerializable
+class UserYearMap implements Countable, IteratorAggregate, JsonSerializable
 {
 	/**
 	 * @var array
@@ -21,7 +21,7 @@ class UserYearMap implements IteratorAggregate, JsonSerializable
 	);
 
 	/**
-	 * @var array
+	 * @var stdClass[]
 	 */
 	protected $data;
 	/**
@@ -103,12 +103,28 @@ class UserYearMap implements IteratorAggregate, JsonSerializable
 	}
 
 	/**
+	 * @return int
+	 */
+	public function count()
+	{
+		return count($this->data);
+	}
+
+	/**
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */
 	public function clear()
 	{
 		$this->data = array();
+	}
+
+	/**
+	 * @return stdClass
+	 */
+	public function getLatestYear()
+	{
+		return end($this->data);
 	}
 
 	/**
