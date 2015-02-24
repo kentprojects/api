@@ -41,7 +41,7 @@ final class Model_Intent extends Model
 	{
 		return Database::prepare(
 			"SELECT `intent_id` FROM `Intent`
-			 WHERE `handler` = ? AND `user_id` = ? AND `hash` = ?",
+			 WHERE `handler` = ? AND `user_id` = ? AND `hash` = ? AND `state` = 'open'",
 			"sis"
 		)->execute($handler, $user->getId(), $hash)->singleval();
 	}
