@@ -23,10 +23,6 @@ fi
 #
 # Remove an unnecessary packages.
 apt-get autoremove -y
-# Since we wish to forward a port on the outside to the internal MySQL port, we need to modify the config file.
-patch /etc/mysql/my.cnf < /vagrant/vagrant/my.cnf.patch
-# And restart MySQL.
-sudo service mysql restart
 #
 # Build the development database.
 mysql -u root -ppassword < /vagrant/vagrant/database.sql

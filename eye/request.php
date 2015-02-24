@@ -31,10 +31,13 @@ class EyeRequest
 	{
 		unset($params["signature"]);
 		ksort($params);
-		array_walk($params, function (&$v)
-		{
-			$v = (string)$v;
-		});
+		array_walk(
+			$params,
+			function (&$v)
+			{
+				$v = (string)$v;
+			}
+		);
 
 		$local = md5(config("checksum", "salt") . static::$application->getSecret() . json_encode($params));
 
@@ -90,7 +93,7 @@ class EyeRequest
 	}
 }
 
-require_once __DIR__."/../functions.php";
+require_once __DIR__ . "/../functions.php";
 
 /**
  * @var Model_Application[] $applications
@@ -147,7 +150,7 @@ if (!empty($_POST["params-keys"]))
 if (!empty($_POST["key"]))
 {
 	$application = null;
-	foreach($applications as $app)
+	foreach ($applications as $app)
 	{
 		if ($app->getKey() === $_POST["key"])
 		{
@@ -171,7 +174,7 @@ if (!empty($_POST["key"]))
 if (!empty($_POST["user"]))
 {
 	$user = null;
-	foreach($users as $u)
+	foreach ($users as $u)
 	{
 		if ($u->getId() == $_POST["user"])
 		{
@@ -277,13 +280,16 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 curl_setopt($ch, CURLOPT_URL, $request->url);
 
+list($headers, $response) = explode("\r\n\r\n", curl_exec($ch), 2);
+
 /**
  * Run the CURL request.
  *
  * @var array
  */
 $response = array(
-	"body" => curl_exec($ch),
+	"body" => $response,
+	"headers" => explode("\n", $headers),
 	"info" => curl_getinfo($ch),
 	"json" => null
 );
