@@ -84,21 +84,7 @@ abstract class Model implements JsonSerializable
 	 */
 	public static function getById($id)
 	{
-		try
-		{
-			return Cache::get(static::cacheName() . "." . $id);
-		}
-		catch (CacheException $e)
-		{
-			if ($e->getCode() === Memcached::RES_NOTFOUND)
-			{
-				return null;
-			}
-			else
-			{
-				throw $e;
-			}
-		}
+		return Cache::get(static::cacheName() . "." . $id);
 	}
 
 	/**
