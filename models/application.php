@@ -27,10 +27,7 @@ class Model_Application extends Model
 				 WHERE `application_id` = ?",
 				"i", __CLASS__
 			)->execute($id)->singleton();
-			if (!empty($application))
-			{
-				Cache::store($application);
-			}
+			Cache::store($application);
 		}
 		return $application;
 	}
@@ -47,13 +44,9 @@ class Model_Application extends Model
 		$id = Cache::get($cacheKey);
 		if (empty($id))
 		{
-			$id = Database::prepare(
-				"SELECT `application_id` FROM `Application` WHERE `key` = ? AND `status` = 1", "s"
-			)->execute($key)->singleval();
-			if (!empty($id))
-			{
-				Cache::set($cacheKey, $id, Cache::HOUR);
-			}
+			$id = Database::prepare("SELECT `application_id` FROM `Application` WHERE `key` = ? AND `status` = 1", "s")
+				->execute($key)->singleval();
+			!empty($id) && Cache::set($cacheKey, $id, Cache::HOUR);
 		}
 		return !empty($id) ? static::getById($id) : null;
 	}

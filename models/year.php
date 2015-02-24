@@ -4,19 +4,21 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-class Model_Year extends Model
+final class Model_Year extends Model
 {
 	/**
 	 * @return Model_Year[]
 	 */
 	public static function getAll()
 	{
-		$years = array();
-		foreach (Database::prepare("SELECT `year` AS 'id' FROM `Year`")->execute()->singlevals() as $year)
+		$cacheKey = static::cacheName() . ".all";
+		$years = Cache::get($cacheKey);
+		if (empty($years))
 		{
-			$years[] = static::getById($year);
+			$years = Database::prepare("SELECT `year` FROM `Year` ORDER BY `year` ASC")->execute()->singlevals();
+			Cache::set($cacheKey, $years, Cache::HOUR);
 		}
-		return $years;
+		return array_map(array(__CLASS__, "getById"), $years);
 	}
 
 	/**
@@ -25,19 +27,36 @@ class Model_Year extends Model
 	 */
 	public static function getById($id)
 	{
-		$statement = Database::prepare("SELECT `year` AS 'id' FROM `Year` WHERE `year` = ?", "i", __CLASS__);
-		return $statement->execute($id)->singleton();
+		/** @var Model_Year $year */
+		$year = parent::getById($id);
+		if (empty($year))
+		{
+			$year = Database::prepare(
+				"SELECT `year` AS 'id'
+				 FROM `Year`
+				 WHERE `year` = ?",
+				"i", __CLASS__
+			)->execute($id)->singleton();
+			Cache::store($year);
+		}
+		return $year;
 	}
 
 	/**
+	 * Get the current Year.
 	 * @return Model_Year
 	 */
 	public static function getCurrentYear()
 	{
-		$statement = Database::prepare("SELECT `year` FROM `Year` ORDER BY `year` DESC LIMIT 1");
-		$year_id = $statement->execute()->singleval();
-
-		return !empty($year_id) ? static::getById($year_id) : null;
+		$cacheKey = static::cacheName() . ".current";
+		$id = Cache::get($cacheKey);
+		if (empty($id))
+		{
+			$id = Database::prepare("SELECT `year` FROM `Year` ORDER BY `year` DESC LIMIT 1")
+				->execute()->singleval();
+			Cache::set($cacheKey, $id, Cache::HOUR);
+		}
+		return !empty($id) ? static::getById($id) : null;
 	}
 
 	/**
@@ -60,13 +79,26 @@ class Model_Year extends Model
 	protected $id;
 
 	/**
+	 * @var Model_User[]
+	 */
+	protected $conveners;
+	/**
+	 * @var Model_User[]
+	 */
+	protected $secondmarkers;
+	/**
+	 * @var Model_User[]
+	 */
+	protected $supervisors;
+
+	/**
 	 * If someone forces the year to be a string, at least it'll become the YEAR, and not fail.
 	 *
 	 * @return string
 	 */
 	public function __toString()
 	{
-		return (string) $this->getId();
+		return (string)$this->getId();
 	}
 
 	/**
@@ -88,11 +120,51 @@ class Model_Year extends Model
 	}
 
 	/**
+	 * @return Model_User[]
+	 */
+	public function getConveners()
+	{
+		if (empty($this->conveners))
+		{
+			$this->conveners = array_map(
+				function ($convenerId)
+				{
+					return Model_User::getById($convenerId);
+				},
+				Database::prepare(
+					"SELECT `user_id` FROM `User_Year_Map` WHERE `year` = ? AND `role_convener` = 1", "i"
+				)->execute($this->getId())->singlevals()
+			);
+		}
+		return $this->conveners;
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getId()
 	{
 		return $this->id;
+	}
+
+	/**
+	 * @return Model_User[]
+	 */
+	public function getSecondMarkers()
+	{
+		if (empty($this->secondmarkers))
+		{
+			$this->secondmarkers = array_map(
+				function ($userId)
+				{
+					return Model_User::getById($userId);
+				},
+				Database::prepare(
+					"SELECT `user_id` FROM `User_Year_Map` WHERE `year` = ? AND `role_secondmarker` = 1", "i"
+				)->execute($this->getId())->singlevals()
+			);
+		}
+		return $this->secondmarkers;
 	}
 
 	/**
@@ -112,6 +184,26 @@ class Model_Year extends Model
 			}
 		}
 		return $users;
+	}
+
+	/**
+	 * @return Model_User[]
+	 */
+	public function getSupervisors()
+	{
+		if (empty($this->supervisors))
+		{
+			$this->supervisors = array_map(
+				function ($userId)
+				{
+					return Model_User::getById($userId);
+				},
+				Database::prepare(
+					"SELECT `user_id` FROM `User_Year_Map` WHERE `year` = ? AND `role_supervisor` = 1", "i"
+				)->execute($this->getId())->singlevals()
+			);
+		}
+		return $this->supervisors;
 	}
 
 	/**

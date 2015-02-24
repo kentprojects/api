@@ -14,19 +14,26 @@ final class Model_Intent extends Model
 	 */
 	public static function getById($id)
 	{
-		return Database::prepare(
-			"SELECT
-				`intent_id` AS 'id',
-				`user_id` AS 'user',
-				`handler`,
-				`hash`,
-				`state`,
-				`created`,
-				`updated`
-			 FROM `Intent`
-			 WHERE `intent_id` = ?",
-			"i", __CLASS__
-		)->execute($id)->singleton();
+		/** @var Model_Intent $intent */
+		$intent = parent::getById($id);
+		if (empty($intent))
+		{
+			$intent = Database::prepare(
+				"SELECT
+					`intent_id` AS 'id',
+					`user_id` AS 'user',
+					`handler`,
+					`hash`,
+					`state`,
+					`created`,
+					`updated`
+				 FROM `Intent`
+				 WHERE `intent_id` = ?",
+				"i", __CLASS__
+			)->execute($id)->singleton();
+			!empty($intent) && Cache::store($intent);
+		}
+		return $intent;
 	}
 
 	/**
@@ -206,6 +213,7 @@ final class Model_Intent extends Model
 			Database::prepare("UPDATE `Intent` SET `state` = ? WHERE `intent_id` = ?", "si")
 				->execute($this->state, $this->id);
 		}
+		Cache::delete($this->getCacheName());
 	}
 
 	/**

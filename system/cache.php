@@ -268,8 +268,27 @@ final class Cache
 		throw new CacheException(static::$memcached->getResultMessage(), static::$memcached->getResultCode());
 	}
 
-	public static function store(Model $model)
+	/**
+	 * @param Model $model
+	 * @throws CacheException
+	 * @return void
+	 */
+	public static function store($model)
 	{
+		if (empty($model))
+		{
+			return;
+		}
+
+		if (!is_object($model))
+		{
+			throw new CacheException("Unknown variable passed to Cache::store: " . gettype($model));
+		}
+		if (!($model instanceof Model))
+		{
+			throw new CacheException("Unknown object passed to Cache::store: " . get_class($model));
+		}
+
 		static::set($model->getCacheName(), $model, 4 * static::HOUR);
 	}
 }

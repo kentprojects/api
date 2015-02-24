@@ -19,20 +19,15 @@ class Model_Project extends Model
 			return null;
 		}
 
-		return Database::prepare(
-			"SELECT
-				`project_id` AS 'id',
-				`year`,
-				`group_id` AS 'group',
-				`name`,
-				`creator_id` AS 'creator',
-				`created`,
-				`updated`,
-				`status`
-			 FROM `Project`
-			 WHERE `group_id` = ?",
-			"i", __CLASS__
-		)->execute($group->getId())->singleton();
+		$cacheKey = static::cacheName() . ".group." . $group->getId();
+		$id = Cache::get($cacheKey);
+		if (empty($id))
+		{
+			$id = Database::prepare("SELECT `project_id` FROM `Project` WHERE `group_id` = ? AND `status` = 1", "i")
+				->execute($group->getId())->singleval();
+			!empty($id) && Cache::set($cacheKey, $id, Cache::HOUR);
+		}
+		return !empty($id) ? static::getById($id) : null;
 	}
 
 	/**
@@ -44,10 +39,10 @@ class Model_Project extends Model
 	public static function getById($id)
 	{
 		/** @var Model_Project $project */
-		// $project = parent::getById($id);
+		$project = parent::getById($id);
 		if (empty($project))
 		{
-			$statement = Database::prepare(
+			$project = Database::prepare(
 				"SELECT
 					`project_id` AS 'id',
 					`year`,
@@ -61,26 +56,10 @@ class Model_Project extends Model
 				 FROM `Project`
 			 	 WHERE `project_id` = ?",
 				"i", __CLASS__
-			);
-			$project = $statement->execute($id)->singleton();
-			if (!empty($project))
-			{
-				// Cache::set($project->getCacheName(), $project);
-			}
+			)->execute($id)->singleton();
+			Cache::store($project);
 		}
 		return $project;
-	}
-
-	/**
-	 * @param Model_Year $year
-	 * @param string $slug
-	 * @return boolean
-	 */
-	public static function validate(Model_Year $year, $slug)
-	{
-		$statement = Database::prepare("SELECT `project_id` FROM `Project` WHERE `year` = ? AND `slug` = ?", "is");
-		$project_id = $statement->execute($year->getId(), $slug)->singleval();
-		return $project_id === null;
 	}
 
 	/**

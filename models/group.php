@@ -18,22 +18,26 @@ class Model_Group extends Model
 		{
 			return null;
 		}
-
-		$statement = Database::prepare(
-			"SELECT
-				`group_id` AS 'id',
-				`year`,
-				`name`,
-				`creator_id` AS 'creator',
-				`created`,
-				`updated`,
-				`status`
-			 FROM `Group`
-			 WHERE `group_id` = ?",
-			"i", __CLASS__
-		);
-
-		return $statement->execute($id)->singleton();
+		/** @var Model_Group $group */
+		$group = parent::getById($id);
+		if (empty($group))
+		{
+			$group = Database::prepare(
+				"SELECT
+					`group_id` AS 'id',
+					`year`,
+					`name`,
+					`creator_id` AS 'creator',
+					`created`,
+					`updated`,
+					`status`
+				 FROM `Group`
+				 WHERE `group_id` = ?",
+				"i", __CLASS__
+			)->execute($id)->singleton();
+			Cache::store($group);
+		}
+		return $group;
 	}
 
 	/**
@@ -48,23 +52,15 @@ class Model_Group extends Model
 		{
 			return null;
 		}
-
-		$statement = Database::prepare(
-			"SELECT
-				g.`group_id` AS 'id',
-				g.`year`,
-				g.`name`,
-				g.`creator_id` AS 'creator',
-				g.`created`,
-				g.`updated`,
-				g.`status`
-			 FROM `Group` g
-			 JOIN `Group_Student_Map` gsm USING (`group_id`)
-			 WHERE g.status = 1 AND gsm.`user_id` = ?",
-			"i", __CLASS__
-		);
-
-		return $statement->execute($user->getId())->singleton();
+		$cacheKey = static::cacheName() . ".user." . $user->getId();
+		$id = Cache::get($cacheKey);
+		if (empty($id))
+		{
+			$id = Database::prepare("SELECT `group_id` FROM `Group_Student_Map` WHERE `user_id` = ?", "i")
+				->execute($user->getId())->singleval();
+			!empty($id) && Cache::set($cacheKey, $id, Cache::HOUR);
+		}
+		return !empty($id) ? static::getById($id) : null;
 	}
 
 	/**

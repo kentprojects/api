@@ -201,9 +201,9 @@ final class Model_User extends Model
 				"name" => $this->getName(),
 				"first_name" => $this->first_name,
 				"last_name" => $this->last_name,
-				"role" => $this->role
+				"role" => $this->role,
+				"years" => !empty($this->years) ? $this->years->jsonSerialize() : array()
 			),
-			(!empty($this->years) ? $this->years->jsonSerialize() : array()),
 			(!empty($this->groups) ? array("group" => $this->groups->getCurrentGroupWithProject()) : array()),
 			array(
 				"bio" => $this->getDescription(),

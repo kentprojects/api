@@ -32,47 +32,56 @@ class Model_Token extends Model
 	 */
 	public static function getByApplicationUser(Model_Application $application, Model_User $user)
 	{
-		return Database::prepare(
-			"SELECT
-				t.`application_id` AS 'application',
-				t.`user_id` AS 'user',
-				t.`token` AS 'token',
-				t.`created` AS 'created',
-				t.`updated` AS 'updated'
-			 FROM `Token` t
-			 JOIN `Application` a USING (`application_id`)
-			 JOIN `User` u USING (`user_id`)
-			 WHERE a.`status` = 1 AND u.`status` = 1
-			 AND t.`application_id` = ? AND u.`user_id` = ?", "ii", __CLASS__
-		)->execute($application->getId(), $user->getId())->singleton();
+		$cacheKey = static::cacheName() . ".app." . $application->getId() . ".user." . $user->getId();
+		$id = Cache::get($cacheKey);
+		if (empty($id))
+		{
+			$id = Database::prepare(
+				"SELECT t.`token`
+				 FROM `Token` t
+				 JOIN `Application` a USING (`application_id`)
+				 JOIN `User` u USING (`user_id`)
+				 WHERE a.`status` = 1 AND u.`status` = 1
+				 AND t.`application_id` = ? AND u.`user_id` = ?", "ii"
+			)->execute($application->getId(), $user->getId())->singleval();
+			!empty($id) && Cache::set($cacheKey, $id, Cache::HOUR);
+		}
+		return !empty($id) ? static::getByToken($id) : null;
 	}
 
 	/**
 	 * Get a Model_Token by it's token.
 	 *
-	 * @param string $token
+	 * @param string $id
 	 * @return Model_Token
 	 */
-	public static function getByToken($token)
+	public static function getByToken($id)
 	{
 		if (empty($token))
 		{
 			return null;
 		}
-
-		return Database::prepare(
-			"SELECT
-				t.`application_id` AS 'application',
-				t.`user_id` AS 'user',
-				t.`token` AS 'token',
-				t.`created` AS 'created',
-				t.`updated` AS 'updated'
-			 FROM `Token` t
-			 JOIN `Application` a USING (`application_id`)
-			 JOIN `User` u USING (`user_id`)
-			 WHERE a.`status` = 1 AND u.`status` = 1
-			 AND t.`token` = ?", "s", __CLASS__
-		)->execute($token)->singleton();
+		/** @var Model_Application $application */
+		$token = Cache::get(static::cacheName() . "." . $id);
+		if (empty($token))
+		{
+			$token = Database::prepare(
+				"SELECT
+					t.`application_id` AS 'application',
+					t.`user_id` AS 'user',
+					t.`token` AS 'token',
+					t.`created` AS 'created',
+					t.`updated` AS 'updated'
+				 FROM `Token` t
+				 JOIN `Application` a USING (`application_id`)
+				 JOIN `User` u USING (`user_id`)
+				 WHERE a.`status` = 1 AND u.`status` = 1
+				 AND t.`token` = ?",
+				"s", __CLASS__
+			)->execute($id)->singleton();
+			Cache::store($token);
+		}
+		return $token;
 	}
 
 	/**

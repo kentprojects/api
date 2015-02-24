@@ -14,12 +14,16 @@ abstract class Model_Staff extends Model
 	 */
 	public static function getByEmail($email)
 	{
-		$statement = Database::prepare(
-			"SELECT `user_id` FROM `User` WHERE `email` = ? AND `role` = 'staff' AND `status` = 1", "s"
-		);
-		$user_id = $statement->execute($email)->singleval();
-
-		return (empty($user_id)) ? null : Model_User::getById($user_id);
+		$cacheKey = static::cacheName() . ".email." . $email;
+		$id = Cache::get($cacheKey);
+		if (empty($id))
+		{
+			$id = Database::prepare(
+				"SELECT `user_id` FROM `User` WHERE `email` = ? AND `role` = 'staff' AND `status` = 1", "s"
+			)->execute($email)->singleval();
+			!empty($id) && Cache::set($cacheKey, $id, Cache::HOUR);
+		}
+		return !empty($id) ? static::getById($id) : null;
 	}
 
 	/**
@@ -30,11 +34,15 @@ abstract class Model_Staff extends Model
 	 */
 	public static function getById($id)
 	{
-		$statement = Database::prepare(
-			"SELECT `user_id` FROM `User` WHERE `user_id` = ? AND `role` = 'staff' AND `status` = 1", "i"
-		);
-		$user_id = $statement->execute($id)->singleval();
-
-		return (empty($user_id)) ? null : Model_User::getById($user_id);
+		$cacheKey = static::cacheName() . "." . $id;
+		$user = Cache::get($cacheKey);
+		if (empty($user))
+		{
+			$user = Database::prepare(
+				"SELECT `user_id` FROM `User` WHERE `user_id` = ? AND `role` = 'staff' AND `status` = 1", "i"
+			)->execute($id)->singleval();
+			!empty($user) && Cache::set($cacheKey, $user, Cache::HOUR);
+		}
+		return !empty($user) ? static::getById($user) : null;
 	}
 }
