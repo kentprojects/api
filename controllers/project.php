@@ -37,11 +37,13 @@ final class Controller_Project extends Controller
 				"action" => ACL::CREATE,
 				"message" => "You do not have permission to create a project."
 			));
-
+			/**
+			 * Validate parameters.
+			 */
 			$params = $this->validateParams(array(
 				"year" => $this->request->post("year", false),
 				"name" => $this->request->post("name", false),
-				"creator" => $this->request->post("creator", false)
+				"creator" => $this->auth->getUser()->getId()
 			));
 
 			$year = Model_Year::getById($params["year"]);

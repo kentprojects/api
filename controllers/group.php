@@ -19,6 +19,10 @@ final class Controller_Group extends Controller
 
 		if ($this->request->getMethod() === Request::POST)
 		{
+			/**
+			 * POST /group
+			 */
+
 			if ($this->request->param("id") !== null)
 			{
 				throw new HttpStatusException(400, "You cannot create a group using an existing ID.");
@@ -34,12 +38,12 @@ final class Controller_Group extends Controller
 			));
 
 			/**
-			 * POST /group
+			 * Validate parameters.
 			 */
 			$params = $this->validateParams(array(
 				"year" => $this->request->post("year", false),
 				"name" => $this->request->post("name", false),
-				"creator" => $this->request->post("creator", false)
+				"creator" => $this->auth->getUser()->getId()
 			));
 
 			$year = Model_Year::getById($params["year"]);
