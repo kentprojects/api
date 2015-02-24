@@ -275,21 +275,23 @@ switch ($request->method)
 		break;
 }
 
+curl_setopt($ch, CURLOPT_HEADER, 1);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $request->getHeaders());
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 curl_setopt($ch, CURLOPT_URL, $request->url);
 
-list($headers, $response) = explode("\r\n\r\n", curl_exec($ch), 2);
+$response = curl_exec($ch);
+list($headers, $response) = explode("\r\n\r\n", $response, 2);
 
 /**
  * Run the CURL request.
  *
  * @var array
  */
-$response = array(
+$output = array(
 	"body" => $response,
-	"headers" => explode("\n", $headers),
+	"headers" => $headers,
 	"info" => curl_getinfo($ch),
 	"json" => null
 );
@@ -299,24 +301,25 @@ if ($request->method == "PUT")
 	fclose($fh);
 }
 
-$response["info"] = print_r($response["info"], true);
-$response["json"] = json_decode($response["body"]);
-if (!empty($response["json"]))
+$output["info"] = print_r($output["info"], true);
+$output["json"] = json_decode($output["body"]);
+if (!empty($output["json"]))
 {
 	/**
 	 * @var array|stdClass|null
 	 */
-	$response["body"] = json_encode($response["json"], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+	$output["body"] = json_encode($output["json"], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 }
 else
 {
-	$response["body"] = $response["json"];
+	$output["body"] = $output["json"];
 }
 
 echo <<<EOT
 	<hr/>
 
 	<p><pre><a href="{$request->url}" target="_blank">{$request->url}</a></pre></p>
-	<pre><code>{$response["body"]}</code></pre>
-	<pre>{$response["info"]}</pre>
+	<pre><code>{$output["headers"]}</code></pre>
+	<pre><code>{$output["body"]}</code></pre>
+	<pre>{$output["info"]}</pre>
 EOT;
