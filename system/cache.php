@@ -62,6 +62,7 @@ final class Cache
 			/**
 			 * If adding it was successful, then yay!
 			 */
+			addStaticHeader("X-Cache-Set", "++");
 			return true;
 		}
 
@@ -137,6 +138,7 @@ final class Cache
 		 */
 		if (empty(static::$memcached))
 		{
+			addStaticHeader("X-Cache-Ignored", "++");
 			return $default;
 		}
 
@@ -146,6 +148,7 @@ final class Cache
 			/**
 			 * If that operation was okay, then return the value.
 			 */
+			addStaticHeader("X-Cache-Hit", "++");
 			return $value;
 		}
 
@@ -156,12 +159,14 @@ final class Cache
 			 * If the item didn't actually exist.
 			 */
 			case Memcached::RES_NOTSTORED:
+				addStaticHeader("X-Cache-Miss", "++");
 				return $default;
 				break;
 			/**
 			 * If the item's value actually was `false`. Because that could totally happen.
 			 */
 			case Memcached::RES_SUCCESS:
+				addStaticHeader("X-Cache-Hit", "++");
 				return false;
 				break;
 			/**
@@ -231,11 +236,13 @@ final class Cache
 		 */
 		if (empty(static::$memcached))
 		{
+			addStaticHeader("X-Cache-Ignored", "++");
 			return false;
 		}
 
 		if (static::$memcached->set($key, $value, $expires) === true)
 		{
+			addStaticHeader("X-Cache-Set", "++");
 			return true;
 		}
 		/**

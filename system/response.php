@@ -7,6 +7,36 @@
 final class Response
 {
 	/**
+	 * @var array
+	 */
+	protected static $staticHeaders = array();
+
+	/**
+	 * @param $key
+	 * @param $value
+	 * @return void
+	 */
+	public static function addStaticHeader($key, $value)
+	{
+		if ($value === null)
+		{
+			unset(static::$staticHeaders[$key]);
+		}
+		elseif ($value === "++")
+		{
+			if (empty(static::$staticHeaders[$key]))
+			{
+				static::$staticHeaders[$key] = 0;
+			}
+			static::$staticHeaders[$key]++;
+		}
+		else
+		{
+			static::$staticHeaders[$key] = (string)$value;
+		}
+	}
+
+	/**
 	 * The body to be sent.
 	 * @var string
 	 */
@@ -77,7 +107,7 @@ final class Response
 			}
 			else
 			{
-				$this->headers[$key] = (string) $value;
+				$this->headers[$key] = (string)$value;
 			}
 			return $this;
 		}
@@ -113,9 +143,11 @@ final class Response
 	public function send()
 	{
 		header(sprintf("HTTP/1.1 %d %s", $this->status, getHttpStatusForCode($this->status)));
-		foreach($this->headers() as $header => $value)
+		foreach ($this->headers() as $header => $value)
+		{
 			header("{$header}: {$value}");
-		echo (string) $this->body;
+		}
+		echo (string)$this->body;
 	}
 
 	/**
@@ -128,7 +160,7 @@ final class Response
 	{
 		if (func_num_args() > 0)
 		{
-			$this->status = (int) $status;
+			$this->status = (int)$status;
 			return $this;
 		}
 		else

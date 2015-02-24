@@ -108,6 +108,16 @@ set_error_handler(
 );
 
 /**
+ * @param string $key
+ * @param string $value
+ * @return void
+ */
+function addStaticHeader($key, $value)
+{
+	class_exists("Response") && call_user_func_array(array("Response", "addStaticHeader"), func_get_args());
+}
+
+/**
  * Returns the first non-empty argument or NULL.
  *
  * @param mixed
