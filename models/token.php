@@ -57,7 +57,7 @@ class Model_Token extends Model
 	 */
 	public static function getByToken($id)
 	{
-		if (empty($token))
+		if (empty($id))
 		{
 			return null;
 		}
