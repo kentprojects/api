@@ -29,7 +29,33 @@ final class Controller_Me extends Controller
 			throw new HttpStatusException(400, "No ID should be passed to the ME controller.");
 		}
 
-		$user = $this->auth->getUser();
+		$this->response->status(200);
+		$this->response->body($this->get($this->auth->getUser()));
+	}
+
+	/**
+	 * @param Model_User $user
+	 * @throws CacheException
+	 * @return array
+	 */
+	protected function get(Model_User $user)
+	{
+		$cacheKey = Cache::PREFIX . "me." . $user->getId();
+		$details = Cache::get($cacheKey);
+		if (empty($details))
+		{
+			$details = $this->getData($user);
+			Cache::set($cacheKey, $details);
+		}
+		return $details;
+	}
+
+	/**
+	 * @param Model_User $user
+	 * @return array
+	 */
+	protected function getData(Model_User $user)
+	{
 		if ($user->isStudent())
 		{
 			$details = array(
@@ -50,8 +76,6 @@ final class Controller_Me extends Controller
 				"user" => $user
 			);
 		}
-
-		$this->response->status(200);
-		$this->response->body($details);
+		return $details;
 	}
 }
