@@ -61,16 +61,16 @@ abstract class Model implements JsonSerializable
 	/**
 	 * @return string
 	 */
-	private static function cachename()
+	protected static function cacheName()
 	{
 		return Cache::PREFIX . ".model." . (config("environment") === "development" ? "dev." : "") .
-		strtolower(str_replace("/", ".", static::classname()));
+		strtolower(str_replace("_", ".", get_called_class()));
 	}
 
 	/**
 	 * @return string
 	 */
-	private static function classname()
+	protected static function className()
 	{
 		return str_replace("_", "/", get_called_class());
 	}
@@ -78,6 +78,7 @@ abstract class Model implements JsonSerializable
 	/**
 	 * Get the relevant Model by it's ID.
 	 *
+	 * @param mixed $id
 	 * @throws CacheException
 	 * @return mixed|null
 	 */
@@ -85,7 +86,7 @@ abstract class Model implements JsonSerializable
 	{
 		try
 		{
-			return Cache::get(static::cachename() . "." . $id);
+			return Cache::get(static::cacheName() . "." . $id);
 		}
 		catch (CacheException $e)
 		{
@@ -127,7 +128,7 @@ abstract class Model implements JsonSerializable
 	 */
 	public function getCacheName()
 	{
-		return static::cachename() . "." . $this->getId();
+		return static::cacheName() . "." . $this->getId();
 	}
 
 	/**
@@ -135,7 +136,7 @@ abstract class Model implements JsonSerializable
 	 */
 	public function getClassName()
 	{
-		return static::classname() . "/" . $this->getId();
+		return static::className() . "/" . $this->getId();
 	}
 
 	/**

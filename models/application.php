@@ -14,21 +14,25 @@ class Model_Application extends Model
 	 */
 	public static function getById($id)
 	{
-		$statement = Database::prepare(
-			"SELECT
-				`application_id` AS 'id',
-				`key`,
-				`secret`,
-				`name`,
-				`created`,
-				`updated`,
-				`status`
-			 FROM `Application`
-			 WHERE `application_id` = ?",
-			"i", __CLASS__
-		);
-
-		return $statement->execute($id)->singleton();
+		/** @var Model_Application $application */
+		$application = parent::getById($id);
+		if (empty($application))
+		{
+			$application = Database::prepare(
+				"SELECT
+					`application_id` AS 'id',
+					`key`, `secret`, `name`,
+					`created`, `updated`, `status`
+				 FROM `Application`
+				 WHERE `application_id` = ?",
+				"i", __CLASS__
+			)->execute($id)->singleton();
+			if (!empty($application))
+			{
+				Cache::store($application);
+			}
+		}
+		return $application;
 	}
 
 	/**
@@ -39,21 +43,19 @@ class Model_Application extends Model
 	 */
 	public static function getByKey($key)
 	{
-		$statement = Database::prepare(
-			"SELECT
-				`application_id` AS 'id',
-				`key`,
-				`secret`,
-				`name`,
-				`created`,
-				`updated`,
-				`status`
-			 FROM `Application`
-			 WHERE `key` = ?",
-			"s", __CLASS__
-		);
-
-		return $statement->execute($key)->singleton();
+		$cacheKey = static::cacheName() . ".key." . $key;
+		$id = Cache::get($cacheKey);
+		if (empty($id))
+		{
+			$id = Database::prepare(
+				"SELECT `application_id` FROM `Application` WHERE `key` = ? AND `status` = 1", "s"
+			)->execute($key)->singleval();
+			if (!empty($id))
+			{
+				Cache::set($cacheKey, $id, Cache::HOUR);
+			}
+		}
+		return !empty($id) ? static::getById($id) : null;
 	}
 
 	/**

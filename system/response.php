@@ -143,7 +143,9 @@ final class Response
 	public function send()
 	{
 		header(sprintf("HTTP/1.1 %d %s", $this->status, getHttpStatusForCode($this->status)));
-		foreach ($this->headers() as $header => $value)
+		$headers = array_merge(static::$staticHeaders, $this->headers());
+		ksort($headers);
+		foreach ($headers as $header => $value)
 		{
 			header("{$header}: {$value}");
 		}

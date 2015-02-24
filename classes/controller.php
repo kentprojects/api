@@ -61,7 +61,7 @@ abstract class Controller
 	 */
 	public function before()
 	{
-
+		Timing::start("controller");
 	}
 
 	/**
@@ -83,6 +83,7 @@ abstract class Controller
 		{
 			$this->response->body("");
 		}
+		Timing::stop("controller");
 	}
 
 	/**

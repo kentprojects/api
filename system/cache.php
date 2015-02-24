@@ -31,6 +31,12 @@ final class Cache
 	 * @var int
 	 */
 	const DAY = 86400;
+	/**
+	 * Represents the number of seconds in a week.
+	 *
+	 * @var int
+	 */
+	const WEEK = 604800;
 
 	/**
 	 * @var Memcached
@@ -55,6 +61,11 @@ final class Cache
 		if (empty(static::$memcached))
 		{
 			return false;
+		}
+
+		if (empty($expires))
+		{
+			$expires = static::WEEK;
 		}
 
 		if (static::$memcached->add($key, $value, $expires) === true)
@@ -159,6 +170,7 @@ final class Cache
 			 * If the item didn't actually exist.
 			 */
 			case Memcached::RES_NOTSTORED:
+			case Memcached::RES_NOTFOUND:
 				addStaticHeader("X-Cache-Miss", "++");
 				return $default;
 				break;
@@ -240,6 +252,11 @@ final class Cache
 			return false;
 		}
 
+		if (empty($expires))
+		{
+			$expires = static::WEEK;
+		}
+
 		if (static::$memcached->set($key, $value, $expires) === true)
 		{
 			addStaticHeader("X-Cache-Set", "++");
@@ -249,6 +266,11 @@ final class Cache
 		 * Unlike the rest of these methods, if this `set` command fails then start panicking.
 		 */
 		throw new CacheException(static::$memcached->getResultMessage(), static::$memcached->getResultCode());
+	}
+
+	public static function store(Model $model)
+	{
+		static::set($model->getCacheName(), $model, 4 * static::HOUR);
 	}
 }
 

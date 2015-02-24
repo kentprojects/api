@@ -4,7 +4,6 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-
 abstract class Request
 {
 	/**
@@ -70,11 +69,13 @@ abstract class Request
 	 */
 	public static function stringToMethod($method)
 	{
-		$method  = strtoupper($method);
+		$method = strtoupper($method);
 		$methods = static::getMethods();
 
 		if (empty($methods[$method]))
+		{
 			throw new Exception("Unable to determine Request constant for '{$method}'.");
+		}
 
 		return $methods[$method];
 	}
@@ -297,7 +298,7 @@ class Request_External extends Request
 		/**
 		 * CURL requirements if we're doing fancy methods.
 		 */
-		switch($this->getMethod())
+		switch ($this->getMethod())
 		{
 			case Request::POST:
 				curl_setopt($ch, CURLOPT_POST, true);
@@ -346,7 +347,7 @@ class Request_External extends Request
 	private function getCurlHeaders()
 	{
 		$headers = array();
-		foreach($this->getHeaders() as $key => $value)
+		foreach ($this->getHeaders() as $key => $value)
 		{
 			$headers[] = "$key: $value";
 		}
@@ -382,6 +383,8 @@ class Request_Internal extends Request
 		}
 		$this->run = true;
 
+		Timing::start("request");
+		$response = new Response($this);
 		try
 		{
 			$this->param = Router::handle($this->getUrl());
@@ -406,16 +409,12 @@ class Request_Internal extends Request
 
 			//Log::debug($this, $controller, $action);
 
-			$response = new Response($this);
-
 			// Run the Controller and the relevant Action
 			/** @var Controller $controller */
 			$controller = new $controller($this, $response);
 			$controller->before();
 			$controller->$action();
 			$controller->after();
-
-			return $response;
 		}
 		catch (HTTPRedirectException $e)
 		{
@@ -425,9 +424,8 @@ class Request_Internal extends Request
 			$response = new Response($this);
 			$response->status($e->getCode());
 			$response->header("Location", $e->getLocation());
-			return $response;
 		}
-		catch(Exception $e)
+		catch (Exception $e)
 		{
 			$response = new Response($this);
 			$response->headers(array(
@@ -455,9 +453,9 @@ class Request_Internal extends Request
 			}
 
 			Log::error($e);
-
-			return $response;
 		}
+		Timing::stop("request");
+		return $response;
 	}
 
 	/**
