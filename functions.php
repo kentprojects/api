@@ -52,7 +52,7 @@ spl_autoload_register(
 		 */
 		elseif (($class != "ModelMap") && (strpos($class, "Map") !== false) && (strpos($class, "Map") === (strlen($class) - 3)))
 		{
-			$filename = APPLICATION_PATH . "/models/maps/" . str_replace("_", "", strtolower($class)) . ".php";
+			$filename = APPLICATION_PATH . "/models/maps/" . $file;
 		}
 		/**
 		 * If the word "Permissions" exists in this class, handle it.
@@ -60,7 +60,7 @@ spl_autoload_register(
 		 */
 		elseif ((strpos($class, "Permissions") !== false) && (strpos($class, "Permissions") === (strlen($class) - 11)))
 		{
-			$filename = APPLICATION_PATH . "/models/permissions/" . str_replace("_", "", strtolower($class)) . ".php";
+			$filename = APPLICATION_PATH . "/models/permissions/" . $file;
 		}
 		/**
 		 * Else this is a generic class in a folder, so go find it!
