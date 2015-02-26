@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-final class Response
+class Response
 {
 	/**
 	 * @var array

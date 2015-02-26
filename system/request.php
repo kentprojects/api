@@ -361,8 +361,8 @@ class Request_Internal extends Request
 	 * Request parameter data from the router.
 	 * @var array
 	 */
-	private $param = array();
-	private $run = false;
+	protected $param = array();
+	protected $run = false;
 
 	/**
 	 * Run the internal request!
