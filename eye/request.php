@@ -295,7 +295,7 @@ try
 catch (Exception $e)
 {
 	$headers = "No HTTP response received.";
-	$response = "Failed to build a response.";
+	$response = json_encode("Failed to build a response.");
 }
 
 /**
