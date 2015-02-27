@@ -281,15 +281,19 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 curl_setopt($ch, CURLOPT_URL, $request->url);
 
+$headers = "Failed.";
 $response = curl_exec($ch);
-list($headers, $response) = explode("\r\n\r\n", $response, 2);
-
-$headers = explode("\n", $headers);
-$httpHeader = array_shift($headers);
-sort($headers);
-array_unshift($headers, $httpHeader);
-$headers = implode("\n", $headers);
-unset($httpHeader);
+$response = explode("\r\n\r\n", $response, 2);
+if (count($response) == 2)
+{
+	list($headers, $response) = $response;
+	$headers = explode("\n", $headers);
+	$httpHeader = array_shift($headers);
+	sort($headers);
+	array_unshift($headers, $httpHeader);
+	$headers = implode("\n", $headers);
+	unset($httpHeader);
+}
 
 /**
  * Run the CURL request.
