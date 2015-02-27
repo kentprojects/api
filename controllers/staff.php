@@ -77,6 +77,7 @@ final class Controller_Staff extends Controller
 			/**
 			 * GET /staff/:id
 			 */
+			Log::debug("Staff:", $user);
 
 			$this->response->status(200);
 			$this->response->body($user);

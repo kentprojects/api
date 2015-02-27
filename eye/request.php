@@ -281,7 +281,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 curl_setopt($ch, CURLOPT_URL, $request->url);
 
-$headers = "Failed.";
+$headers = "No HTTP response received.";
 $response = curl_exec($ch);
 $response = explode("\r\n\r\n", $response, 2);
 if (count($response) == 2)
