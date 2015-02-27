@@ -5,12 +5,10 @@
  * @link: http://kentprojects.com
  */
 require_once __DIR__ . "/functions.php";
-
 Timing::start("api");
 
 /** @noinspection PhpParamsInspection */
 $request = Request::factory(Request::stringToMethod($_SERVER["REQUEST_METHOD"]), $_SERVER["PATH_INFO"]);
-
 if (!($request instanceof Request_Internal))
 {
 	exit((string)new RequestException(sprintf(
@@ -24,13 +22,11 @@ if (!($request instanceof Request_Internal))
  * Set the request header information.
  */
 $request->setHeaders(apache_request_headers());
-
 /**
  * Set the GET and POST data.
  */
 $request->setQueryData($_GET);
 $request->setPostData(json_decode(file_get_contents("php://input"), true));
-
 /**
  * Execute the request and send the response.
  */
