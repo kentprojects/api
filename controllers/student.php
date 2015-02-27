@@ -27,7 +27,7 @@ final class Controller_Student extends Controller
 		{
 			throw new HttpStatusException(404, "Student not found.");
 		}
-		Log::debug("Student", $user);
+		Log::error("Student", $user);
 
 		$isSelf = ($this->auth->getUser() !== null) ? ($this->auth->getUser()->getId() == $user->getId()) : false;
 
