@@ -28,8 +28,6 @@ final class Controller_Staff extends Controller
 				throw new HttpStatusException(404, "Staff member not found.");
 			}
 
-			Log::error("Staff", $user);
-
 			$isSelf = ($this->auth->getUser() !== null) ? ($this->auth->getUser()->getId() == $user->getId()) : false;
 
 			if ($this->request->getMethod() === Request::PUT)
