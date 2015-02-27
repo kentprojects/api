@@ -294,8 +294,8 @@ try
 }
 catch (Exception $e)
 {
-	$headers = "No HTTP response received.";
-	$response = json_encode("Failed to build a response.");
+	$headers = "Failed to build a response from the CURL request.";
+	$response = json_encode("Maybe the CURL request received no data?");
 }
 
 /**
