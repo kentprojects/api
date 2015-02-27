@@ -312,6 +312,8 @@ if ($request->method == "PUT")
 	fclose($fh);
 }
 
+Log::debug($output["body"]);
+
 $output["info"] = print_r($output["info"], true);
 $output["json"] = json_decode($output["body"]);
 if (!empty($output["json"]))
