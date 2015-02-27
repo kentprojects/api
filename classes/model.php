@@ -63,8 +63,8 @@ abstract class Model implements JsonSerializable
 	 */
 	protected static function cacheName()
 	{
-		return Cache::PREFIX . ".model." . (config("environment") === "development" ? "dev." : "") .
-		strtolower(str_replace("_", ".", get_called_class()));
+		return Cache::PREFIX . "model." . (config("environment") === "development" ? "dev." : "") .
+		strtolower(str_replace("Model_", "", get_called_class()));
 	}
 
 	/**

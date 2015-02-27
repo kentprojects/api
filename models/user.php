@@ -19,10 +19,15 @@ final class Model_User extends Model
 	 */
 	public static function getByEmail($email)
 	{
-		$statement = Database::prepare("SELECT `user_id` FROM `User` WHERE `email` = ? AND `status` = 1", "s");
-		$user_id = $statement->execute($email)->singleval();
-
-		return (empty($user_id)) ? null : Model_User::getById($user_id);
+		$cacheKey = static::cacheName() . ".email." . $email;
+		$id = Cache::get($cacheKey);
+		if (empty($id))
+		{
+			$id = Database::prepare("SELECT `user_id` FROM `User` WHERE `email` = ? AND `status` = 1", "s")
+				->execute($email)->singleval();
+			!empty($id) && Cache::set($cacheKey, $id, Cache::HOUR);
+		}
+		return static::getById($id);
 	}
 
 	/**
@@ -33,21 +38,32 @@ final class Model_User extends Model
 	 */
 	public static function getById($id)
 	{
-		return Database::prepare(
-			"SELECT
-				`user_id` AS 'id',
-				`email`,
-				`first_name`,
-				`last_name`,
-				`role`,
-				`created`,
-				`lastlogin`,
-				`updated`,
-				`status`
-			 FROM `User`
-			 WHERE `user_id` = ?",
-			"i", __CLASS__
-		)->execute($id)->singleton();
+		if (empty($id))
+		{
+			return null;
+		}
+		/** @var Model_User $user */
+		$user = Cache::get(static::cacheName() . "." . $id);
+		if (empty($user))
+		{
+			$user = Database::prepare(
+				"SELECT
+					`user_id` AS 'id',
+					`email`,
+					`first_name`,
+					`last_name`,
+					`role`,
+					`created`,
+					`lastlogin`,
+					`updated`,
+					`status`
+				 FROM `User`
+				 WHERE `user_id` = ?",
+				"i", __CLASS__
+			)->execute($id)->singleton();
+			Cache::store($user);
+		}
+		return $user;
 	}
 
 	/**

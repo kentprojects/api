@@ -23,26 +23,26 @@ abstract class Model_Student extends Model
 			)->execute($email)->singleval();
 			!empty($id) && Cache::set($cacheKey, $id, Cache::HOUR);
 		}
-		return !empty($id) ? static::getById($id) : null;
+		return !empty($id) ? Model_User::getById($id) : null;
 	}
 
 	/**
 	 * Get a student by their ID.
 	 *
-	 * @param int $id
+	 * @param int $user_id
 	 * @return Model_User
 	 */
-	public static function getById($id)
+	public static function getById($user_id)
 	{
-		$cacheKey = static::cacheName() . "." . $id;
-		$user = Cache::get($cacheKey);
-		if (empty($user))
+		$cacheKey = static::cacheName() . "." . $user_id;
+		$id = Cache::get($cacheKey);
+		if (empty($id))
 		{
-			$user = Database::prepare(
+			$id = Database::prepare(
 				"SELECT `user_id` FROM `User` WHERE `user_id` = ? AND `role` = 'student' AND `status` = 1", "i"
-			)->execute($id)->singleval();
-			!empty($user) && Cache::set($cacheKey, $user, Cache::HOUR);
+			)->execute($user_id)->singleval();
+			!empty($id) && Cache::set($cacheKey, $id, Cache::HOUR);
 		}
-		return !empty($user) ? static::getById($user) : null;
+		return !empty($id) ? Model_User::getById($id) : null;
 	}
 }

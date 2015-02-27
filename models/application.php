@@ -86,12 +86,7 @@ class Model_Application extends Model
 	 */
 	public function __construct($name = null, $contact_email = null)
 	{
-		parent::__construct();
-		if ($this->getId() !== null)
-		{
-			return;
-		}
-		else
+		if ($this->getId() === null)
 		{
 			if (empty($name))
 			{
@@ -105,6 +100,7 @@ class Model_Application extends Model
 			}
 			$this->metadata->contact_email = $contact_email;
 		}
+		parent::__construct();
 	}
 
 	/**
@@ -212,16 +208,14 @@ class Model_Application extends Model
 				}
 				catch (DatabaseException $e)
 				{
-					error_log("When trying to create an application: " . $e);
+					Log::error((string)$e);
 				}
 			}
 		}
 		else
 		{
 			Database::prepare(
-				"UPDATE `Application`
-				 SET `name` = ?
-				 WHERE `application_id` = ?",
+				"UPDATE `Application` SET `name` = ? WHERE `application_id` = ?",
 				"si"
 			)->execute(
 				$this->name,

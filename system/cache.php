@@ -63,6 +63,8 @@ final class Cache
 			return false;
 		}
 
+		$key = (string)$key;
+		$value = serialize($value);
 		if (empty($expires))
 		{
 			$expires = static::WEEK;
@@ -160,7 +162,7 @@ final class Cache
 			 * If that operation was okay, then return the value.
 			 */
 			addStaticHeader("X-Cache-Hit", "++");
-			return $value;
+			return unserialize($value);
 		}
 
 		$exception = new CacheException(static::$memcached->getResultMessage(), static::$memcached->getResultCode());
@@ -173,13 +175,6 @@ final class Cache
 			case Memcached::RES_NOTFOUND:
 				addStaticHeader("X-Cache-Miss", "++");
 				return $default;
-				break;
-			/**
-			 * If the item's value actually was `false`. Because that could totally happen.
-			 */
-			case Memcached::RES_SUCCESS:
-				addStaticHeader("X-Cache-Hit", "++");
-				return false;
 				break;
 			/**
 			 * Otherwise panic. Something big went down.
@@ -252,6 +247,8 @@ final class Cache
 			return false;
 		}
 
+		$key = (string)$key;
+		$value = serialize($value);
 		if (empty($expires))
 		{
 			$expires = static::WEEK;
