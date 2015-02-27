@@ -37,15 +37,27 @@ $files = array_merge(
 
 /**
  * Build the mysql command that will be run.
- * @var string
+ * @var string $mysql
  */
-$mysql = sprintf(
-	"mysql -h %s -u %s -p%s %s",
-	$config["database"]["hostname"],
-	$config["database"]["username"],
-	$config["database"]["password"],
-	$config["database"]["database"]
-);
+if (empty($config["database"]["password"]))
+{
+	$mysql = sprintf(
+		"mysql -h %s -u %s %s",
+		$config["database"]["hostname"],
+		$config["database"]["username"],
+		$config["database"]["database"]
+	);
+}
+else
+{
+	$mysql = sprintf(
+		"mysql -h %s -u %s -p%s %s",
+		$config["database"]["hostname"],
+		$config["database"]["username"],
+		$config["database"]["password"],
+		$config["database"]["database"]
+	);
+}
 
 /**
  * Translating foreign characters to real Bash characters.
@@ -58,10 +70,16 @@ $translate = array(
 /**
  * Loop through each file and use the command line tool to load them into the database!
  */
-foreach($files as $file)
+foreach ($files as $file)
 {
 	$file = strtr($file, $translate);
 	echo substr(strrchr($file, "/"), 1), PHP_EOL;
-	if (false) echo "{$mysql} < {$file}",PHP_EOL;
-	else passthru("{$mysql} < {$file}");
+	if (false)
+	{
+		echo "{$mysql} < {$file}", PHP_EOL;
+	}
+	else
+	{
+		passthru("{$mysql} < {$file}");
+	}
 }
