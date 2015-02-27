@@ -290,15 +290,17 @@ final class Cache
 	}
 }
 
-$exit = 1;
-$output = array();
-exec("which memcached", $output, $exit);
-if ($exit > 0)
+if (config("cache", "use") === "true")
 {
-	error_log("Memcached is not installed on this server.");
-	// throw new CacheException("Memcached is not installed on this server.", 1);
-}
-else
-{
-	Cache::init();
+	$exit = 1;
+	$output = array();
+	exec("which memcached", $output, $exit);
+	if ($exit > 0)
+	{
+		throw new CacheException("Memcached is not installed on this server.", 1);
+	}
+	else
+	{
+		Cache::init();
+	}
 }

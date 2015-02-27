@@ -29,7 +29,7 @@ mysql -u root -ppassword < /vagrant/vagrant/database.sql
 #   And it's structure.
 php /vagrant/database/update.php
 #   And then import some sample data.
-mysql -u root -ppassword kentprojects < /vagrant/database/Sample.sql
+mysql -u root -ppassword kentprojects < /vagrant/tests/sample.sql
 #
 # Clear out the original Apache virtualhosts.
 rm /etc/apache2/sites-enabled/*

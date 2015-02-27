@@ -6,9 +6,9 @@
  */
 if (empty($GLOBALS["config.ini"]))
 {
-	if (file_exists(__DIR__ . "/../config.testing.ini"))
+	if (file_exists(__DIR__ . "/../config.ci.ini"))
 	{
-		$configFile = __DIR__ . "/../config.testing.ini";
+		$configFile = __DIR__ . "/../config.ci.ini";
 	}
 	elseif (file_exists(__DIR__ . "/../config.ini"))
 	{
@@ -24,24 +24,6 @@ if (empty($GLOBALS["config.ini"]))
 }
 
 require_once __DIR__ . "/../functions.php";
-
-try
-{
-	if (config("testing", "checkDatabase"))
-	{
-		Database::prepare("SELECT 1");
-	}
-}
-catch (DatabaseException $e)
-{
-	echo "No database connection available.";
-	exit(1);
-}
-catch (PHPException $e)
-{
-	echo "No database connection available.";
-	exit(1);
-}
 
 /**
  * Print out to the stderr channel.
@@ -85,7 +67,7 @@ function stdout()
 	);
 }
 
-require_once __DIR__ . "/base/abstract.php";
-require_once __DIR__ . "/base/controller.php";
-require_once __DIR__ . "/base/database.php";
-require_once __DIR__ . "/base/model.php";
+require_once __DIR__ . "/base.abstract.php";
+require_once __DIR__ . "/base.controller.php";
+require_once __DIR__ . "/base.database.php";
+require_once __DIR__ . "/base.model.php";
