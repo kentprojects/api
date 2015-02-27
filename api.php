@@ -50,3 +50,4 @@ else
 }
 
 $response->send();
+Log::write();

@@ -141,6 +141,8 @@ final class Log
 			flock($fh, LOCK_UN);
 			fclose($fh);
 		}
+
+		static::$logs = array();
 	}
 }
 if (!empty($_SERVER["VAGRANT_ENV"]))
@@ -154,9 +156,4 @@ else
 /**
  * Initiate the write when the script has finished.
  */
-register_shutdown_function(
-	function ()
-	{
-		Log::write();
-	}
-);
+register_shutdown_function(array("Log", "write"));

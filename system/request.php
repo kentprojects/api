@@ -407,7 +407,7 @@ class Request_Internal extends Request
 				throw new RequestException("Method $controller::$action was not found.");
 			}
 
-			//Log::debug($this, $controller, $action);
+			Log::error($this, $controller, $action);
 
 			// Run the Controller and the relevant Action
 			/** @var Controller $controller */
