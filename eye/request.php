@@ -294,6 +294,10 @@ if (count($response) == 2)
 	$headers = implode("\n", $headers);
 	unset($httpHeader);
 }
+else
+{
+	$response = current($response);
+}
 
 /**
  * Run the CURL request.
@@ -311,8 +315,6 @@ if ($request->method == "PUT")
 {
 	fclose($fh);
 }
-
-Log::debug($output["body"]);
 
 $output["info"] = print_r($output["info"], true);
 $output["json"] = json_decode($output["body"]);
