@@ -104,6 +104,10 @@ final class Model_User extends Model
 	protected $status;
 
 	/**
+	 * @var Model_Group
+	 */
+	protected $currentGroup;
+	/**
 	 * @var StudentGroupMap
 	 */
 	public $groups;
@@ -117,15 +121,24 @@ final class Model_User extends Model
 	 */
 	public function getCurrentGroup()
 	{
-		if (empty($this->groups))
-		{
-			$this->groups = new StudentGroupMap($this);
-		}
+		$this->getGroups();
 		if (count($this->groups) === 0)
 		{
 			return null;
 		}
-		return $this->groups->getCurrentGroup();
+		$this->currentGroup = $this->groups->getCurrentGroup();
+		return $this->currentGroup;
+	}
+
+	public function getCurrentGroupWithProject()
+	{
+		$this->getGroups();
+		if (count($this->groups) === 0)
+		{
+			return null;
+		}
+		$this->currentGroup = $this->groups->getCurrentGroupWithProject();
+		return $this->currentGroup;
 	}
 
 	/**
@@ -236,7 +249,8 @@ final class Model_User extends Model
 				"role" => $this->role,
 				"years" => !empty($this->years) ? $this->years->jsonSerialize() : array()
 			),
-			(!empty($this->groups) ? array("group" => $this->groups->getCurrentGroupWithProject()) : array()),
+			(!empty($this->groups) ? array("groups" => $this->groups) : array()),
+			(!empty($this->currentGroup) ? array("group" => $this->currentGroup) : array()),
 			array(
 				"bio" => $this->getDescription(),
 				"interests" => $this->getInterests()

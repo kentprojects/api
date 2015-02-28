@@ -56,7 +56,9 @@ final class Controller_Students extends Controller
 		$users = $query->execute()->singlevals();
 		foreach ($users as $k => $user_id)
 		{
-			$users[$k] = Model_User::getById($user_id);
+			$user = Model_User::getById($user_id);
+			$user->getCurrentGroupWithProject();
+			$users[$k] = $user;
 		}
 
 		$this->response->status(200);
