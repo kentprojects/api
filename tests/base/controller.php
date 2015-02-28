@@ -6,9 +6,10 @@
  */
 abstract class KentProjects_Controller_TestBase extends KentProjects_TestBase
 {
-	protected $applicationKey = "ad7921ce757a74d8676c9140ec498003";
-	protected $applicationSecret = "be0855399d72ad351807f3eeecec5ade";
-	protected $userTokens = array(
+	protected static $applicationKey = "ad7921ce757a74d8676c9140ec498003";
+	protected static $applicationSecret = "be0855399d72ad351807f3eeecec5ade";
+	protected static $tokenModels = array();
+	protected static $userTokens = array(
 		"convener" => "daa4ed4e5994c355197cc17bb52bf0d9",
 		"supervisor" => "e529609067c6dd7fcb1e744f3f634adf",
 		"student" => "3865caf68614ce90f15c5f77cdbbb8b9",
@@ -61,6 +62,27 @@ abstract class KentProjects_Controller_TestBase extends KentProjects_TestBase
 	}
 
 	/**
+	 * @param string $token
+	 * @return Model_Token
+	 */
+	protected function getUserForToken($token)
+	{
+		if (empty(static::$tokenModels[$token]))
+		{
+			if (empty(static::$userTokens[$token]))
+			{
+				throw new InvalidArgumentException("Invalid token '$token'.");
+			}
+			static::$tokenModels[$token] = Model_Token::getByToken(static::$userTokens[$token]);
+			if (empty(static::$tokenModels[$token]))
+			{
+				throw new InvalidArgumentException("Invalid token '$token'.");
+			}
+		}
+		return static::$tokenModels[$token];
+	}
+
+	/**
 	 * @param Request_Internal $request
 	 * @param Response $response
 	 * @param string $controller
@@ -87,16 +109,16 @@ abstract class KentProjects_Controller_TestBase extends KentProjects_TestBase
 	private function signRequest(array $getData, $token = null)
 	{
 		$forcedGetData = array(
-			"key" => $this->applicationKey,
+			"key" => static::$applicationKey,
 			"expires" => time() + 600
 		);
 		if (!empty($token))
 		{
-			if (empty($this->userTokens[$token]))
+			if (empty(static::$userTokens[$token]))
 			{
 				throw new InvalidArgumentException("Invalid token '$token'.");
 			}
-			$forcedGetData["user"] = $this->userTokens[$token];
+			$forcedGetData["user"] = static::$userTokens[$token];
 		}
 
 		$getData = array_merge($forcedGetData, $getData);
@@ -111,7 +133,7 @@ abstract class KentProjects_Controller_TestBase extends KentProjects_TestBase
 			}
 		);
 		$getData["signature"] = md5(
-			config("checksum", "salt") . $this->applicationSecret . json_encode($getData)
+			config("checksum", "salt") . static::$applicationSecret . json_encode($getData)
 		);
 
 		return $getData;

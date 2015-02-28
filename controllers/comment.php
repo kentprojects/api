@@ -56,6 +56,9 @@ final class Controller_Comment extends Controller
 			$comment = new Model_Comment($params["root"], $this->auth->getUser(), $params["comment"]);
 			$comment->save();
 
+			$this->acl->set("comment/" . $comment->getId(), false, true, true, true);
+			$this->acl->save();
+
 			$this->response->status(201);
 			$this->response->body($comment);
 			return;

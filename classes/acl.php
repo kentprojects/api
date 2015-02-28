@@ -40,15 +40,15 @@ final class ACL
 
 		$range = explode("/", $entity);
 		$rangeString = "";
-		$values = array();
+		$values = static::$template;
+
 		foreach ($range as $i => $piece)
 		{
 			$rangeString .= ($i == 0 ? "" : "/") . $piece;
-			$values[] = $this->checkExactMatch($rangeString);
+			$values = array_merge($values, $this->checkExactMatch($rangeString));
 		}
-		$values[] = static::$template;
 
-		return call_user_func_array("array_merge", array_reverse($values));
+		return $values;
 	}
 
 	/**
@@ -65,6 +65,12 @@ final class ACL
 			}
 		}
 		return array();
+	}
+
+	public function delete($entity)
+	{
+		unset($this->acl[$entity]);
+		ksort($this->acl);
 	}
 
 	public function fetch()
@@ -99,26 +105,45 @@ final class ACL
 		{
 			return;
 		}
+
+		Database::prepare("DELETE FROM `ACL` WHERE `user_id` = ?", "i")->execute($this->user->getId());
+
+		$query = "INSERT " . "INTO `ACL` (`user_id`, `entity`, `create`, `read`, `update`, `delete`) VALUES ";
+		$types = "";
+		$values = array();
+		$valueFields = array();
+
+		foreach ($this->acl as $entity => $acl)
+		{
+			$valueFields[] = "(?, ?,?,?,?,?)";
+			$types .= "isiiii";
+			$values = array_merge($values, array(
+				$this->user->getId(), $entity, $acl["create"], $acl["read"], $acl["update"], $acl["delete"]
+			));
+		}
+
+		$statement = Database::prepare($query . implode(", ", $valueFields), $types);
+		call_user_func_array(array($statement, "execute"), $values);
 	}
 
 	/**
 	 * Update a user's permissions for something.
 	 *
-	 * @param string $string
+	 * @param string $entity
 	 * @param bool $create
 	 * @param bool $read
 	 * @param bool $update
 	 * @param bool $delete
 	 * @return void
 	 */
-	public function update($string, $create = false, $read = false, $update = false, $delete = false)
+	public function set($entity, $create = false, $read = false, $update = false, $delete = false)
 	{
 		if (empty($this->user))
 		{
 			return;
 		}
 
-		$this->acl[$string] = array(
+		$this->acl[$entity] = array(
 			"create" => $create ? 1 : 0,
 			"read" => $read ? 1 : 0,
 			"update" => $update ? 1 : 0,

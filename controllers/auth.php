@@ -325,24 +325,28 @@ final class Controller_Auth extends Controller
 		/**
 		 * Provide the ability to update themselves.
 		 */
-		$this->acl->update("user/" . $user->getId(), false, true, true, false);
+		$this->acl->set("user/" . $user->getId(), false, true, true, false);
 		/**
 		 * Provide the ability to create and read comments.
 		 */
-		$this->acl->update("comment", true, true, false, false);
+		$this->acl->set("comment", true, true, false, false);
 		/**
 		 * Provide the ability to create and read group profiles.
 		 * As a new user, they can create groups. Once they are part of a group the create permission is removed.
 		 */
-		$this->acl->update("group", true, true, false, false);
+		$this->acl->set("group", true, true, false, false);
 		/**
 		 * Provide the ability to read project profiles.
 		 */
-		$this->acl->update("project", false, true, false, false);
+		$this->acl->set("project", false, true, false, false);
 		/**
 		 * Provide the ability to read user profiles.
 		 */
-		$this->acl->update("user", false, true, false, false);
+		$this->acl->set("user", false, true, false, false);
+		/**
+		 * And finally save.
+		 */
+		$this->acl->save();
 	}
 
 	/**

@@ -14,7 +14,7 @@ final class Model_Comment extends Model
 	 */
 	public static function delete(Model_Comment $comment)
 	{
-		Database::prepare("DELETE FROM `Comment` WHERE `id` = ?", "i")->execute($comment->getId());
+		Database::prepare("DELETE FROM `Comment` WHERE `comment_id` = ?", "i")->execute($comment->getId());
 		Cache::delete($comment->getCacheName());
 	}
 

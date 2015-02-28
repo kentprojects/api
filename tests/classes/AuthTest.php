@@ -113,7 +113,7 @@ class AuthTest extends KentProjects_Controller_TestBase
 		$request = $this->createUnsignedRequest(
 			Request::GET,
 			array("get" => array(
-				"key" => $this->applicationKey,
+				"key" => static::$applicationKey,
 				"expires" => time() + 100,
 				"signature" => "thisisnotthesignatureyourelookingfor"
 			))
@@ -127,7 +127,7 @@ class AuthTest extends KentProjects_Controller_TestBase
 		$request = $this->createSignedRequest(Request::GET);
 		$response = new Response($request);
 		$auth = new Auth($request, $response, Auth::APP);
-		$this->assertEquals($this->applicationKey, $auth->getApplication()->getKey());
+		$this->assertEquals(static::$applicationKey, $auth->getApplication()->getKey());
 	}
 
 	public function getGetUser()
