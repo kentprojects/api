@@ -35,6 +35,8 @@ final class Controller_Auth extends Controller
 			throw new HttpStatusException(400, "Invalid authentication token.");
 		}
 
+		$user->getCurrentGroupWithProject();
+
 		$token = Model_Token::generate($this->auth->getApplication(), $user);
 		$this->response->status(200);
 		$this->response->body($token);
