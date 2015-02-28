@@ -193,9 +193,11 @@ class UserYearMap implements Countable, IteratorAggregate, JsonSerializable
 			}
 		}
 
-		$query = implode("", array(
-			"INSERT ",
-			"INTO `User_Year_Map` (",
+		$query = implode("", array_merge(
+			array(
+				"INSERT ",
+				"INTO `User_Year_Map` ("
+			),
 			array_map(
 				function ($field)
 				{
@@ -203,8 +205,10 @@ class UserYearMap implements Countable, IteratorAggregate, JsonSerializable
 				},
 				static::$fields
 			),
-			") VALUES ",
-			implode(", ", $query)
+			array(
+				") VALUES ",
+				implode(", ", $query)
+			)
 		));
 
 		$statement = Database::prepare($query, $types);
