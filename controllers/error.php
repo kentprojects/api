@@ -33,6 +33,8 @@ final class Controller_Error extends Controller
 				if (config("environment") === "development")
 				{
 					$error["query"] = $e->getQuery();
+					$error["types"] = $e->getTypes();
+					$error["params"] = $e->getParams();
 				}
 				break;
 			case "HttpStatusException":
