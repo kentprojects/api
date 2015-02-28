@@ -73,13 +73,18 @@ VALUES
 	(1, 2)
 ON DUPLICATE KEY UPDATE `project_id` = `project_id`, `user_id` = `user_id`;
 
+INSERT INTO `Metadata` (`root`, `key`, `value`) VALUES
+	('Model/Application/1', 'contact_email', 'developers@kentprojects.com'),
+	('Model/Application/2', 'contact_email', 'developers@kentprojects.com'),
+	('Model/User/2', 'interests', 'make tea'),
+	('Model/User/2', 'interests', 'refresh tea')
+ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);
+
+INSERT INTO `ACL` (`user_id`, `entity`, `read`, `update`)
+	SELECT `user_id`, CONCAT('user/', `user_id`), 1, 1 FROM `User`;
+
 INSERT INTO `ACL` (`user_id`, `entity`, `create`, `read`, `update`, `delete`)
 VALUES
 	(1, 'group', 1, 1, 1, 1),
 	(1, 'project', 1, 1, 1, 1),
 	(1, 'user', 1, 1, 1, 1);
-
-INSERT INTO `Metadata` (`root`, `key`, `value`) VALUES
-	('Model/Application/1', 'contact_email', 'developers@kentprojects.com'),
-	('Model/Application/2', 'contact_email', 'developers@kentprojects.com')
-ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);
