@@ -67,7 +67,6 @@ function stdout()
 	);
 }
 
-require_once __DIR__ . "/base.abstract.php";
-require_once __DIR__ . "/base.controller.php";
-require_once __DIR__ . "/base.database.php";
-require_once __DIR__ . "/base.model.php";
+require_once __DIR__ . "/base/abstract.php";
+require_once __DIR__ . "/base/controller.php";
+require_once __DIR__ . "/base/model.php";

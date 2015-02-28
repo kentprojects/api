@@ -7,8 +7,8 @@ INSERT INTO `Application` (`application_id`, `key`, `secret`, `name`, `created`)
 VALUES
 	(1, '77bf0b0815ce058841d74298394643ab', '7ede1f827d744b39666214441122764c', 'Frontend', CURRENT_TIMESTAMP),
 	(2, 'ad7921ce757a74d8676c9140ec498003', 'be0855399d72ad351807f3eeecec5ade', 'PHPUnit', CURRENT_TIMESTAMP)
-ON DUPLICATE KEY UPDATE `application_id` = `application_id`, `key` = VALUES(`key`), `name` = VALUES(`name`),
-	`created` = VALUES(`created`);
+ON DUPLICATE KEY UPDATE `application_id` = `application_id`, `key` = VALUES(`key`), `secret` = VALUES(`secret`),
+	`name` = VALUES(`name`), `created` = VALUES(`created`);
 
 INSERT INTO `Year` (`year`)
 VALUES
@@ -26,6 +26,14 @@ VALUES
 	(6, 'supervisor2@kent.ac.uk', 'Stuart', 'Supervisor', 'staff', '2014-11-28 11:10:05', '2014-12-16 16:47:14')
 ON DUPLICATE KEY UPDATE `user_id` = `user_id`, `email` = `email`, `first_name` = VALUES(`first_name`),
 	`last_name` = VALUES(`last_name`), `role` = `role`, `created` = `created`, `updated` = `updated`;
+
+INSERT INTO `Token` (`application_id`, `user_id`, `token`, `created`, `updated`)
+VALUES
+	(2, 1, 'daa4ed4e5994c355197cc17bb52bf0d9', '2015-02-24 23:31:25', '2015-02-24 23:31:25'),
+	(2, 2, 'e529609067c6dd7fcb1e744f3f634adf', '2015-02-24 23:31:25', '2015-02-24 23:31:25'),
+	(2, 3, '3865caf68614ce90f15c5f77cdbbb8b9', '2015-02-24 23:31:25', '2015-02-24 23:31:25')
+ON DUPLICATE KEY UPDATE `application_id` = `application_id`, `user_id` = `user_id`, `token` = VALUES(`token`),
+	`created` = VALUES(`created`), `updated` = VALUES(`updated`);
 
 INSERT INTO `User_Year_Map` (`year`, `user_id`, `role_convener`, `role_supervisor`, `role_secondmarker`)
 VALUES

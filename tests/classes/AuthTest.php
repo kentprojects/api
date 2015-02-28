@@ -27,9 +27,9 @@ class AuthTest extends KentProjects_Controller_TestBase
 	{
 		$request = $this->createUnsignedRequest(
 			Request::GET,
-			array(
+			array("get" => array(
 				"key" => "foo"
-			)
+			))
 		);
 		$response = new Response($request);
 		new Auth($request, $response, Auth::APP);
@@ -44,11 +44,10 @@ class AuthTest extends KentProjects_Controller_TestBase
 	{
 		$request = $this->createUnsignedRequest(
 			Request::GET,
-			array(
+			array("get" => array(
 				"key" => "foo",
 				"expires" => time() + 100
-			)
-
+			))
 		);
 		$response = new Response($request);
 		new Auth($request, $response, Auth::APP);
@@ -63,12 +62,11 @@ class AuthTest extends KentProjects_Controller_TestBase
 	{
 		$request = $this->createUnsignedRequest(
 			Request::GET,
-			array(
+			array("get" => array(
 				"key" => "foo",
 				"expires" => time() - 100,
 				"signature" => "bar"
-			)
-
+			))
 		);
 		$response = new Response($request);
 		new Auth($request, $response, Auth::APP);
@@ -83,9 +81,9 @@ class AuthTest extends KentProjects_Controller_TestBase
 	{
 		$request = $this->createSignedRequest(
 			Request::GET,
-			array(
-				"key" => "foo",
-			)
+			array("get" => array(
+				"key" => "foo"
+			))
 		);
 		$response = new Response($request);
 		new Auth($request, $response, Auth::APP);
@@ -112,15 +110,13 @@ class AuthTest extends KentProjects_Controller_TestBase
 	 */
 	public function testInvalidSignature()
 	{
-		$applications = parse_ini_file(APPLICATION_PATH . "/applications.ini", true);
-
 		$request = $this->createUnsignedRequest(
 			Request::GET,
-			array(
-				"key" => $applications["phpunit"]["key"],
+			array("get" => array(
+				"key" => $this->applicationKey,
 				"expires" => time() + 100,
 				"signature" => "thisisnotthesignatureyourelookingfor"
-			)
+			))
 		);
 		$response = new Response($request);
 		new Auth($request, $response, Auth::APP);
@@ -128,27 +124,15 @@ class AuthTest extends KentProjects_Controller_TestBase
 
 	public function testGetApplication()
 	{
-		$applications = parse_ini_file(APPLICATION_PATH . "/applications.ini", true);
-
-		$request = $this->createSignedRequest(
-			Request::GET,
-			array(
-				"key" => $applications["phpunit"]["key"]
-			)
-		);
+		$request = $this->createSignedRequest(Request::GET);
 		$response = new Response($request);
 		$auth = new Auth($request, $response, Auth::APP);
-		$this->assertEquals($applications["phpunit"]["key"], $auth->getApplication()->key);
+		$this->assertEquals($this->applicationKey, $auth->getApplication()->getKey());
 	}
 
 	public function getGetUser()
 	{
-		$request = $this->createSignedRequest(
-			Request::GET,
-			array(
-				"user" => config("phpunit-user", "token")
-			)
-		);
+		$request = $this->createSignedRequest(Request::GET, array(), "convener");
 		$response = new Response($request);
 		$auth = new Auth($request, $response, Auth::USER);
 		$this->assertEmpty($auth->getUser());
