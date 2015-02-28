@@ -8,10 +8,11 @@ abstract class KentProjects_Controller_TestBase extends KentProjects_TestBase
 {
 	protected $applicationKey = "ad7921ce757a74d8676c9140ec498003";
 	protected $applicationSecret = "be0855399d72ad351807f3eeecec5ade";
-
-	protected $userTokenConvener = "daa4ed4e5994c355197cc17bb52bf0d9";
-	protected $userTokenSupervisor = "e529609067c6dd7fcb1e744f3f634adf";
-	protected $userTokenStudent = "3865caf68614ce90f15c5f77cdbbb8b9";
+	protected $userTokens = array(
+		"convener" => "daa4ed4e5994c355197cc17bb52bf0d9",
+		"supervisor" => "e529609067c6dd7fcb1e744f3f634adf",
+		"student" => "3865caf68614ce90f15c5f77cdbbb8b9",
+	);
 
 	/**
 	 * @param string $method
@@ -91,12 +92,11 @@ abstract class KentProjects_Controller_TestBase extends KentProjects_TestBase
 		);
 		if (!empty($token))
 		{
-			$userToken = "UserToken" . ucfirst($token);
-			if (empty($this->$userToken))
+			if (empty($this->userTokens[$token]))
 			{
 				throw new InvalidArgumentException("Invalid token '$token'.");
 			}
-			$forcedGetData["user"] = $this->$userToken;
+			$forcedGetData["user"] = $this->userTokens[$token];
 		}
 
 		$getData = array_merge($forcedGetData, $getData);
