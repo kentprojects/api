@@ -87,7 +87,7 @@ final class Controller_Me extends Controller
 		if (empty($details))
 		{
 			$details = $this->getData($user);
-			Cache::set($cacheKey, $details);
+			Cache::set($cacheKey, $details, 10 * Cache::MINUTE);
 		}
 		return $details;
 	}
@@ -98,6 +98,7 @@ final class Controller_Me extends Controller
 	 */
 	protected function getData(Model_User $user)
 	{
+		$user->initYearMap();
 		if ($user->isStudent())
 		{
 			$details = array(
