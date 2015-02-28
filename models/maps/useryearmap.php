@@ -176,10 +176,10 @@ class UserYearMap implements Countable, IteratorAggregate, JsonSerializable
 		}
 
 		// (?,?,?,?)
-		$valuesTemplate = "(" . implode(",", array_pad(array(), count(static::$fields), "?")) . ")";
-		$typesTemplate = implode("", array_pad(array(), count(static::$fields), "i"));
+		$valuesTemplate = "(" . implode(",", array_pad(array(), count(static::$fields) + 1, "?")) . ")";
+		$typesTemplate = implode("", array_pad(array(), count(static::$fields) + 1, "i"));
 
-		$query = array();
+		$queryValues = array();
 		$types = "";
 		$values = array();
 
@@ -187,6 +187,7 @@ class UserYearMap implements Countable, IteratorAggregate, JsonSerializable
 		{
 			$queryValues[] = $valuesTemplate;
 			$types .= $typesTemplate;
+			$values[] = $this->user->getId();
 			foreach ($map as $key => $value)
 			{
 				$values[] = intval($value);
@@ -195,7 +196,7 @@ class UserYearMap implements Countable, IteratorAggregate, JsonSerializable
 
 		$query = implode("", array(
 			"INSERT ",
-			"INTO `User_Year_Map` (",
+			"INTO `User_Year_Map` (`user_id`, ",
 			implode(", ", array_map(
 				function ($field)
 				{
