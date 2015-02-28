@@ -8,6 +8,10 @@ class MailTest extends KentProjects_TestBase
 {
 	public function testSend()
 	{
+		$this->markTestIncomplete(
+			'This test has not been implemented yet.'
+		);
+
 		$mail = new Mail;
 		$mail->setTo("developers@kentprojects.com", "KentProject Developers");
 		$mail->setSubject("A Test Email");

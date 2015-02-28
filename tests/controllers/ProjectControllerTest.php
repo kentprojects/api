@@ -14,17 +14,24 @@ class ProjectControllerTest extends KentProjects_Controller_TestBase
 			return;
 		}
 
-		$request = $this->createSignedRequest(Request::GET);
+		$request = $this->createSignedRequest(Request::GET, array(), "convener");
 		$response = new Response($request);
 
 		$this->runController($request, $response, "Projects");
-
 		$this->assertEquals(200, $response->status());
 	}
 
 	public function testGetProject()
 	{
-		$request = $this->createSignedRequest(Request::GET, array(), array(), array("id" => 2));
+		$request = $this->createSignedRequest(
+			Request::GET,
+			array(
+				"param" => array(
+					"id" => 2
+				)
+			),
+			"convener"
+		);
 		$response = new Response($request);
 
 		$this->runController($request, $response, "Project");
