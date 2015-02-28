@@ -210,12 +210,9 @@ final class Cache
 
 		if ($memcached->addServer(config("cache", "host"), config("cache", "port")) === false)
 		{
-			error_log(
-				(string)new CacheException(
-					static::$memcached->getResultMessage(), static::$memcached->getResultCode()
-				)
-			);
-			return;
+			$exception = new CacheException(static::$memcached->getResultMessage(), static::$memcached->getResultCode());
+			error_log((string)$exception);
+			throw $exception;
 		}
 
 		if ($memcached->setOption(Memcached::OPT_BINARY_PROTOCOL, true) === false)
@@ -290,7 +287,7 @@ final class Cache
 	}
 }
 
-if (config("cache", "use") === "true")
+if (config("cache", "use") == true)
 {
 	$exit = 1;
 	$output = array();

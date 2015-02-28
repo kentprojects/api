@@ -278,17 +278,27 @@ final class Controller_Auth extends Controller
 	/**
 	 * @param array $url
 	 * @param Model_User $user
+	 * @throws HttpStatusException
 	 * @return HttpRedirectException
 	 */
 	protected function generateAuthUrl(array $url, Model_User $user)
 	{
-		$break = false;
+		$runtime = 0;
+		$success = false;
 		$token = null;
 
-		while (!$break)
+		while (!$success && ($runtime < 5))
 		{
 			$token = md5(uniqid());
-			$break = Cache::add(Cache::PREFIX . $this->prefixCacheKey . $token, $user->getId(), 10 * Cache::MINUTE);
+			$success = Cache::add(Cache::PREFIX . $this->prefixCacheKey . $token, $user->getId(), 10 * Cache::MINUTE);
+			$runtime++;
+		}
+		if (!$success)
+		{
+			/**
+			 * HTTP/1.1 724 This line should be unreachable.
+			 */
+			throw new HttpStatusException(500, "Failed to generate authentication url.");
 		}
 
 		$url = $url["scheme"] . "://" . $url["host"] . (!empty($url["port"]) ? ":" . $url["port"] : "") .
@@ -303,7 +313,6 @@ final class Controller_Auth extends Controller
 	 */
 	private function validateCode($token)
 	{
-		$user_id = Cache::getOnce(Cache::PREFIX . $this->prefixCacheKey . $token, null);
-		return (empty($user_id)) ? null : Model_User::getById($user_id);
+		return Model_User::getById(Cache::getOnce(Cache::PREFIX . $this->prefixCacheKey . $token, null));
 	}
 }

@@ -43,7 +43,7 @@ final class Model_User extends Model
 			return null;
 		}
 		/** @var Model_User $user */
-		$user = Cache::get(static::cacheName() . "." . $id);
+		$user = parent::getById($id);
 		if (empty($user))
 		{
 			$user = Database::prepare(
@@ -134,6 +134,14 @@ final class Model_User extends Model
 	public function getDescription()
 	{
 		return $this->metadata->description;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getEmail()
+	{
+		return $this->email;
 	}
 
 	/**
