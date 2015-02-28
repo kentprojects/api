@@ -52,21 +52,22 @@ class Model_Token extends Model
 	/**
 	 * Get a Model_Token by it's token.
 	 *
-	 * @param string $id
+	 * @param string $tokenString
 	 * @return Model_Token
 	 */
-	public static function getByToken($id)
+	public static function getByToken($tokenString)
 	{
-		if (empty($id))
+		if (empty($tokenString))
 		{
 			return null;
 		}
 		/** @var Model_Application $application */
-		$token = Cache::get(static::cacheName() . "." . $id);
+		$token = Cache::get(static::cacheName() . "." . $tokenString);
 		if (empty($token))
 		{
 			$token = Database::prepare(
 				"SELECT
+					t.`token_id` AS 'id',
 					t.`application_id` AS 'application',
 					t.`user_id` AS 'user',
 					t.`token` AS 'token',
@@ -78,12 +79,16 @@ class Model_Token extends Model
 				 WHERE a.`status` = 1 AND u.`status` = 1
 				 AND t.`token` = ?",
 				"s", __CLASS__
-			)->execute($id)->singleton();
+			)->execute($tokenString)->singleton();
 			Cache::store($token);
 		}
 		return $token;
 	}
 
+	/**
+	 * @var int
+	 */
+	protected $id;
 	/**
 	 * @var Model_Application
 	 */
@@ -116,7 +121,7 @@ class Model_Token extends Model
 	 */
 	public function __construct(Model_Application $application = null, Model_User $user = null)
 	{
-		if (!empty($this->application) && !empty($this->user))
+		if ($this->getId() !== null)
 		{
 			/** @noinspection PhpParamsInspection */
 			$this->application = Model_Application::getById($this->application);
@@ -136,7 +141,7 @@ class Model_Token extends Model
 	 */
 	public function getId()
 	{
-		return sprintf("application:%d/user:%d", $this->application->getId(), $this->user->getId());
+		return $this->id;
 	}
 
 	/**
@@ -145,6 +150,14 @@ class Model_Token extends Model
 	public function getApplication()
 	{
 		return $this->application;
+	}
+
+	/**
+	 * @return stdClass
+	 */
+	public function getSettings()
+	{
+		return !empty($this->metadata->settings) ? json_decode($this->metadata->settings) : new stdClass;
 	}
 
 	/**
@@ -172,6 +185,7 @@ class Model_Token extends Model
 			"application" => $this->application,
 			"user" => $this->user,
 			"token" => $this->token,
+			"settings" => $this->getSettings(),
 			"created" => $this->created,
 			"updated" => $this->updated
 		);
@@ -212,5 +226,16 @@ class Model_Token extends Model
 		$this->updated = Date::format(Date::TIMESTAMP, time());
 		$this->hasTokenRegenerated = false;
 		parent::save();
+	}
+
+	/**
+	 * @param array $settings
+	 * @return void
+	 */
+	public function setSettings(array $settings)
+	{
+		$this->metadata->settings = json_encode(array_filter(array_merge(
+			!empty($this->metadata->settings) ? json_decode($this->metadata->settings, true) : array(), $settings
+		)));
 	}
 }

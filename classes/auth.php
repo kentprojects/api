@@ -137,6 +137,14 @@ final class Auth
 	}
 
 	/**
+	 * @return Model_Token
+	 */
+	public function getToken()
+	{
+		return $this->token;
+	}
+
+	/**
 	 * @return Model_User
 	 */
 	public function getUser()

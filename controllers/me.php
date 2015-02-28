@@ -15,6 +15,8 @@ final class Controller_Me extends Controller
 	 * /me
 	 * /me/:id
 	 *
+	 * GET
+	 *
 	 * Get a collection of information for the current user.
 	 *
 	 * @throws HttpStatusException
@@ -29,8 +31,48 @@ final class Controller_Me extends Controller
 			throw new HttpStatusException(400, "No ID should be passed to the ME controller.");
 		}
 
+		$details = $this->get($this->auth->getUser());
+		$details["settings"] = $this->auth->getToken()->getSettings();
+
 		$this->response->status(200);
-		$this->response->body($this->get($this->auth->getUser()));
+		$this->response->body($details);
+	}
+
+	/**
+	 * /me/settings
+	 * /me/:id/settings
+	 *
+	 * GET / PUT
+	 *
+	 * Gets and sets settings for the user.
+	 *
+	 * @throws HttpStatusException
+	 * @return void
+	 */
+	public function action_settings()
+	{
+		$this->validateMethods(Request::GET, Request::PUT);
+
+		if ($this->request->param("id") !== null)
+		{
+			throw new HttpStatusException(400, "No ID should be passed to the ME controller.");
+		}
+
+		$token = $this->auth->getToken();
+
+		if ($this->request->getMethod() === Request::PUT)
+		{
+			/**
+			 * PUT /me/settings
+			 */
+			$token->setSettings($this->request->getPostData());
+			$token->save();
+		}
+
+		Log::debug($this->request->getMethod(), $token, $token->getSettings());
+
+		$this->response->status(200);
+		$this->response->body($token->getSettings());
 	}
 
 	/**
@@ -40,7 +82,7 @@ final class Controller_Me extends Controller
 	 */
 	protected function get(Model_User $user)
 	{
-		$cacheKey = Cache::PREFIX . "me." . $user->getId();
+		$cacheKey = Cache::getPrefix() . "me." . $user->getId();
 		$details = Cache::get($cacheKey);
 		if (empty($details))
 		{
@@ -61,6 +103,7 @@ final class Controller_Me extends Controller
 			$details = array(
 				"group" => null,
 				"project" => null,
+				"settings" => null,
 				"user" => $user
 			);
 

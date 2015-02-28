@@ -199,6 +199,15 @@ final class Cache
 	}
 
 	/**
+	 * Return a suitable Cache prefix for use through the application.
+	 * @return string
+	 */
+	public static function getPrefix()
+	{
+		return Cache::PREFIX . (config("environment") === "development" ? "dev." : "");
+	}
+
+	/**
 	 * Initialise the cache.
 	 *
 	 * @throws CacheException
