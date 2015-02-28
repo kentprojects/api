@@ -24,9 +24,7 @@ final class ACL
 		}
 
 		$this->user = $user;
-		$this->acl = Database::prepare(
-			"SELECT `entity`, `create`, `read`, `update`, `delete` FROM `ACL` WHERE `user_id` = ?", "i"
-		)->execute($this->user->getId())->as_assoc()->all();
+		$this->fetch();
 	}
 
 	/**
@@ -54,22 +52,80 @@ final class ACL
 	}
 
 	/**
-	 * @param string $entity
+	 * @param string $entry
 	 * @return array
 	 */
-	protected function checkExactMatch($entity)
+	protected function checkExactMatch($entry)
 	{
-		foreach ($this->acl as $acl)
+		foreach ($this->acl as $entity => $acl)
 		{
-			if ($acl["entity"] === $entity)
+			if ($entity === $entry)
 			{
-				unset($acl["entity"]);
-
 				return $acl;
 			}
 		}
-
 		return array();
+	}
+
+	public function fetch()
+	{
+		if (empty($this->user))
+		{
+			return;
+		}
+
+		$this->acl = array();
+		$control = Database::prepare(
+			"SELECT `entity`, `create`, `read`, `update`, `delete` FROM `ACL` WHERE `user_id` = ?", "i"
+		)->execute($this->user->getId())->as_assoc()->all();
+
+		foreach ($control as $acl)
+		{
+			$entity = $acl["entity"];
+			unset($acl["entity"]);
+			$this->acl[$entity] = $acl;
+		}
+
+		ksort($this->acl);
+	}
+
+	/**
+	 * Save the user's permissions.
+	 * @return void
+	 */
+	public function save()
+	{
+		if (empty($this->user))
+		{
+			return;
+		}
+	}
+
+	/**
+	 * Update a user's permissions for something.
+	 *
+	 * @param string $string
+	 * @param bool $create
+	 * @param bool $read
+	 * @param bool $update
+	 * @param bool $delete
+	 * @return void
+	 */
+	public function update($string, $create = false, $read = false, $update = false, $delete = false)
+	{
+		if (empty($this->user))
+		{
+			return;
+		}
+
+		$this->acl[$string] = array(
+			"create" => $create ? 1 : 0,
+			"read" => $read ? 1 : 0,
+			"update" => $update ? 1 : 0,
+			"delete" => $delete ? 1 : 0
+		);
+
+		ksort($this->acl);
 	}
 
 	/**
