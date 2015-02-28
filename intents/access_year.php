@@ -114,8 +114,10 @@ final class Intent_Access_Year extends Intent
 	{
 		parent::update($data);
 
+		$intentAuthor = $this->model->getUser();
+
 		$this->mergeData($data);
-		$intent_creator_name = $this->model->getUser()->getName();
+		$intent_creator_name = $intentAuthor->getName();
 
 		$mail = new Postmark;
 		$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
@@ -130,9 +132,13 @@ final class Intent_Access_Year extends Intent
 				 */
 				return;
 			case static::STATE_ACCEPTED:
-				$students = new GroupStudentMap($group);
-				$students->add($this->model->getUser());
-				$students->save();
+				$entry = new stdClass;
+				$entry->year = (string)Model_Year::getCurrentYear();
+
+				$years = new UserYearMap($intentAuthor);
+				$years->add($entry);
+				$years->save();
+
 				$mail->setBody(array(
 					"Hey {$intent_creator_name},\n\n",
 					"You have been granted access to the year.\n",
