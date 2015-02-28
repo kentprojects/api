@@ -4,5 +4,7 @@
 # @license: Copyright KentProjects
 # @link: http://kentprojects.com
 #
-php phpunit.phar --bootstrap functions.php --color --verbose ./
-exit $?
+ssh kentprojects@kentprojects.com <<'ENDSSH'
+cd /var/www/kentprojects-api-dev && sudo -u www-data git pull
+php database/update.php
+ENDSSH

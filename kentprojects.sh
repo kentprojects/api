@@ -141,7 +141,11 @@ function hotfix()
 case "$1" in
 	"deploy") deploy ;;
 	"hotfix") hotfix ;;
-	"test") sh tests/run.sh ;;
+	"test")
+	    cd tests/
+	    ./run.sh
+	    cd ..
+	    ;;
 	*)
 		printf "A simple utility to help you work with the KentProjects codebase!\n\n"
 		printf "Usage: ./kentprojects.sh ACTION\n"

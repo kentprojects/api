@@ -31,9 +31,9 @@ deployment:
   development:
     branch: develop
     commands:
-      - ping -c 10 dev.kentprojects.com
+      - ./scripts/deploy_develop.sh
 # Deploy the master branch.
   production:
     branch: master
     commands:
-      - ping -c 10 kentprojects.com
+      - ./scripts/deploy_master.sh
