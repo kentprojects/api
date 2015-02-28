@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 BASE_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 pushd "$BASE_PATH" > /dev/null
