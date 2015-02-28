@@ -4,21 +4,6 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-if (empty($GLOBALS["config.ini"]))
-{
-	if (file_exists(__DIR__ . "/../config.ini"))
-	{
-		$configFile = __DIR__ . "/../config.ini";
-	}
-	else
-	{
-		trigger_error("No config file found.", E_USER_ERROR);
-		return null;
-	}
-	$GLOBALS["config.ini"] = parse_ini_file($configFile, true);
-	unset($configFile);
-}
-
 require_once __DIR__ . "/../functions.php";
 
 /**
