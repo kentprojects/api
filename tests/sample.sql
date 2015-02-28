@@ -80,10 +80,24 @@ INSERT INTO `Metadata` (`root`, `key`, `value`) VALUES
 	('Model/User/2', 'interests', 'refresh tea')
 ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);
 
+# Everyone can read and update themselves.
 INSERT INTO `ACL` (`user_id`, `entity`, `read`, `update`)
 	SELECT `user_id`, CONCAT('user/', `user_id`), 1, 1 FROM `User`;
+# Everyone can create and read comments.
+INSERT INTO `ACL` (`user_id`, `entity`, `create`, `read`)
+	SELECT `user_id`, 'comment', 1, 1 FROM `User`;
+# Everyone can read group profiles.
+INSERT INTO `ACL` (`user_id`, `entity`, `read`)
+	SELECT `user_id`, 'group', 1 FROM `User`;
+# Everyone can read project profiles.
+INSERT INTO `ACL` (`user_id`, `entity`, `read`)
+	SELECT `user_id`, 'project', 1 FROM `User`;
+# Everyone can read user profiles.
+INSERT INTO `ACL` (`user_id`, `entity`, `read`)
+	SELECT `user_id`, 'user', 1 FROM `User`;
 
-INSERT INTO `ACL` (`user_id`, `entity`, `create`, `read`, `update`, `delete`)
+# The convener can do everything.
+INSERT IGNORE INTO `ACL` (`user_id`, `entity`, `create`, `read`, `update`, `delete`)
 VALUES
 	(1, 'group', 1, 1, 1, 1),
 	(1, 'project', 1, 1, 1, 1),

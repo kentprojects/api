@@ -231,6 +231,8 @@ final class Controller_Auth extends Controller
 			$user->setEmail($email);
 			$user->setRole($role);
 			$user->save();
+
+			$this->setNewUserValues($user);
 		}
 
 		$url = parse_url(!empty($_SESSION["incoming-url"]) ? $_SESSION["incoming-url"] : $backupUrl);
@@ -305,6 +307,42 @@ final class Controller_Auth extends Controller
 			"/login.php?success=" . $token;
 
 		return new HttpRedirectException(302, $url);
+	}
+
+	/**
+	 * Sets acls and other items for new users.
+	 *
+	 * @param Model_User $user
+	 * @return void
+	 */
+	private function setNewUserValues(Model_User $user)
+	{
+		/**
+		 * This is the point where a NEW USER has been created.
+		 * They require initiations. Or something cult-like.
+		 */
+		$this->acl = new ACL($user);
+		/**
+		 * Provide the ability to update themselves.
+		 */
+		$this->acl->update("user/" . $user->getId(), false, true, true, false);
+		/**
+		 * Provide the ability to create and read comments.
+		 */
+		$this->acl->update("comment", true, true, false, false);
+		/**
+		 * Provide the ability to create and read group profiles.
+		 * As a new user, they can create groups. Once they are part of a group the create permission is removed.
+		 */
+		$this->acl->update("group", true, true, false, false);
+		/**
+		 * Provide the ability to read project profiles.
+		 */
+		$this->acl->update("project", false, true, false, false);
+		/**
+		 * Provide the ability to read user profiles.
+		 */
+		$this->acl->update("user", false, true, false, false);
 	}
 
 	/**
