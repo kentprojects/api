@@ -42,8 +42,7 @@ final class Controller_Group extends Controller
 			 */
 			$params = $this->validateParams(array(
 				"year" => $this->request->post("year", false),
-				"name" => $this->request->post("name", false),
-				"creator" => $this->auth->getUser()->getId()
+				"name" => $this->request->post("name", false)
 			));
 
 			$year = Model_Year::getById($params["year"]);
@@ -52,13 +51,7 @@ final class Controller_Group extends Controller
 				throw new HttpStatusException(400, "Invalid year entered.");
 			}
 
-			$creator = Model_User::getById($params["creator"]);
-			if (empty($creator))
-			{
-				throw new HttpStatusException(400, "Invalid user id entered for the group's creator.");
-			}
-
-			$group = new Model_Group($year, $params["name"], $creator);
+			$group = new Model_Group($year, $params["name"], $this->auth->getUser());
 			$group->save();
 
 			$this->response->status(201);
