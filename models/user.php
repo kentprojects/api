@@ -173,6 +173,14 @@ final class Model_User extends Model
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getInterests()
+	{
+		return $this->metadata["interests"];
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getName()
@@ -231,6 +239,7 @@ final class Model_User extends Model
 			(!empty($this->groups) ? array("group" => $this->groups->getCurrentGroupWithProject()) : array()),
 			array(
 				"bio" => $this->getDescription(),
+				"interests" => $this->getInterests()
 			),
 			$this->jsonPermissions(),
 			array(
@@ -304,6 +313,15 @@ final class Model_User extends Model
 		$this->first_name = $firstName;
 	}
 
+	public function setInterests(array $interests)
+	{
+		unset($this->metadata["interests"]);
+		foreach ($interests as $interest)
+		{
+			$this->metadata["interests"] = $interest;
+		}
+	}
+
 	public function setLastName($lastName)
 	{
 		$this->last_name = $lastName;
@@ -321,6 +339,7 @@ final class Model_User extends Model
 
 	/**
 	 * @param array $data
+	 * @throws HttpStatusException
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */
@@ -329,6 +348,17 @@ final class Model_User extends Model
 		if (!empty($data["bio"]))
 		{
 			$this->setDescription($data["bio"]);
+		}
+		if (!empty($data["interests"]))
+		{
+			if (is_array($data["interests"]))
+			{
+				$this->setInterests($data["interests"]);
+			}
+			else
+			{
+				throw new HttpStatusException(400, "User interests is not an array.");
+			}
 		}
 	}
 }

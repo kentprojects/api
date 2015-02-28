@@ -95,7 +95,9 @@ class Metadata implements ArrayAccess, JsonSerializable
 
 	public function offsetGet($key)
 	{
-		return $this->data[$key];
+		return $this->offsetExists($key)
+			? $this->data[$key]
+			: array();
 	}
 
 	public function offsetSet($key, $value)
