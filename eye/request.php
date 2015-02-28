@@ -284,7 +284,7 @@ curl_setopt($ch, CURLOPT_URL, $request->url);
 $response = curl_exec($ch);
 if (true)
 {
-	error_log($response);
+	// error_log($response);
 	echo <<<EOT
 	<hr/>
 	<p><pre><a href="{$request->url}" target="_blank">{$request->url}</a></pre></p>
