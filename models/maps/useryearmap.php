@@ -189,7 +189,7 @@ class UserYearMap implements Countable, IteratorAggregate, JsonSerializable
 			$types .= $typesTemplate;
 			foreach ($map as $key => $value)
 			{
-				$values[] = $value;
+				$values[] = intval($value);
 			}
 		}
 
@@ -204,7 +204,7 @@ class UserYearMap implements Countable, IteratorAggregate, JsonSerializable
 				static::$fields
 			)),
 			") VALUES ",
-			implode(", ", $query)
+			implode(", ", $queryValues)
 		));
 
 		$statement = Database::prepare($query, $types);
