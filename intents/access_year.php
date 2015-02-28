@@ -132,11 +132,10 @@ final class Intent_Access_Year extends Intent
 				 */
 				return;
 			case static::STATE_ACCEPTED:
-				$entry = new stdClass;
-				$entry->year = (string)Model_Year::getCurrentYear();
-
 				$years = new UserYearMap($intentAuthor);
-				$years->add($entry);
+				$years->add(array(
+					"year" => (string)Model_Year::getCurrentYear()
+				));
 				$years->save();
 
 				$mail->setBody(array(

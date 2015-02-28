@@ -56,7 +56,7 @@ class UserYearMap implements Countable, IteratorAggregate, JsonSerializable
 	}
 
 	/**
-	 * @param stdClass $map
+	 * @param array|stdClass $map
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */
