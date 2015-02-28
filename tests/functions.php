@@ -6,11 +6,7 @@
  */
 if (empty($GLOBALS["config.ini"]))
 {
-	if (file_exists(__DIR__ . "/../config.ci.ini"))
-	{
-		$configFile = __DIR__ . "/../config.ci.ini";
-	}
-	elseif (file_exists(__DIR__ . "/../config.ini"))
+	if (file_exists(__DIR__ . "/../config.ini"))
 	{
 		$configFile = __DIR__ . "/../config.ini";
 	}
