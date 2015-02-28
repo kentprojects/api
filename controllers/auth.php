@@ -45,7 +45,7 @@ final class Controller_Auth extends Controller
 	 */
 	public function action_index()
 	{
-		$this->action_internal();
+		$this->action_sso();
 	}
 
 	/**
