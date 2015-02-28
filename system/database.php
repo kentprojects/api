@@ -145,7 +145,7 @@ class _Database_Query
 		$success = $this->statement->execute();
 		if ($success === false)
 		{
-			throw new DatabaseException($this->statement->error, $this->statement->errno, $this->query, $this->types, $values);
+			throw new DatabaseException($this->statement->error, $this->statement->errno, $this->query, $this->types, func_get_args());
 		}
 
 		$result = $this->statement->get_result();
