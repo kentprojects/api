@@ -265,6 +265,24 @@ final class Model_User extends Model
 	}
 
 	/**
+	 * @return array
+	 */
+	public function jsonSimpleSerialize()
+	{
+		return array(
+			"id" => $this->getId(),
+			"email" => $this->email,
+			"name" => $this->getName(),
+			"first_name" => $this->first_name,
+			"last_name" => $this->last_name,
+			"role" => $this->role,
+			"created" => $this->created,
+			"lastlogin" => $this->lastlogin,
+			"updated" => $this->updated
+		);
+	}
+
+	/**
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */

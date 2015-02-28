@@ -142,6 +142,14 @@ abstract class Model implements JsonSerializable
 	}
 
 	/**
+	 * @return array
+	 */
+	public function jsonSimpleSerialize()
+	{
+		return $this->jsonSerialize();
+	}
+
+	/**
 	 * @param string|null $entity
 	 * @return array
 	 */
