@@ -8,11 +8,16 @@ class PostmarkTest extends KentProjects_TestBase
 {
 	public function testSend()
 	{
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		try
+		{
+			$mail = new Postmark;
+		}
+		catch (InvalidArgumentException $e)
+		{
+			$this->markTestIncomplete($e->getMessage());
+			return;
+		}
 
-		$mail = new Postmark;
 		$mail->setTo("james.dryden@kentprojects.com", "KentProject Developers");
 		$mail->setSubject("A Test Email");
 		$mail->setBody(array(

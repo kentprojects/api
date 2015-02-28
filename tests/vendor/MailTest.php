@@ -8,11 +8,16 @@ class MailTest extends KentProjects_TestBase
 {
 	public function testSend()
 	{
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		try
+		{
+			$mail = new Mail;
+		}
+		catch (InvalidArgumentException $e)
+		{
+			$this->markTestIncomplete($e->getMessage());
+			return;
+		}
 
-		$mail = new Mail;
 		$mail->setTo("developers@kentprojects.com", "KentProject Developers");
 		$mail->setSubject("A Test Email");
 		$mail->setBody(array(
