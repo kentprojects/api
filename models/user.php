@@ -316,9 +316,12 @@ final class Model_User extends Model
 	public function setInterests(array $interests)
 	{
 		unset($this->metadata["interests"]);
-		foreach ($interests as $interest)
+		if (!empty($interests))
 		{
-			$this->metadata["interests"] = $interest;
+			foreach ($interests as $interest)
+			{
+				$this->metadata["interests"] = $interest;
+			}
 		}
 	}
 
@@ -349,7 +352,7 @@ final class Model_User extends Model
 		{
 			$this->setDescription($data["bio"]);
 		}
-		if (!empty($data["interests"]))
+		if (isset($data["interests"]))
 		{
 			if (is_array($data["interests"]))
 			{
