@@ -282,15 +282,28 @@ curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 curl_setopt($ch, CURLOPT_URL, $request->url);
 
 $response = curl_exec($ch);
+if (true)
+{
+	error_log($response);
+	echo <<<EOT
+	<hr/>
+	<p><pre><a href="{$request->url}" target="_blank">{$request->url}</a></pre></p>
+	<pre><code>{$response}</code></pre>
+EOT;
+	exit();
+}
+
 try
 {
-	list($headers, $response) = explode("\r\n\r\n", $response, 2);
-	$headers = explode("\n", $headers);
+	$splitResponse = explode("\r\n\r\n", $response, 2);
+	$response = array_pop($splitResponse);
+	$headers = explode("\n", array_pop($splitResponse));
 	$httpHeader = array_shift($headers);
 	sort($headers);
 	array_unshift($headers, $httpHeader);
+	error_log(print_r($headers, true));
 	$headers = implode("\n", $headers);
-	unset($httpHeader);
+	unset($splitResponse, $httpHeader);
 }
 catch (Exception $e)
 {
@@ -310,7 +323,7 @@ $output = array(
 	"json" => null
 );
 
-if ($request->method == "PUT")
+if (!empty($fh))
 {
 	fclose($fh);
 }
