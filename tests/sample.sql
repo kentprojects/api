@@ -99,6 +99,7 @@ INSERT INTO `ACL` (`user_id`, `entity`, `read`)
 # The convener can do everything.
 INSERT IGNORE INTO `ACL` (`user_id`, `entity`, `create`, `read`, `update`, `delete`)
 VALUES
+	(1, 'comment', 1, 1, 1, 1),
 	(1, 'group', 1, 1, 1, 1),
 	(1, 'project', 1, 1, 1, 1),
 	(1, 'user', 1, 1, 1, 1);
