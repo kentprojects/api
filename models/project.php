@@ -100,16 +100,7 @@ class Model_Project extends Model
 
 	public function __construct(Model_Year $year = null, $name = null, Model_User $creator = null)
 	{
-		if ($this->getId() !== null)
-		{
-			/** @noinspection PhpParamsInspection */
-			$this->year = Model_Year::getById($this->year);
-			/** @noinspection PhpParamsInspection */
-			$this->creator = Model_User::getById($this->creator);
-			/** @noinspection PhpParamsInspection */
-			$this->supervisor = Model_User::getById($this->supervisor);
-		}
-		else
+		if ($this->getId() === null)
 		{
 			if (empty($year))
 			{
@@ -129,7 +120,6 @@ class Model_Project extends Model
 			}
 			$this->creator = $creator;
 		}
-
 		parent::__construct();
 	}
 
@@ -146,6 +136,11 @@ class Model_Project extends Model
 	 */
 	public function getCreator()
 	{
+		if (!empty($this->creator) && is_numeric($this->creator))
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->creator = Model_User::getById($this->creator);
+		}
 		return $this->creator;
 	}
 
@@ -164,7 +159,6 @@ class Model_Project extends Model
 			/** @noinspection PhpParamsInspection */
 			$this->group = Model_Group::getById($this->group);
 		}
-
 		return $this->group;
 	}
 
@@ -197,6 +191,11 @@ class Model_Project extends Model
 	 */
 	public function getSupervisor()
 	{
+		if (!empty($this->supervisor) && is_numeric($this->supervisor))
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->supervisor = Model_User::getById($this->supervisor);
+		}
 		return $this->supervisor;
 	}
 
@@ -217,22 +216,29 @@ class Model_Project extends Model
 	}
 
 	/**
+	 * Render the project.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
 	 * @return array
 	 */
-	public function jsonSerialize()
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
+		$this->getCreator();
+		$this->getSupervisor();
+
 		return $this->validateFields(array_merge(
-			parent::jsonSerialize(),
+			parent::render($request, $response, $acl, $internal),
 			array(
 				"year" => (string)$this->year,
-				"group" => $this->group,
+				"group" => is_object($this->group) ? $this->group->render($request, $response, $acl, $internal) : $this->group,
 				"name" => $this->name,
 				"description" => $this->getDescription(),
-				"creator" => $this->creator,
-				"supervisor" => $this->supervisor
-			),
-			$this->jsonPermissions(),
-			array(
+				"creator" => $this->creator->render($request, $response, $acl, true),
+				"supervisor" => $this->supervisor->render($request, $response, $acl, true),
+				"permissions" => $acl->get(str_replace("Model/", "", $this->getClassName())),
 				"created" => $this->created,
 				"updated" => $this->updated
 			)

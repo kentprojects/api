@@ -44,19 +44,4 @@ class StudentGroupMap extends ModelMap
 	{
 		return !empty($this->current) ? $this->data[$this->current] : null;
 	}
-
-	/**
-	 * @return Model_Group
-	 */
-	public function getCurrentGroupWithProject()
-	{
-		if (empty($this->current))
-		{
-			return null;
-		}
-		/** @var Model_Group $group */
-		$group = $this->data[$this->current];
-		$group->getProject();
-		return $group;
-	}
 }

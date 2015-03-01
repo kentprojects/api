@@ -49,11 +49,6 @@ abstract class Controller
 
 		$this->auth = new Auth($request, $response, $this->authentication);
 		$this->acl = new ACL($this->auth->getUser());
-
-		/**
-		 * Set some global ACL information.
-		 */
-		KentProjects::$acl =& $this->acl;
 	}
 
 	/**
@@ -70,12 +65,7 @@ abstract class Controller
 	public function after()
 	{
 		$this->response->header("Content-Type", "application/json");
-		$this->response->body(
-			json_encode(
-				$this->response->body(),
-				JSON_PRETTY_PRINT
-			)
-		);
+		$this->response->body(json_encode($this->render($this->response->body()), JSON_PRETTY_PRINT));
 
 		$this->response->header("Content-Length", strlen($this->response->body()));
 
@@ -84,6 +74,39 @@ abstract class Controller
 			$this->response->body("");
 		}
 		Timing::stop("controller");
+	}
+
+	/**
+	 * @param mixed $body
+	 * @return mixed
+	 */
+	private function render($body)
+	{
+		if (is_object($body))
+		{
+			if ($body instanceof Intent || $body instanceof Model || $body instanceof ModelMap ||
+				$body instanceof UserYearMap
+			)
+			{
+				return $body->render($this->request, $this->response, $this->acl);
+			}
+			else
+			{
+				return json_decode(json_encode($body));
+			}
+		}
+		elseif (is_array($body))
+		{
+			foreach ($body as $i => $b)
+			{
+				$body[$i] = $this->render($b);
+			}
+			return $body;
+		}
+		else
+		{
+			return json_decode(json_encode($body));
+		}
 	}
 
 	/**

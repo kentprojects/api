@@ -106,15 +106,11 @@ final class Model_User extends Model
 	/**
 	 * @var Model_Group
 	 */
-	protected $currentGroup;
-	/**
-	 * @var StudentGroupMap
-	 */
-	public $groups;
+	protected $group;
 	/**
 	 * @var UserYearMap
 	 */
-	public $years;
+	protected $years;
 
 	/**
 	 * @constructor
@@ -122,10 +118,6 @@ final class Model_User extends Model
 	public function __construct()
 	{
 		parent::__construct();
-		if ($this->getId() !== null)
-		{
-			$this->initYearMap();
-		}
 	}
 
 	public function clearCaches()
@@ -133,31 +125,6 @@ final class Model_User extends Model
 		parent::clearCaches();
 		Cache::delete($this->getCacheName("group"));
 		Cache::delete($this->getCacheName("project"));
-	}
-
-	/**
-	 * @return Model_Group
-	 */
-	public function getCurrentGroup()
-	{
-		$this->getGroups();
-		if (count($this->groups) === 0)
-		{
-			return null;
-		}
-		$this->currentGroup = $this->groups->getCurrentGroup();
-		return $this->currentGroup;
-	}
-
-	public function getCurrentGroupWithProject()
-	{
-		$this->getGroups();
-		if (count($this->groups) === 0)
-		{
-			return null;
-		}
-		$this->currentGroup = $this->groups->getCurrentGroupWithProject();
-		return $this->currentGroup;
 	}
 
 	/**
@@ -185,15 +152,15 @@ final class Model_User extends Model
 	}
 
 	/**
-	 * @return StudentGroupMap
+	 * @return Model_Group
 	 */
-	public function getGroups()
+	public function getGroup()
 	{
-		if (empty($this->groups))
+		if (empty($this->group))
 		{
-			$this->groups = new StudentGroupMap($this);
+			$this->group = Model_Group::getByUser($this);
 		}
-		return $this->groups;
+		return $this->group;
 	}
 
 	/**
@@ -236,7 +203,7 @@ final class Model_User extends Model
 		return $this->role;
 	}
 
-	public function initYearMap()
+	public function getYears()
 	{
 		if (empty($this->years))
 		{
@@ -262,59 +229,58 @@ final class Model_User extends Model
 	}
 
 	/**
+	 * Render the user.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
 	 * @return array
 	 */
-	public function jsonSerialize()
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
-		return $this->validateFields(array_merge(
-			parent::jsonSerialize(),
+		$data = array_merge(
+			parent::render($request, $response, $acl, $internal),
 			array(
 				"email" => $this->email,
 				"name" => $this->getName(),
 				"first_name" => $this->first_name,
 				"last_name" => $this->last_name,
-				"role" => $this->role,
-				"years" => !empty($this->years) ? $this->years->jsonSerialize() : array()
-			),
-			(!empty($this->currentGroup) ? array("group" => $this->currentGroup) : array()),
-			array(
+				"role" => $this->role
+			)
+		);
+
+		if (!$internal)
+		{
+			$this->getYears();
+			$data = array_merge($data, array(
+				"years" => $this->years->render($request, $response, $acl, true)
+			));
+		}
+
+		if (!empty($this->group))
+		{
+			$data = array_merge($data, array(
+				"group" => $this->group->render($request, $response, $acl, true)
+			));
+		}
+
+		if (!$internal)
+		{
+			$data = array_merge($data, array(
 				"bio" => $this->getDescription(),
 				"interests" => $this->getInterests()
-			),
-			$this->jsonPermissions(),
-			array(
-				"created" => $this->created,
-				"lastlogin" => $this->lastlogin,
-				"updated" => $this->updated
-			)
-		));
-	}
+			));
+		}
 
-	/**
-	 * @return array
-	 */
-	public function jsonSimpleSerialize()
-	{
-		return array(
-			"id" => $this->getId(),
-			"email" => $this->email,
-			"name" => $this->getName(),
-			"first_name" => $this->first_name,
-			"last_name" => $this->last_name,
-			"role" => $this->role,
+		$data = array_merge($data, array(
+			"permissions" => $acl->get(str_replace("Model/", "", $this->getClassName())),
 			"created" => $this->created,
-			"lastlogin" => $this->lastlogin,
+			"last_login" => $this->lastlogin,
 			"updated" => $this->updated
-		);
-	}
+		));
 
-	/**
-	 * Clear the user's `/me` response.
-	 * @return void
-	 */
-	public function refreshMeResponse()
-	{
-		Cache::delete(Cache::key("me") . $this->getId());
+		return $this->validateFields($data);
 	}
 
 	/**

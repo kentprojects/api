@@ -79,6 +79,8 @@ final class Controller_Comment extends Controller
 				"message" => "You do not have permission to delete this comment."
 			));
 			Model_Comment::delete($comment);
+			$this->acl->delete("comment/" . $comment->getId());
+			$this->acl->save();
 			$this->response->status(204);
 			return;
 		}

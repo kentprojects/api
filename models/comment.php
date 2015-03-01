@@ -15,7 +15,7 @@ final class Model_Comment extends Model
 	public static function delete(Model_Comment $comment)
 	{
 		Database::prepare("DELETE FROM `Comment` WHERE `comment_id` = ?", "i")->execute($comment->getId());
-		Cache::delete($comment->getCacheName());
+		$comment->clearCaches();
 	}
 
 	/**
@@ -53,14 +53,15 @@ final class Model_Comment extends Model
 	 */
 	public static function getByRoot($root)
 	{
-		return array_map(
-			function ($commentId)
-			{
-				return static::getById($commentId);
-			},
-			Database::prepare("SELECT `comment_id` FROM `Comment` WHERE `root` = ? ORDER BY `comment_id` ASC", "s")
-				->execute($root)->singlevals()
-		);
+		$ids = Cache::get(static::cacheName() . ".root." . $root);
+		if (empty($ids))
+		{
+			$ids = Database::prepare(
+				"SELECT `comment_id` FROM `Comment` WHERE `root` = ? ORDER BY `comment_id` ASC", "s"
+			)->execute($root)->singlevals();
+			!empty($ids) && Cache::get(static::cacheName() . ".root." . $root, 2 * Cache::HOUR);
+		}
+		return array_filter(array_map(array(get_called_class(), "getById"), $ids));
 	}
 
 	/**
@@ -121,6 +122,12 @@ final class Model_Comment extends Model
 		parent::__construct();
 	}
 
+	public function clearCache()
+	{
+		Cache::delete($this->getCacheName());
+		Cache::delete(static::getCacheName() . ".root." . $this->root);
+	}
+
 	/**
 	 * @return int
 	 */
@@ -130,16 +137,22 @@ final class Model_Comment extends Model
 	}
 
 	/**
-	 * Export a comment.
+	 * Render the comment.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
 	 * @return array
 	 */
-	public function jsonSerialize()
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
 		return $this->validateFields(array_merge(
-			parent::jsonSerialize(),
+			parent::render($request, $response, $acl, $internal),
 			array(
 				"comment" => $this->comment,
-				"author" => $this->user->jsonSimpleSerialize()
+				"author" => $this->user->render($request, $response, $acl, true),
+				"created" => $this->created
 			)
 		));
 	}

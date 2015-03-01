@@ -75,7 +75,7 @@ final class Controller_Student extends Controller
 		}
 		else
 		{
-			$user->getGroups();
+			$user->getGroup();
 		}
 
 		/**

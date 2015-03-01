@@ -57,7 +57,7 @@ final class Controller_Students extends Controller
 		foreach ($users as $k => $user_id)
 		{
 			$user = Model_User::getById($user_id);
-			$user->getCurrentGroupWithProject();
+			$user->getGroup();
 			$users[$k] = $user;
 		}
 

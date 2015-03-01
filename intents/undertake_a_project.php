@@ -28,7 +28,7 @@ final class Intent_Undertake_A_Project extends Intent
 		/**
 		 * If you don't have a group.
 		 */
-		$group = $user->getCurrentGroup();
+		$group = $user->getGroup();
 		if (empty($group))
 		{
 			return false;
@@ -107,7 +107,7 @@ final class Intent_Undertake_A_Project extends Intent
 		$this->mergeData($data);
 		$this->save();
 
-		$group_name = $this->model->getUser()->getCurrentGroup()->getName();
+		$group_name = $this->model->getUser()->getGroup()->getName();
 		$intent_creator_name = $this->model->getUser()->getName();
 		$project_supervisor_name = $project->getSupervisor()->getFirstName();
 		$project_name = $project->getName();
@@ -145,7 +145,7 @@ final class Intent_Undertake_A_Project extends Intent
 	public function jsonSerialize()
 	{
 		$json = parent::jsonSerialize();
-		$json["group"] = $this->model->getUser()->getCurrentGroup();
+		$json["group"] = $this->model->getUser()->getGroup();
 		$json["project"] = Model_Project::getById($this->data->project_id);
 		return $json;
 	}
@@ -172,7 +172,7 @@ final class Intent_Undertake_A_Project extends Intent
 		}
 
 		$this->mergeData($data);
-		$group = $this->model->getUser()->getCurrentGroup();
+		$group = $this->model->getUser()->getGroup();
 
 		$intent_creator_name = $this->model->getUser()->getName();
 		$project_supervisor_name = $project->getSupervisor()->getFirstName();

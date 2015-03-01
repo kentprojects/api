@@ -7,6 +7,16 @@
 class Model_Group extends Model
 {
 	/**
+	 * @param Model_Group $group
+	 * @return void
+	 */
+	public static function delete(Model_Group $group)
+	{
+		Database::prepare("DELETE FROM `Group` WHERE `group_id` = ?", "i")->execute($group->getId());
+		$group->clearCaches();
+	}
+
+	/**
 	 * Get the relevant Group by it's ID.
 	 *
 	 * @param int $id
@@ -139,8 +149,6 @@ class Model_Group extends Model
 		}
 
 		parent::__construct();
-
-		$this->students = new GroupStudentMap($this);
 	}
 
 	/**
@@ -223,6 +231,15 @@ class Model_Group extends Model
 		return !empty($this->project);
 	}
 
+	public function getStudents()
+	{
+		if (empty($this->students))
+		{
+			$this->students = new GroupStudentMap($this);
+		}
+		return $this->students;
+	}
+
 	/**
 	 * @return array
 	 */
@@ -245,6 +262,48 @@ class Model_Group extends Model
 				"updated" => $this->updated
 			)
 		));
+	}
+
+	/**
+	 * Render the group.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
+	 * @return array
+	 */
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
+	{
+		$this->getProject();
+
+		$data = array_merge(
+			parent::render($request, $response, $acl, $internal),
+			array(
+				"year" => (string)$this->year,
+				"name" => $this->name
+			)
+		);
+
+		if (!$internal)
+		{
+			$this->getStudents();
+			$data = array_merge($data, array(
+				"project" => !empty($this->project) ? $this->project->render($request, $response, $acl, true) : null,
+				"students" => (count($this->students) > 0)
+					? $this->students->render($request, $response, $acl, true)
+					: array(),
+			));
+		}
+
+		$data = array_merge($data, array(
+			"creator" => $this->creator->render($request, $response, $acl, true),
+			"permissions" => $acl->get(str_replace("Model/", "", $this->getClassName())),
+			"created" => $this->created,
+			"updated" => $this->updated
+		));
+
+		return $this->validateFields($data);
 	}
 
 	/**

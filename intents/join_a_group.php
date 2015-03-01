@@ -199,7 +199,7 @@ final class Intent_Join_A_Group extends Intent
 				$acl->set("group/" . $group->getId(), false, true, true, true);
 				$acl->save();
 
-				$this->model->getUser()->refreshMeResponse();
+				$this->model->getUser()->clearCaches();
 
 				$mail->setBody(array(
 					"Hey {$intent_creator_name},\n\n",

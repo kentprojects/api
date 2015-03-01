@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-class Metadata implements ArrayAccess, JsonSerializable
+class Metadata implements ArrayAccess, Countable
 {
 	protected $data = array();
 	protected $root;
@@ -57,30 +57,9 @@ class Metadata implements ArrayAccess, JsonSerializable
 		$this->data[$key] = array($value);
 	}
 
-	/**
-	 * @return array|stdClass
-	 */
-	function jsonSerialize()
+	public function count()
 	{
-		$data = array();
-		foreach ($this->data as $key => $value)
-		{
-			if (is_array($value) && (count($value) === 1))
-			{
-				$data[$key] = array_shift($value);
-			}
-			else
-			{
-				$data[$key] = $value;
-			}
-		}
-
-		if (empty($data))
-		{
-			$data = new stdClass;
-		}
-
-		return $data;
+		return count($this->data);
 	}
 
 	public function offsetCount($key)
@@ -123,6 +102,31 @@ class Metadata implements ArrayAccess, JsonSerializable
 		{
 			unset($this->data[$key]);
 		}
+	}
+
+	/**
+	 * @return array|stdClass
+	 */
+	function render()
+	{
+		$data = new stdClass;
+		if (count($this->data))
+		{
+			return $data;
+		}
+
+		foreach ($this->data as $key => $value)
+		{
+			if (is_array($value) && (count($value) === 1))
+			{
+				$data->$key = array_shift($value);
+			}
+			else
+			{
+				$data->$key = $value;
+			}
+		}
+		return $data;
 	}
 
 	public function save($root = null)

@@ -121,16 +121,18 @@ class Model_Token extends Model
 	 */
 	public function __construct(Model_Application $application = null, Model_User $user = null)
 	{
-		if ($this->getId() !== null)
+		if ($this->getId() === null)
 		{
-			/** @noinspection PhpParamsInspection */
-			$this->application = Model_Application::getById($this->application);
-			/** @noinspection PhpParamsInspection */
-			$this->user = Model_User::getById($this->user);
-		}
-		else
-		{
+			if (empty($application))
+			{
+				trigger_error("Missing APPLICATION passed to the TOKEN constructor", E_USER_ERROR);
+			}
 			$this->application = $application;
+
+			if (empty($user))
+			{
+				trigger_error("Missing USER passed to the TOKEN constructor", E_USER_ERROR);
+			}
 			$this->user = $user;
 		}
 		parent::__construct();
@@ -149,6 +151,11 @@ class Model_Token extends Model
 	 */
 	public function getApplication()
 	{
+		if (!empty($this->application) && is_numeric($this->application))
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->application = Model_Application::getById($this->application);
+		}
 		return $this->application;
 	}
 
@@ -173,22 +180,12 @@ class Model_Token extends Model
 	 */
 	public function getUser()
 	{
+		if (!empty($this->user) && is_numeric($this->user))
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->user = Model_User::getById($this->user);
+		}
 		return $this->user;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function jsonSerialize()
-	{
-		return array(
-			"application" => $this->application,
-			"user" => $this->user,
-			"token" => $this->token,
-			"settings" => $this->getSettings(),
-			"created" => $this->created,
-			"updated" => $this->updated
-		);
 	}
 
 	/**
@@ -204,6 +201,33 @@ class Model_Token extends Model
 	}
 
 	/**
+	 * Render the token.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
+	 * @return array
+	 */
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
+	{
+		$this->getApplication();
+		$this->getUser();
+
+		return $this->validateFields(array_merge(
+			parent::render($request, $response, $acl, $internal),
+			array(
+				"application" => $this->application->render($request, $response, $acl, true),
+				"user" => $this->user->render($request, $response, $acl, true),
+				"token" => $this->token,
+				"settings" => $this->getSettings(),
+				"created" => $this->created,
+				"updated" => $this->updated
+			)
+		));
+	}
+
+	/**
 	 * @return void
 	 */
 	public function save()
@@ -213,6 +237,9 @@ class Model_Token extends Model
 			$this->regenerate();
 			$this->created = Date::format(Date::TIMESTAMP, time());
 		}
+
+		$this->getApplication();
+		$this->getUser();
 
 		Database::prepare(
 			"INSERT INTO `Token` (`application_id`, `user_id`, `token`, `created`)

@@ -7,7 +7,7 @@
  * Class ModelMap
  * This class is designed to bring two objects together by way of a map table.
  */
-abstract class ModelMap implements Countable, IteratorAggregate, JsonSerializable
+abstract class ModelMap implements Countable, IteratorAggregate
 {
 	protected $data = array();
 	protected $foreignClass;
@@ -134,16 +134,6 @@ abstract class ModelMap implements Countable, IteratorAggregate, JsonSerializabl
 	}
 
 	/**
-	 * Useful so the ModelMap can partake in json_encode.
-	 *
-	 * @return array
-	 */
-	public function jsonSerialize()
-	{
-		return array_values($this->data);
-	}
-
-	/**
 	 * @param Model $model
 	 * @return void
 	 */
@@ -153,6 +143,28 @@ abstract class ModelMap implements Countable, IteratorAggregate, JsonSerializabl
 		{
 			unset($this->data[$model->getId()]);
 		}
+	}
+
+	/**
+	 * Render the model map.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
+	 * @return array
+	 */
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
+	{
+		return array_values(
+			array_map(
+				function (Model $model) use ($request, $response, $acl, $internal)
+				{
+					return $model->render($request, $response, $acl, $internal);
+				},
+				$this->data
+			)
+		);
 	}
 
 	/**

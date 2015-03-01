@@ -55,11 +55,8 @@ final class Controller_Group extends Controller
 			$this->acl->set("group/" . $group->getId(), false, true, true, true);
 			$this->acl->save();
 
-			$this->auth->getUser()->refreshMeResponse();
-
 			$this->response->status(201);
 			$this->response->body($group);
-
 			return;
 		}
 
@@ -106,6 +103,7 @@ final class Controller_Group extends Controller
 				"action" => ACL::DELETE,
 				"message" => "You do not have permission to delete this group."
 			));
+			Model_Group::delete($group);
 			throw new HttpStatusException(501, "Deleting a group is coming soon.");
 		}
 		else

@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-abstract class Intent implements JsonSerializable
+abstract class Intent
 {
 	const STATE_OPEN = "intent:state:open";
 	const STATE_ACCEPTED = "intent:state:accepted";
@@ -179,20 +179,6 @@ abstract class Intent implements JsonSerializable
 	}
 
 	/**
-	 * @return array
-	 */
-	public function jsonSerialize()
-	{
-		return array(
-			"id" => $this->model->getId(),
-			"user" => $this->model->getUser(),
-			"handler" => $this->getHandlerName(),
-			"data" => $this->data->jsonSerialize(),
-			"state" => $this->model->getCleanState()
-		);
-	}
-
-	/**
 	 * @param array $data
 	 * @throws InvalidArgumentException
 	 * @return void
@@ -219,6 +205,23 @@ abstract class Intent implements JsonSerializable
 				$this->data->$key = $value;
 			}
 		}
+	}
+
+	/**
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @return array
+	 */
+	public function render(Request_Internal $request, Response &$response, ACL $acl)
+	{
+		return array(
+			"id" => $this->model->getId(),
+			"user" => $this->model->getUser(),
+			"handler" => $this->getHandlerName(),
+			"data" => $this->data->render(),
+			"state" => $this->model->getCleanState()
+		);
 	}
 
 	/**

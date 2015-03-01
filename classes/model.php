@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-abstract class Model implements JsonSerializable
+abstract class Model
 {
 	/**
 	 * An array of the allowed fields.
@@ -12,6 +12,10 @@ abstract class Model implements JsonSerializable
 	 * @var array
 	 */
 	private static $limitFields = array();
+	/**
+	 * An array of the models already rendered;
+	 */
+	protected static $rendered = array();
 
 	/**
 	 * Builds a new model like the Database does.
@@ -95,6 +99,16 @@ abstract class Model implements JsonSerializable
 		self::$limitFields[get_called_class()] = array_merge(array("id"), $fields);
 	}
 
+	protected static function rendered($entity)
+	{
+		if (array_key_exists($entity, static::$rendered))
+		{
+			return true;
+		}
+		static::$rendered[$entity] = true;
+		return false;
+	}
+
 	/**
 	 * @var Metadata
 	 */
@@ -142,33 +156,18 @@ abstract class Model implements JsonSerializable
 	public abstract function getId();
 
 	/**
+	 * Render the model.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
 	 * @return array
 	 */
-	public function jsonSerialize()
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
 		return array(
 			"id" => $this->getId()
-		);
-	}
-
-	/**
-	 * @return array
-	 */
-	public function jsonSimpleSerialize()
-	{
-		return $this->jsonSerialize();
-	}
-
-	/**
-	 * @param string|null $entity
-	 * @return array
-	 */
-	protected function jsonPermissions($entity = null)
-	{
-		return array(
-			"permissions" => KentProjects::ACL(
-				strtolower(empty($entity) ? str_replace("Model/", "", $this->getClassName()) : $entity)
-			)
 		);
 	}
 

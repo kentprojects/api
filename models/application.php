@@ -168,12 +168,18 @@ class Model_Application extends Model
 	}
 
 	/**
+	 * Render the application.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
 	 * @return array
 	 */
-	public function jsonSerialize()
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
 		return $this->validateFields(array_merge(
-			parent::jsonSerialize(),
+			parent::render($request, $response, $acl, $internal),
 			array(
 				"key" => $this->key,
 				"name" => $this->name,

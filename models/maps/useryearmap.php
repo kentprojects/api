@@ -8,7 +8,7 @@
  * This class is designed to bring two objects together by way of a map table.
  * This does not extend a ModelMap since it's a little... different...
  */
-class UserYearMap implements Countable, IteratorAggregate, JsonSerializable
+class UserYearMap implements Countable, IteratorAggregate
 {
 	/**
 	 * @var array
@@ -138,16 +138,6 @@ class UserYearMap implements Countable, IteratorAggregate, JsonSerializable
 	}
 
 	/**
-	 * Useful so the ModelMap can partake in json_encode.
-	 *
-	 * @return array
-	 */
-	public function jsonSerialize()
-	{
-		return $this->data;
-	}
-
-	/**
 	 * @param string $year
 	 * @return void
 	 */
@@ -157,6 +147,20 @@ class UserYearMap implements Countable, IteratorAggregate, JsonSerializable
 		{
 			unset($this->data[$year]);
 		}
+	}
+
+	/**
+	 * Render the model map.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
+	 * @return array
+	 */
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
+	{
+		return $this->data;
 	}
 
 	/**

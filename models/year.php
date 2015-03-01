@@ -207,20 +207,6 @@ final class Model_Year extends Model
 	}
 
 	/**
-	 * @return array
-	 */
-	public function jsonSerialize()
-	{
-		return $this->validateFields(array_merge(
-			parent::jsonSerialize(),
-			array(
-				"projects" => 0,
-				"users" => 0
-			)
-		));
-	}
-
-	/**
 	 * @param Model_User $user
 	 * @return bool
 	 */
@@ -234,5 +220,25 @@ final class Model_Year extends Model
 			"DELETE FROM `User_Year_Map` WHERE `user_id` = ? AND `year` = ?", "ii"
 		);
 		return $statement->execute($user->getId(), $this->id)->affected_rows == 1;
+	}
+
+	/**
+	 * Render the year.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
+	 * @return array
+	 */
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
+	{
+		return $this->validateFields(array_merge(
+			parent::render($request, $response, $acl, $internal),
+			array(
+				"projects" => 0,
+				"users" => 0
+			)
+		));
 	}
 }
