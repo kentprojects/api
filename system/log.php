@@ -156,4 +156,9 @@ else
 /**
  * Initiate the write when the script has finished.
  */
-register_shutdown_function(array("Log", "write"));
+register_shutdown_function(
+	function ()
+	{
+		Log::write();
+	}
+);
