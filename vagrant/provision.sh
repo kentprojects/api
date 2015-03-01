@@ -14,15 +14,12 @@ echo "mysql-server mysql-server/root_password password password" | debconf-set-s
 echo "mysql-server mysql-server/root_password_again password password" | debconf-set-selections
 # Install MySQL, Apache, Curl, Screen and PHP.
 apt-get install -y mysql-server apache2 curl screen && \
-apt-get install -y php5 php5-cli php5-curl php5-mysqlnd php5-json && \
-apt-get install -y nodejs npm
+apt-get install -y php5 php5-cli php5-curl php5-mysqlnd php5-json
 # If one of them failed, then abort.
 if [ $? -ne 0 ]; then
 	echo "Something went wrong trying to install the packages. ABORTING."
 	exit 1
 fi
-#
-ln -s /usr/bin/nodejs /usr/bin/node
 #
 # Remove an unnecessary packages.
 apt-get autoremove -y
