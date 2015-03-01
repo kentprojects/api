@@ -15,23 +15,31 @@ final class Controller_Me extends Controller
 	 * /me
 	 * /me/:id
 	 *
-	 * GET
+	 * GET / PUT
 	 *
-	 * Get a collection of information for the current user.
+	 * Get a collection of information for the current user, or a clever method to update yourself.
 	 *
 	 * @throws HttpStatusException
 	 * @return void
 	 */
 	public function action_index()
 	{
-		$this->validateMethods(Request::GET);
+		$this->validateMethods(Request::GET, Request::PUT);
 
 		if ($this->request->param("id") !== null)
 		{
 			throw new HttpStatusException(400, "No ID should be passed to the ME controller.");
 		}
 
-		$details = $this->get($this->auth->getUser());
+		$user = $this->auth->getUser();
+
+		if ($this->request->getMethod() === Request::PUT)
+		{
+			$user->update($this->request->getPostData());
+			$user->save();
+		}
+
+		$details = $this->get($user);
 		$details["settings"] = $this->auth->getToken()->getSettings();
 
 		$this->response->status(200);

@@ -196,6 +196,14 @@ final class Model_User extends Model
 	/**
 	 * @return string
 	 */
+	public function getLastName()
+	{
+		return $this->last_name;
+	}
+
+	/**
+	 * @return string
+	 */
 	public function getName()
 	{
 		return trim($this->first_name . " " . $this->last_name);
@@ -384,6 +392,10 @@ final class Model_User extends Model
 		{
 			$this->setDescription($data["bio"]);
 		}
+		if (!empty($data["first_name"]))
+		{
+			$this->setFirstName($data["first_name"]);
+		}
 		if (isset($data["interests"]))
 		{
 			if (is_array($data["interests"]))
@@ -394,6 +406,10 @@ final class Model_User extends Model
 			{
 				throw new HttpStatusException(400, "User interests is not an array.");
 			}
+		}
+		if (!empty($data["last_name"]))
+		{
+			$this->setLastName($data["last_name"]);
 		}
 	}
 }
