@@ -197,8 +197,9 @@ case "$1" in
 	"hotfix") hotfix ;;
 	"reloadDatabase") reloadDatabase ;;
 	"test")
+	    shift
 	    cd tests/
-	    ./run.sh
+	    ./run.sh $@
 	    cd ..
 	    ;;
 	*)

@@ -5,4 +5,3 @@ config.production.ini
 docs/_site/
 logs/
 !logs/README.md
-tests/phpunit.phar

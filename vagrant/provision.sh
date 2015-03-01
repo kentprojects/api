@@ -27,8 +27,6 @@ ln -s /usr/bin/nodejs /usr/bin/node
 # Remove an unnecessary packages.
 apt-get autoremove -y
 #
-wget https://github.com/kentprojects/scripts/raw/master/phpunit/phpunit.phar -O /vagrant/tests/phpunit.phar
-#
 # Build the development database.
 /vagrant/kentprojects.sh reloadDatabase
 #
