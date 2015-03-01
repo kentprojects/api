@@ -73,6 +73,8 @@ final class Intent_Leave_A_Group extends Intent
 		$students->remove($this->model->getUser());
 		$students->save();
 
+		// TODO: Remove the original intent to join too.
+
 		$acl = new ACL($this->model->getUser());
 		$acl->delete("group/" . $group->getId());
 		$acl->set("group", true, true, false, false);
