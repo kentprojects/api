@@ -36,6 +36,35 @@ function Question()
 }
 
 #
+# Internal function to deploy the develop branch.
+#
+# @return void
+#
+function circleCiDeployDevelop()
+{
+    ssh kentprojects@kentprojects.com <<'ENDSSH'
+cd /var/www/kentprojects-api-dev && sudo -u www-data git pull && \
+php database/update.php && \
+sudo service apache2 restart && \
+sudo service memcached restart
+ENDSSH
+}
+#
+# Internal function to deploy the master branch.
+#
+# @return void
+#
+function circleCiDeployMaster()
+{
+    ssh kentprojects@kentprojects.com <<'ENDSSH'
+cd /var/www/kentprojects-api && sudo -u www-data git pull && \
+php database/update.php && \
+sudo service apache2 restart && \
+sudo service memcached restart
+ENDSSH
+}
+
+#
 # Internal function for deploying the codebase.
 #
 # @return void
@@ -138,9 +167,35 @@ function hotfix()
 	fi
 }
 
+#
+# Internal function for (re)building the database.
+#
+# @return void
+#
+function reloadDatabase()
+{
+#   Build the development database.
+    mysql -u root -ppassword < /vagrant/vagrant/database.sql
+#   And it's structure.
+    php /vagrant/database/update.php
+#   And then import some sample data.
+    mysql -u root -ppassword kentprojects < /vagrant/tests/sample.sql
+}
+
 case "$1" in
+    "circleci")
+        case "$2" in
+            "deployDevelop") circleCiDeployDevelop ;;
+            "deployMaster") circleCiDeployMaster ;;
+            *)
+                printf "$FAIL Unknown CircleCi action"
+                exit 6
+                ;;
+        esac
+        ;;
 	"deploy") deploy ;;
 	"hotfix") hotfix ;;
+	"reloadDatabase") reloadDatabase ;;
 	"test")
 	    cd tests/
 	    ./run.sh
