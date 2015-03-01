@@ -145,6 +145,7 @@ final class Controller_Auth extends Controller
 			}
 			else
 			{
+				Log::debug($prefixDevCacheKey . $this->request->query("data"));
 				$attributes = Cache::getOnce($prefixDevCacheKey . $this->request->query("data"));
 				if (empty($attributes))
 				{
