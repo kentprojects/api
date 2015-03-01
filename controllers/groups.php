@@ -48,7 +48,9 @@ final class Controller_Groups extends Controller
 		$groups = $query->execute()->singlevals();
 		foreach ($groups as $k => $group_id)
 		{
-			$groups[$k] = Model_Group::getById($group_id);
+			$group = Model_Group::getById($group_id);
+			$group->getProject();
+			$groups[$k] = $group;
 		}
 
 		$this->response->status(200);
