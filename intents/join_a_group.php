@@ -91,6 +91,10 @@ final class Intent_Join_A_Group extends Intent
 		{
 			throw new HttpStatusException(404, "Group with `group_id` is not found.");
 		}
+		if ($group->hasProject())
+		{
+			throw new IntentException("This group already has a project and cannot be joined.");
+		}
 
 		$data = array_merge($data, array(
 			"group_id" => $group->getId()
