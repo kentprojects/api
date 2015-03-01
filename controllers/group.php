@@ -51,6 +51,7 @@ final class Controller_Group extends Controller
 			$groupStudentMap->add($this->auth->getUser());
 			$groupStudentMap->save();
 
+			$this->acl->set("group", false, true, false, true);
 			$this->acl->set("group/" . $group->getId(), false, true, true, true);
 			$this->acl->save();
 
