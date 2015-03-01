@@ -220,7 +220,7 @@ class Model_Group extends Model
 	public function hasProject()
 	{
 		$this->getProject();
-		return empty($this->project);
+		return !empty($this->project);
 	}
 
 	/**
