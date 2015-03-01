@@ -130,11 +130,14 @@ class AuthTest extends KentProjects_Controller_TestBase
 		$this->assertEquals(static::$applicationKey, $auth->getApplication()->getKey());
 	}
 
-	public function getGetUser()
+	public function testGetGetUser()
 	{
 		$request = $this->createSignedRequest(Request::GET, array(), "convener");
 		$response = new Response($request);
+		$userToken = $this->getUserForToken("convener");
+
 		$auth = new Auth($request, $response, Auth::USER);
-		$this->assertEmpty($auth->getUser());
+		$this->assertNotEmpty($auth->getUser());
+		$this->assertEqualsModel($userToken->getUser(), $auth->getUser());
 	}
 }

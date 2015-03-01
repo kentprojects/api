@@ -105,6 +105,7 @@ final class Controller_Auth extends Controller
 			$user->setEmail($authUser["username"] . "@kent.ac.uk");
 			$user->setRole($authUser["role"]);
 			$user->save();
+			$this->setNewUserValues($user);
 		}
 
 		throw $this->generateAuthUrl($url, $user);
@@ -310,7 +311,7 @@ final class Controller_Auth extends Controller
 	}
 
 	/**
-	 * Sets acls and other items for new users.
+	 * Sets the ACL and other items for new users.
 	 *
 	 * @param Model_User $user
 	 * @return void
