@@ -39,9 +39,9 @@ final class Controller_Me extends Controller
 
 		if ($this->request->getMethod() === Request::PUT)
 		{
+			Cache::delete(Cache::key("me") . $user->getId());
 			$user->update($this->request->getPostData());
 			$user->save();
-			Cache::delete(Cache::key("me") . $user->getId());
 		}
 
 		$details = $this->get($user);
@@ -114,7 +114,6 @@ final class Controller_Me extends Controller
 		$details = array(
 			"user" => null
 		);
-		$user->initYearMap();
 		if ($user->isStudent())
 		{
 			$details = array(
