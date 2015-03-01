@@ -64,6 +64,12 @@ final class Intent_Leave_A_Group extends Intent
 		}
 
 		$students = new GroupStudentMap($group);
+		// TODO: This should be a HAS and take an existing Model.
+		$student = $students->get($this->model->getUser()->getId());
+		if (empty($student))
+		{
+			throw new HttpStatusException(400, "You are not in this group.");
+		}
 		$students->remove($this->model->getUser());
 		$students->save();
 

@@ -115,6 +115,15 @@ abstract class ModelMap implements Countable, IteratorAggregate, JsonSerializabl
 	}
 
 	/**
+	 * @param int $modelId
+	 * @return Model
+	 */
+	public function get($modelId)
+	{
+		return array_key_exists($modelId, $this->data) ? $this->data[$modelId] : null;
+	}
+
+	/**
 	 * Useful so the ModelMap can partake in a foreach loop.
 	 *
 	 * @return array
