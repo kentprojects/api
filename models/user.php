@@ -128,6 +128,13 @@ final class Model_User extends Model
 		}
 	}
 
+	public function clearCaches()
+	{
+		parent::clearCaches();
+		Cache::delete($this->getCacheName("group"));
+		Cache::delete($this->getCacheName("project"));
+	}
+
 	/**
 	 * @return Model_Group
 	 */
@@ -352,8 +359,6 @@ final class Model_User extends Model
 			$this->updated = Date::format(Date::TIMESTAMP, time());
 		}
 		parent::save();
-		Cache::delete($this->getCacheName("group"));
-		Cache::delete($this->getCacheName("project"));
 	}
 
 	/**

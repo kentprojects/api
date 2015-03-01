@@ -109,6 +109,15 @@ abstract class Model implements JsonSerializable
 	}
 
 	/**
+	 * @throws CacheException
+	 * @return void
+	 */
+	public function clearCaches()
+	{
+		Cache::delete($this->getCacheName());
+	}
+
+	/**
 	 * @param string $append
 	 * @return string
 	 */
@@ -194,7 +203,7 @@ abstract class Model implements JsonSerializable
 	public function save()
 	{
 		$this->metadata->save(($this->getId() !== null) ? $this->getClassName() : null);
-		Cache::delete($this->getCacheName());
+		$this->clearCaches();
 	}
 
 	/**
