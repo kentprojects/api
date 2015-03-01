@@ -44,11 +44,6 @@ final class Controller_Me extends Controller
 		);
 		if ($user->isStudent())
 		{
-			$details = array(
-				"group" => null,
-				"project" => null,
-			);
-
 			$details["group"] = Model_Group::getByUser($user);
 			if (!empty($details["group"]))
 			{
