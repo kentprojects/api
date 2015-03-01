@@ -188,7 +188,7 @@ final class Intent_Join_A_Group extends Intent
 				$students->save();
 
 				$acl = new ACL($this->model->getUser());
-				$acl->set("group", false, true, false, true);
+				$acl->set("group", false, true, false, false);
 				$acl->set("group/" . $group->getId(), false, true, true, true);
 				$acl->save();
 
