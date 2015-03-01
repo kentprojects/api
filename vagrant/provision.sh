@@ -14,22 +14,23 @@ echo "mysql-server mysql-server/root_password password password" | debconf-set-s
 echo "mysql-server mysql-server/root_password_again password password" | debconf-set-selections
 # Install MySQL, Apache, Curl, Screen and PHP.
 apt-get install -y mysql-server apache2 curl screen && \
-apt-get install -y php5 php5-cli php5-curl php5-mysqlnd php5-json
+apt-get install -y php5 php5-cli php5-curl php5-mysqlnd php5-json && \
+apt-get install -y nodejs npm
 # If one of them failed, then abort.
 if [ $? -ne 0 ]; then
 	echo "Something went wrong trying to install the packages. ABORTING."
 	exit 1
 fi
 #
+ln -s /usr/bin/nodejs /usr/bin/node
+#
 # Remove an unnecessary packages.
 apt-get autoremove -y
 #
+wget https://github.com/kentprojects/scripts/raw/master/phpunit/phpunit.phar -O /vagrant/tests/phpunit.phar
+#
 # Build the development database.
-mysql -u root -ppassword < /vagrant/vagrant/database.sql
-#   And it's structure.
-php /vagrant/database/update.php
-#   And then import some sample data.
-mysql -u root -ppassword kentprojects < /vagrant/tests/sample.sql
+/vagrant/kentprojects.sh reloadDatabase
 #
 # Clear out the original Apache virtualhosts.
 rm /etc/apache2/sites-enabled/*
