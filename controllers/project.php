@@ -52,6 +52,7 @@ final class Controller_Project extends Controller
 			}
 
 			$project = new Model_Project(Model_Year::getCurrentYear(), $params["name"], $creator);
+			$project->setSupervisor($this->auth->getUser());
 			$project->save();
 
 			$this->response->status(201);

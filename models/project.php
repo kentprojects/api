@@ -246,12 +246,12 @@ class Model_Project extends Model
 		{
 			/** @var _Database_State $result */
 			$result = Database::prepare(
-				"INSERT INTO `Project` (`year`, `group_id`, `name`, `creator_id`, `created`)
-				 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)",
-				"iisi"
+				"INSERT INTO `Project` (`year`, `group_id`, `name`, `creator_id`, `supervisor_id`, `created`)
+				 VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
+				"iisii"
 			)->execute(
 				(string)$this->year, (!empty($this->group) ? $this->group->getId() : null), $this->name,
-				$this->creator->getId()
+				$this->creator->getId(), $this->supervisor->getId()
 			);
 			$this->id = $result->insert_id;
 			$this->created = $this->updated = Date::format(Date::TIMESTAMP, time());
@@ -268,11 +268,11 @@ class Model_Project extends Model
 			}
 			Database::prepare(
 				"UPDATE `Project`
-				 SET `year` = ?, `group_id` = ?, `name` = ?, `creator_id` = ?
+				 SET `year` = ?, `group_id` = ?, `name` = ?, `supervisor_id` = ?
 				 WHERE `project_id` = ?",
 				"iisii"
 			)->execute(
-				(string)$this->year, $group_id, $this->name, $this->creator->getId(),
+				(string)$this->year, $group_id, $this->name, $this->supervisor->getId(),
 				$this->id
 			);
 			$this->updated = Date::format(Date::TIMESTAMP, time());
@@ -296,6 +296,14 @@ class Model_Project extends Model
 	public function setGroup(Model_Group $group)
 	{
 		$this->group = $group;
+	}
+
+	public function setSupervisor(Model_User $supervisor)
+	{
+		/**
+		 * TODO: Validate this user is a registered supervisor of this year.
+		 */
+		$this->supervisor = $supervisor;
 	}
 
 	/**
