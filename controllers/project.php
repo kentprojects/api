@@ -41,16 +41,9 @@ final class Controller_Project extends Controller
 			 * Validate parameters.
 			 */
 			$params = $this->validateParams(array(
-				"year" => $this->request->post("year", false),
 				"name" => $this->request->post("name", false),
 				"creator" => $this->auth->getUser()->getId()
 			));
-
-			$year = Model_Year::getById($params["year"]);
-			if (empty($year))
-			{
-				throw new HttpStatusException(400, "Invalid year entered.");
-			}
 
 			$creator = Model_User::getById($params["creator"]);
 			if (empty($creator))
@@ -58,7 +51,7 @@ final class Controller_Project extends Controller
 				throw new HttpStatusException(400, "Invalid user id entered for the project's creator.");
 			}
 
-			$project = new Model_Project($year, $params["name"], $creator);
+			$project = new Model_Project(Model_Year::getCurrentYear(), $params["name"], $creator);
 			$project->save();
 
 			$this->response->status(201);
