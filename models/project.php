@@ -19,13 +19,12 @@ class Model_Project extends Model
 			return null;
 		}
 
-		$cacheKey = static::cacheName() . ".group." . $group->getId();
-		$id = Cache::get($cacheKey);
+		$id = Cache::get($group->getCacheName("project"));
 		if (empty($id))
 		{
 			$id = Database::prepare("SELECT `project_id` FROM `Project` WHERE `group_id` = ? AND `status` = 1", "i")
 				->execute($group->getId())->singleval();
-			!empty($id) && Cache::set($cacheKey, $id, Cache::HOUR);
+			!empty($id) && Cache::set($group->getCacheName("project"), $id, Cache::HOUR);
 		}
 		return !empty($id) ? static::getById($id) : null;
 	}

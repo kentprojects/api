@@ -217,6 +217,12 @@ class Model_Group extends Model
 		return $this->year;
 	}
 
+	public function hasProject()
+	{
+		$this->getProject();
+		return empty($this->project);
+	}
+
 	/**
 	 * @return array
 	 */

@@ -145,7 +145,6 @@ final class Intent_Join_A_Group extends Intent
 
 	/**
 	 * @param array $data
-	 * @throws HttpStatusException
 	 * @throws IntentException
 	 * @return void
 	 */
@@ -162,6 +161,10 @@ final class Intent_Join_A_Group extends Intent
 		if (empty($group))
 		{
 			throw new IntentException("Missing group.");
+		}
+		if ($group->hasProject())
+		{
+			throw new IntentException("This group already has a project and cannot be joined.");
 		}
 
 		$this->mergeData($data);
