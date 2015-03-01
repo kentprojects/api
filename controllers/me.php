@@ -41,7 +41,7 @@ final class Controller_Me extends Controller
 		{
 			$user->update($this->request->getPostData());
 			$user->save();
-			Cache::delete(Cache::getPrefix() . $this->cacheKeyPrefix . $user->getId());
+			Cache::delete(Cache::key("me") . $user->getId());
 		}
 
 		$details = $this->get($user);
@@ -94,14 +94,13 @@ final class Controller_Me extends Controller
 	 * @throws CacheException
 	 * @return array
 	 */
-	protected function get(Model_User $user)
+	protected function get(Model_User &$user)
 	{
-		$cacheKey = Cache::getPrefix() . $this->cacheKeyPrefix . $user->getId();
-		$details = Cache::get($cacheKey);
+		$details = Cache::get(Cache::key("me") . $user->getId());
 		if (empty($details))
 		{
 			$details = $this->getData($user);
-			Cache::set($cacheKey, $details, 10 * Cache::MINUTE);
+			Cache::set(Cache::key("me") . $user->getId(), $details, 10 * Cache::MINUTE);
 		}
 		return $details;
 	}
@@ -110,7 +109,7 @@ final class Controller_Me extends Controller
 	 * @param Model_User $user
 	 * @return array
 	 */
-	protected function getData(Model_User $user)
+	protected function getData(Model_User &$user)
 	{
 		$details = array(
 			"user" => null

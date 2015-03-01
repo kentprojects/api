@@ -137,6 +137,7 @@ final class Intent_Access_Year extends Intent
 					"year" => (string)Model_Year::getCurrentYear()
 				));
 				$years->save();
+				Cache::delete(Cache::key("me") . $intentAuthor->getId());
 
 				$mail->setBody(array(
 					"Hey {$intent_creator_name},\n\n",
