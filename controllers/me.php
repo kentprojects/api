@@ -39,7 +39,6 @@ final class Controller_Me extends Controller
 
 		if ($this->request->getMethod() === Request::PUT)
 		{
-			Cache::delete(Cache::key("me") . $user->getId());
 			$user->update($this->request->getPostData());
 			$user->save();
 		}
@@ -94,7 +93,7 @@ final class Controller_Me extends Controller
 	 * @throws CacheException
 	 * @return array
 	 */
-	protected function get(Model_User &$user)
+	protected function get(Model_User $user)
 	{
 		$details = Cache::get(Cache::key("me") . $user->getId());
 		if (empty($details))
@@ -109,7 +108,7 @@ final class Controller_Me extends Controller
 	 * @param Model_User $user
 	 * @return array
 	 */
-	protected function getData(Model_User &$user)
+	protected function getData(Model_User $user)
 	{
 		$details = array(
 			"user" => null

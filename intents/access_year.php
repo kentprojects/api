@@ -127,9 +127,6 @@ final class Intent_Access_Year extends Intent
 		switch ($this->state())
 		{
 			case static::STATE_OPEN:
-				/**
-				 * This is not the state you are looking for. Move along.
-				 */
 				return;
 			case static::STATE_ACCEPTED:
 				$years = new UserYearMap($intentAuthor);
@@ -137,7 +134,7 @@ final class Intent_Access_Year extends Intent
 					"year" => (string)Model_Year::getCurrentYear()
 				));
 				$years->save();
-				Cache::delete(Cache::key("me") . $intentAuthor->getId());
+				Cache::delete($intentAuthor->getCacheName());
 
 				$mail->setBody(array(
 					"Hey {$intent_creator_name},\n\n",
