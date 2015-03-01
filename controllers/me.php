@@ -10,6 +10,10 @@ final class Controller_Me extends Controller
 	 * @var string
 	 */
 	protected $authentication = Auth::USER;
+	/**
+	 * @var string
+	 */
+	protected $cacheKeyPrefix = "me.";
 
 	/**
 	 * /me
@@ -37,10 +41,12 @@ final class Controller_Me extends Controller
 		{
 			$user->update($this->request->getPostData());
 			$user->save();
+			Cache::delete(Cache::getPrefix() . $this->cacheKeyPrefix . $user->getId());
 		}
 
 		$details = $this->get($user);
 		$details["settings"] = $this->auth->getToken()->getSettings();
+		$details["user"] = $user;
 
 		$this->response->status(200);
 		$this->response->body($details);
@@ -90,7 +96,7 @@ final class Controller_Me extends Controller
 	 */
 	protected function get(Model_User $user)
 	{
-		$cacheKey = Cache::getPrefix() . "me." . $user->getId();
+		$cacheKey = Cache::getPrefix() . $this->cacheKeyPrefix . $user->getId();
 		$details = Cache::get($cacheKey);
 		if (empty($details))
 		{
@@ -106,14 +112,15 @@ final class Controller_Me extends Controller
 	 */
 	protected function getData(Model_User $user)
 	{
+		$details = array(
+			"user" => null
+		);
 		$user->initYearMap();
 		if ($user->isStudent())
 		{
 			$details = array(
 				"group" => null,
 				"project" => null,
-				"settings" => null,
-				"user" => $user
 			);
 
 			$details["group"] = Model_Group::getByUser($user);
@@ -121,12 +128,6 @@ final class Controller_Me extends Controller
 			{
 				$details["project"] = Model_Project::getByGroup($details["group"]);
 			}
-		}
-		else
-		{
-			$details = array(
-				"user" => $user
-			);
 		}
 		return $details;
 	}
