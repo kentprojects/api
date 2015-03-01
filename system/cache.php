@@ -101,6 +101,7 @@ final class Cache
 	 * If that item never existed in the cache, don't panic. You'll get a `false` back.
 	 *
 	 * @param string $key
+	 * [ @param string $key More keys ]
 	 * @throws CacheException
 	 * @return bool
 	 */
@@ -114,25 +115,28 @@ final class Cache
 			return false;
 		}
 
-		if (static::$memcached->delete($key) === true)
+		foreach (func_get_args() as $key)
 		{
-			return true;
-		}
+			if (static::$memcached->delete($key) === true)
+			{
+				return true;
+			}
 
-		$exception = new CacheException(static::$memcached->getResultMessage(), static::$memcached->getResultCode());
-		if ($exception->getCode() === Memcached::RES_NOTFOUND)
-		{
-			/**
-			 * If the actual error was a calm 'NOT FOUND', then relax.
-			 */
-			return false;
-		}
-		else
-		{
-			/**
-			 * Otherwise panic. Something big went down.
-			 */
-			throw $exception;
+			$exception = new CacheException(static::$memcached->getResultMessage(), static::$memcached->getResultCode());
+			if ($exception->getCode() === Memcached::RES_NOTFOUND)
+			{
+				/**
+				 * If the actual error was a calm 'NOT FOUND', then relax.
+				 */
+				return false;
+			}
+			else
+			{
+				/**
+				 * Otherwise panic. Something big went down.
+				 */
+				throw $exception;
+			}
 		}
 	}
 

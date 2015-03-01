@@ -109,11 +109,12 @@ abstract class Model implements JsonSerializable
 	}
 
 	/**
+	 * @param string $append
 	 * @return string
 	 */
-	public function getCacheName()
+	public function getCacheName($append = null)
 	{
-		return static::cacheName() . "." . $this->getId();
+		return static::cacheName() . "." . $this->getId() . (!empty($append) ? "." . $append : "");
 	}
 
 	/**

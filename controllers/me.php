@@ -10,10 +10,6 @@ final class Controller_Me extends Controller
 	 * @var string
 	 */
 	protected $authentication = Auth::USER;
-	/**
-	 * @var string
-	 */
-	protected $cacheKeyPrefix = "me.";
 
 	/**
 	 * /me
@@ -43,9 +39,23 @@ final class Controller_Me extends Controller
 			$user->save();
 		}
 
-		$details = $this->get($user);
+		$details = array(
+			"user" => $user
+		);
+		if ($user->isStudent())
+		{
+			$details = array(
+				"group" => null,
+				"project" => null,
+			);
+
+			$details["group"] = Model_Group::getByUser($user);
+			if (!empty($details["group"]))
+			{
+				$details["project"] = Model_Project::getByGroup($details["group"]);
+			}
+		}
 		$details["settings"] = $this->auth->getToken()->getSettings();
-		$details["user"] = $user;
 
 		$this->response->status(200);
 		$this->response->body($details);
@@ -86,46 +96,5 @@ final class Controller_Me extends Controller
 
 		$this->response->status(200);
 		$this->response->body($token->getSettings());
-	}
-
-	/**
-	 * @param Model_User $user
-	 * @throws CacheException
-	 * @return array
-	 */
-	protected function get(Model_User $user)
-	{
-		$details = Cache::get(Cache::key("me") . $user->getId());
-		if (empty($details))
-		{
-			$details = $this->getData($user);
-			Cache::set(Cache::key("me") . $user->getId(), $details, 10 * Cache::MINUTE);
-		}
-		return $details;
-	}
-
-	/**
-	 * @param Model_User $user
-	 * @return array
-	 */
-	protected function getData(Model_User $user)
-	{
-		$details = array(
-			"user" => null
-		);
-		if ($user->isStudent())
-		{
-			$details = array(
-				"group" => null,
-				"project" => null,
-			);
-
-			$details["group"] = Model_Group::getByUser($user);
-			if (!empty($details["group"]))
-			{
-				$details["project"] = Model_Project::getByGroup($details["group"]);
-			}
-		}
-		return $details;
 	}
 }

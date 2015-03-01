@@ -269,7 +269,6 @@ final class Model_User extends Model
 				"role" => $this->role,
 				"years" => !empty($this->years) ? $this->years->jsonSerialize() : array()
 			),
-			(!empty($this->groups) ? array("groups" => $this->groups) : array()),
 			(!empty($this->currentGroup) ? array("group" => $this->currentGroup) : array()),
 			array(
 				"bio" => $this->getDescription(),
@@ -353,6 +352,8 @@ final class Model_User extends Model
 			$this->updated = Date::format(Date::TIMESTAMP, time());
 		}
 		parent::save();
+		Cache::delete($this->getCacheName("group"));
+		Cache::delete($this->getCacheName("project"));
 	}
 
 	/**

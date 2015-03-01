@@ -52,13 +52,12 @@ class Model_Group extends Model
 		{
 			return null;
 		}
-		$cacheKey = static::cacheName() . ".user." . $user->getId();
-		$id = Cache::get($cacheKey);
+		$id = Cache::get($user->getCacheName("group"));
 		if (empty($id))
 		{
 			$id = Database::prepare("SELECT `group_id` FROM `Group_Student_Map` WHERE `user_id` = ?", "i")
 				->execute($user->getId())->singleval();
-			!empty($id) && Cache::set($cacheKey, $id, Cache::HOUR);
+			!empty($id) && Cache::set($user->getCacheName("group"), $id, Cache::HOUR);
 		}
 		return !empty($id) ? static::getById($id) : null;
 	}
@@ -275,6 +274,7 @@ class Model_Group extends Model
 			$this->updated = Date::format(Date::TIMESTAMP, time());
 		}
 		parent::save();
+		Cache::delete($this->getCacheName("project"));
 	}
 
 	/**
