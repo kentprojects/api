@@ -303,6 +303,15 @@ final class Model_User extends Model
 	}
 
 	/**
+	 * Clear the user's `/me` response.
+	 * @return void
+	 */
+	public function refreshMeResponse()
+	{
+		Cache::delete(Cache::key("me") . $this->getId());
+	}
+
+	/**
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */

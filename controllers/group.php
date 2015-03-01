@@ -54,6 +54,8 @@ final class Controller_Group extends Controller
 			$this->acl->set("group/" . $group->getId(), false, true, true, true);
 			$this->acl->save();
 
+			$this->auth->getUser()->refreshMeResponse();
+
 			$this->response->status(201);
 			$this->response->body($group);
 
