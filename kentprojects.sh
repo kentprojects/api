@@ -194,8 +194,7 @@ ENDSQL
 function reloadLive()
 {
     ssh kentprojects@kentprojects.com <<'ENDSSH'
-sudo service apache2 restart && \
-sudo service memcached restart
+sudo service apache2 restart && sudo service memcached restart
 ENDSSH
 }
 
