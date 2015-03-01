@@ -186,6 +186,12 @@ final class Intent_Join_A_Group extends Intent
 				$students = new GroupStudentMap($group);
 				$students->add($this->model->getUser());
 				$students->save();
+
+				$acl = new ACL($this->model->getUser());
+				$acl->set("group", false, true, false, true);
+				$acl->set("group/" . $group->getId(), false, true, true, true);
+				$acl->save();
+
 				$mail->setBody(array(
 					"Hey {$intent_creator_name},\n\n",
 					"{$group_creator_name} was a total lad and allowed you to join '{$group_name}'.\n",
