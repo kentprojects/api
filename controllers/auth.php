@@ -24,6 +24,13 @@ final class Controller_Auth extends Controller
 	{
 		$this->validateMethods(Request::POST);
 
+		if ($this->auth->getApplication() === null)
+		{
+			throw new HttpStatusException(
+				400, "Missing application. You must authorise as an application to confirm authentication."
+			);
+		}
+
 		if ($this->request->post("code") === null)
 		{
 			throw new HttpStatusException(400, "Missing state code.");
