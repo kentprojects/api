@@ -77,5 +77,7 @@ final class Intent_Leave_A_Group extends Intent
 		$acl->delete("group/" . $group->getId());
 		$acl->set("group", true, true, false, false);
 		$acl->save();
+
+		$this->model->getUser()->refreshMeResponse();
 	}
 }
