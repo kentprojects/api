@@ -21,6 +21,6 @@ final class KentProjects
 	 */
 	public static function ACL($entity)
 	{
-		return empty(static::$acl) ? array() : static::$acl->checkMatch($entity);
+		return empty(static::$acl) ? array() : static::$acl->get($entity);
 	}
 }

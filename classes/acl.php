@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-final class ACL
+final class ACL implements Countable
 {
 	const CREATE = "acl:create";
 	const READ = "acl:read";
@@ -31,21 +31,32 @@ final class ACL
 	 * @param string $entity
 	 * @return array
 	 */
-	public function checkMatch($entity)
+	public function get($entity)
 	{
 		if (empty($this->user))
 		{
 			return array();
 		}
 
+		$values = static::$template;
+
+		if (empty($this->acl))
+		{
+			return $values;
+		}
+
 		$range = explode("/", $entity);
 		$rangeString = "";
-		$values = static::$template;
 
 		foreach ($range as $i => $piece)
 		{
 			$rangeString .= ($i == 0 ? "" : "/") . $piece;
-			$values = array_merge($values, $this->checkExactMatch($rangeString));
+			$values = array_merge($values, $this->checkMatch($rangeString));
+		}
+
+		foreach ($values as $key => $value)
+		{
+			$values[$key] = boolval($value);
 		}
 
 		return $values;
@@ -55,7 +66,7 @@ final class ACL
 	 * @param string $entry
 	 * @return array
 	 */
-	protected function checkExactMatch($entry)
+	protected function checkMatch($entry)
 	{
 		foreach ($this->acl as $entity => $acl)
 		{
@@ -65,6 +76,14 @@ final class ACL
 			}
 		}
 		return array();
+	}
+
+	/**
+	 * @return int
+	 */
+	public function count()
+	{
+		return empty($this->acl) ? 0 : count($this->acl);
 	}
 
 	public function delete($entity)
@@ -172,9 +191,8 @@ final class ACL
 		}
 
 		$action = str_replace("acl:", "", $action);
-		$control = $this->checkMatch(strtolower($entity));
-		Log::debug($entity, $action, $control);
+		$control = $this->get(strtolower($entity));
 
-		return array_key_exists($action, $control) && ($control[$action] == 1);
+		return array_key_exists($action, $control) && ($control[$action] === true);
 	}
 }
