@@ -41,17 +41,10 @@ final class Controller_Group extends Controller
 			 * Validate parameters.
 			 */
 			$params = $this->validateParams(array(
-				"year" => $this->request->post("year", false),
 				"name" => $this->request->post("name", false)
 			));
 
-			$year = Model_Year::getById($params["year"]);
-			if (empty($year))
-			{
-				throw new HttpStatusException(400, "Invalid year entered.");
-			}
-
-			$group = new Model_Group($year, $params["name"], $this->auth->getUser());
+			$group = new Model_Group(Model_Year::getCurrentYear(), $params["name"], $this->auth->getUser());
 			$group->save();
 
 			$this->response->status(201);
