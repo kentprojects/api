@@ -172,19 +172,6 @@ function hotfix()
 #
 # @return void
 #
-function reloadLive()
-{
-    ssh kentprojects@kentprojects.com <<'ENDSSH'
-sudo service apache2 restart && \
-sudo service memcached restart
-ENDSSH
-}
-
-#
-# Internal function for (re)building the database.
-#
-# @return void
-#
 function reloadDatabase()
 {
 #   Build the development database.
@@ -197,6 +184,19 @@ ENDSQL
     php /vagrant/database/update.php
 #   And then import some sample data.
     mysql -u root -ppassword kentprojects < /vagrant/tests/sample.sql
+}
+
+#
+# Internal function for (re)building the database.
+#
+# @return void
+#
+function reloadLive()
+{
+    ssh kentprojects@kentprojects.com <<'ENDSSH'
+sudo service apache2 restart && \
+sudo service memcached restart
+ENDSSH
 }
 
 case "$1" in
@@ -212,8 +212,8 @@ case "$1" in
         ;;
 	"deploy") deploy ;;
 	"hotfix") hotfix ;;
-	"reloadCache") reloadCache ;;
 	"reloadDatabase") reloadDatabase ;;
+	"reloadLive") reloadLive ;;
 	"test")
 	    shift
 	    cd tests/
