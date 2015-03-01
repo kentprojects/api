@@ -175,7 +175,11 @@ function hotfix()
 function reloadDatabase()
 {
 #   Build the development database.
-    mysql -u root -ppassword < /vagrant/vagrant/database.sql
+    mysql -u root -ppassword <<'ENDSQL'
+DROP DATABASE IF EXISTS `kentprojects`;
+CREATE DATABASE `kentprojects` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+GRANT ALL PRIVILEGES ON `kentprojects`.* TO 'kentprojects'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION;
+ENDSQL
 #   And it's structure.
     php /vagrant/database/update.php
 #   And then import some sample data.
