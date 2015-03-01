@@ -117,6 +117,18 @@ final class Model_User extends Model
 	public $years;
 
 	/**
+	 * @constructor
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		if ($this->getId() !== null)
+		{
+			$this->initYearMap();
+		}
+	}
+
+	/**
 	 * @return Model_Group
 	 */
 	public function getCurrentGroup()
