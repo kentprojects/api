@@ -92,6 +92,15 @@ set_error_handler(
 );
 
 /**
+ * @param string $key
+ * @param string $value
+ * @return void
+ */
+function addStaticHeader($key, $value)
+{
+}
+
+/**
  * Returns the first non-empty argument or NULL.
  *
  * @param mixed
