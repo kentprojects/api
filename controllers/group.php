@@ -47,6 +47,13 @@ final class Controller_Group extends Controller
 			$group = new Model_Group(Model_Year::getCurrentYear(), $params["name"], $this->auth->getUser());
 			$group->save();
 
+			$groupStudentMap = new GroupStudentMap($group);
+			$groupStudentMap->add($this->auth->getUser());
+			$groupStudentMap->save();
+
+			$this->acl->set("group/" . $group->getId(), false, true, true, true);
+			$this->acl->save();
+
 			$this->response->status(201);
 			$this->response->body($group);
 
