@@ -247,8 +247,8 @@ class Model_Project extends Model
 			/** @var _Database_State $result */
 			$result = Database::prepare(
 				"INSERT INTO `Project` (`year`, `group_id`, `name`, `creator_id`, `created`)
-				 VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
-				"iisii"
+				 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)",
+				"iisi"
 			)->execute(
 				(string)$this->year, (!empty($this->group) ? $this->group->getId() : null), $this->name,
 				$this->creator->getId()
