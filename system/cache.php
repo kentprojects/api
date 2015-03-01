@@ -290,7 +290,7 @@ final class Cache
 	}
 }
 
-if (config("cache", "use") === "true")
+if (config("cache", "use") == true)
 {
 	$exit = 1;
 	$output = array();
