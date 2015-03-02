@@ -55,7 +55,9 @@ final class DatabaseException extends Exception
 /**
  * Class FormException
  */
-final class FormException extends Exception {}
+class FormException extends Exception
+{
+}
 
 /**
  * Class HttpRedirectException
@@ -114,14 +116,18 @@ class HttpStatusException extends Exception
 		$this->status_message = getHttpStatusForCode($code);
 
 		if (empty($this->status_message))
+		{
 			trigger_error(
 				"Bad status code used in HttpStatusException (" . $code . ") for: " . $message .
 				(!empty($previous) ? " with exception " . (string)$previous : ""),
 				E_USER_WARNING
 			);
+		}
 
 		if (empty($message))
+		{
 			$message = $this->status_message;
+		}
 
 		parent::__construct($message, $code, $previous);
 	}
@@ -214,4 +220,13 @@ final class PHPException extends Exception
 /**
  * Class RequestException
  */
-final class RequestException extends Exception {}
+final class RequestException extends Exception
+{
+}
+
+/**
+ * Class ValidationException
+ */
+final class ValidationException extends FormException
+{
+}
