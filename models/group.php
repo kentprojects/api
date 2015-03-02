@@ -12,8 +12,10 @@ class Model_Group extends Model
 	 */
 	public static function delete(Model_Group $group)
 	{
+		$students = $group->getStudents();
 		Database::prepare("DELETE FROM `Group` WHERE `group_id` = ?", "i")->execute($group->getId());
 		$group->clearCaches();
+		$students->clearCaches();
 	}
 
 	/**

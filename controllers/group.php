@@ -106,7 +106,8 @@ final class Controller_Group extends Controller
 				"message" => "You do not have permission to delete this group."
 			));
 			Model_Group::delete($group);
-			throw new HttpStatusException(501, "Deleting a group is coming soon.");
+			$this->response->status(204);
+			return;
 		}
 		else
 		{
