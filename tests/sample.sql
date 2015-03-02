@@ -68,11 +68,6 @@ ON DUPLICATE KEY UPDATE `group_id` = `group_id`, `year` = VALUES(`year`), `name`
 	`creator_id` = VALUES(`creator_id`), `supervisor_id` = VALUES(`supervisor_id`),
 	`created` = VALUES(`created`);
 
-INSERT INTO `Project_Supervisor_Map` (`project_id`, `user_id`)
-VALUES
-	(1, 2)
-ON DUPLICATE KEY UPDATE `project_id` = `project_id`, `user_id` = `user_id`;
-
 INSERT INTO `Metadata` (`root`, `key`, `value`) VALUES
 	('Model/Application/1', 'contact_email', 'developers@kentprojects.com'),
 	('Model/Application/2', 'contact_email', 'developers@kentprojects.com'),
@@ -93,8 +88,8 @@ INSERT INTO `ACL` (`user_id`, `entity`, `read`)
 INSERT INTO `ACL` (`user_id`, `entity`, `read`)
 	SELECT `user_id`, 'project', 1 FROM `User`;
 # Everyone can read user profiles.
-INSERT INTO `ACL` (`user_id`, `entity`, `read`)
-	SELECT `user_id`, 'user', 1 FROM `User`;
+INSERT INTO `ACL` (`user_id`, `entity`, `read`, `update`)
+	SELECT `user_id`, 'user', 1, 1 FROM `User`;
 
 # The convener can do everything.
 INSERT INTO `ACL` (`user_id`, `entity`, `create`, `read`, `update`, `delete`)
@@ -103,5 +98,22 @@ VALUES
 	(1, 'group', 1, 1, 1, 1),
 	(1, 'project', 1, 1, 1, 1),
 	(1, 'user', 1, 1, 1, 1)
+ON DUPLICATE KEY UPDATE `create` = VALUES(`create`), `read` = VALUES(`read`), `update` = VALUES(`update`),
+	`delete` = VALUES(`delete`);
+
+# Students in their groups.
+INSERT INTO `ACL` (`user_id`, `entity`, `create`, `read`, `update`, `delete`)
+	SELECT `user_id`, CONCAT('group/', `group_id`), 0, 1, 1, 0 FROM `Group_Student_Map`
+ON DUPLICATE KEY UPDATE `create` = VALUES(`create`), `read` = VALUES(`read`), `update` = VALUES(`update`),
+	`delete` = VALUES(`delete`);
+
+# Students who created groups.
+INSERT INTO `ACL` (`user_id`, `entity`, `delete`)
+	SELECT `creator_id`, CONCAT('group/', `group_id`), 1 FROM `Group`
+ON DUPLICATE KEY UPDATE `delete` = VALUES(`delete`);
+
+# Supervisors with their projects.
+INSERT INTO `ACL` (`user_id`, `entity`, `create`, `read`, `update`, `delete`)
+	SELECT `supervisor_id`, CONCAT('project/', `project_id`), 1, 1, 1, 1 FROM `Project`
 ON DUPLICATE KEY UPDATE `create` = VALUES(`create`), `read` = VALUES(`read`), `update` = VALUES(`update`),
 	`delete` = VALUES(`delete`);
