@@ -238,7 +238,7 @@ class Model_Project extends Model
 				"description" => $this->getDescription(),
 				"creator" => $this->creator->render($request, $response, $acl, true),
 				"supervisor" => $this->supervisor->render($request, $response, $acl, true),
-				"permissions" => $acl->get(str_replace("Model/", "", $this->getClassName())),
+				"permissions" => $acl->get($this->getEntityName()),
 				"created" => $this->created,
 				"updated" => $this->updated
 			)

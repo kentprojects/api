@@ -149,6 +149,14 @@ abstract class Model
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getEntityName()
+	{
+		return strtolower(str_replace("Model_", "", get_called_class()) . "/" . $this->getId());
+	}
+
+	/**
 	 * Get the ID of a Model.
 	 *
 	 * @return int|string

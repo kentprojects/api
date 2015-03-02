@@ -274,7 +274,7 @@ final class Model_User extends Model
 		}
 
 		$data = array_merge($data, array(
-			"permissions" => $acl->get(str_replace("Model/", "", $this->getClassName())),
+			"permissions" => $acl->get($this->getEntityName()),
 			"created" => $this->created,
 			"last_login" => $this->lastlogin,
 			"updated" => $this->updated

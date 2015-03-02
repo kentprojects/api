@@ -298,7 +298,7 @@ class Model_Group extends Model
 
 		$data = array_merge($data, array(
 			"creator" => $this->creator->render($request, $response, $acl, true),
-			"permissions" => $acl->get(str_replace("Model/", "", $this->getClassName())),
+			"permissions" => $acl->get($this->getEntityName()),
 			"created" => $this->created,
 			"updated" => $this->updated
 		));

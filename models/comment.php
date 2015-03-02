@@ -152,6 +152,7 @@ final class Model_Comment extends Model
 			array(
 				"comment" => $this->comment,
 				"author" => $this->user->render($request, $response, $acl, true),
+				"permissions" => $acl->get($this->getEntityName()),
 				"created" => $this->created
 			)
 		));
