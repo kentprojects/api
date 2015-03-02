@@ -151,6 +151,7 @@ class Model_Group extends Model
 
 		parent::clearCaches();
 		$this->students->clearCaches();
+		Cache::delete($this->getCacheName("project"));
 	}
 
 	/**
