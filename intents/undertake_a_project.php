@@ -151,6 +151,34 @@ final class Intent_Undertake_A_Project extends Intent
 	}
 
 	/**
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
+	 * @throws HttpStatusException
+	 * @return array
+	 */
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
+	{
+		$group = $this->model->getUser()->getGroup();
+		if (empty($group))
+		{
+			throw new HttpStatusException(500, "Failed to fetch group for this intent.");
+		}
+
+		$project = Model_Project::getById($this->data->project_id);
+		if (empty($project))
+		{
+			throw new HttpStatusException(500, "Failed to fetch project for this intent.");
+		}
+
+		$rendered = parent::render($request, $response, $acl, $internal);
+		$rendered["group"] = $group->render($request, $response, $acl, true);
+		$rendered["project"] = $project->render($request, $response, $acl, true);
+		return $rendered;
+	}
+
+	/**
 	 * @param array $data
 	 * @throws HttpStatusException
 	 * @throws IntentException

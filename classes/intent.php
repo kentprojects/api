@@ -211,13 +211,21 @@ abstract class Intent
 	 * @param Request_Internal $request
 	 * @param Response $response
 	 * @param ACL $acl
+	 * @param boolean $internal
+	 * @throws HttpStatusException
 	 * @return array
 	 */
-	public function render(Request_Internal $request, Response &$response, ACL $acl)
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
+		$user = $this->model->getUser();
+		if (empty($user))
+		{
+			throw new HttpStatusException(500, "Failed to get user for this intent.");
+		}
+
 		return array(
 			"id" => $this->model->getId(),
-			"user" => $this->model->getUser(),
+			"user" => $user->render($request, $response, $acl, true),
 			"handler" => $this->getHandlerName(),
 			"data" => $this->data->render(),
 			"state" => $this->model->getCleanState()
