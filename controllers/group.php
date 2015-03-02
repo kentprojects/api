@@ -106,6 +106,10 @@ final class Controller_Group extends Controller
 				"message" => "You do not have permission to delete this group."
 			));
 			Model_Group::delete($group);
+
+			$this->acl->set("group", true, true, false, false);
+			$this->acl->delete("group/" . $group->getId());
+
 			$this->response->status(204);
 			return;
 		}
@@ -123,104 +127,5 @@ final class Controller_Group extends Controller
 		 */
 		$this->response->status(200);
 		$this->response->body($group);
-	}
-
-	/**
-	 * /group/student
-	 * /group/:id/student
-	 *
-	 * @throws HttpStatusException
-	 * @return void
-	 */
-	public function action_student()
-	{
-		$this->validateMethods(Request::POST, Request::DELETE);
-
-		if ($this->request->param("id") === null)
-		{
-			throw new HttpStatusException(400, "No group id provided.");
-		}
-
-		$group = Model_Group::getById($this->request->param("id"));
-		if (empty($group))
-		{
-			throw new HttpStatusException(404, "Group not found.");
-		}
-
-		/**
-		 * Validate that this user is allowed to update this group's students.
-		 */
-		$this->validateUser(array(
-			"entity" => "group/" . $group->getId(),
-			"action" => ACL::UPDATE,
-			"message" => "You do not have permission to update this groups' students."
-		));
-
-		if ($this->request->getMethod() === Request::POST)
-		{
-			/**
-			 * POST /group/:id/student
-			 * Adding a student to a group.
-			 */
-			throw new HttpStatusException(501, "Adding a student to a group is coming soon.");
-		}
-		elseif ($this->request->getMethod() === Request::DELETE)
-		{
-			/**
-			 * DELETE /group/:id/student
-			 * Removing a student from a group.
-			 */
-			throw new HttpStatusException(501, "Removing a student from a group is coming soon.");
-		}
-	}
-
-	/**
-	 * /group/supervisor
-	 * /group/:id/supervisor
-	 *
-	 * @throws HttpStatusException
-	 * @return void
-	 */
-	public function action_supervisor()
-	{
-		$this->validateMethods(Request::POST, Request::DELETE);
-
-		if ($this->request->param("id") === null)
-		{
-			throw new HttpStatusException(400, "No group id provided.");
-		}
-
-		$group = Model_Group::getById($this->request->param("id"));
-		if (empty($group))
-		{
-			throw new HttpStatusException(404, "Group not found.");
-		}
-
-		/**
-		 * Validate that this user is a member of staff and is allowed to update this group's supervisors.
-		 */
-		$this->validateUser(array(
-			"entity" => "group/" . $group->getId(),
-			"action" => ACL::UPDATE,
-			"message" => "You do not have permission to update this groups' supervisors.",
-			"role" => "staff"
-		));
-
-		if ($this->request->getMethod() === Request::POST)
-		{
-			/**
-			 * POST /group/:id/supervisor
-			 * Adding a supervisor to a group.
-			 */
-			throw new HttpStatusException(501, "Adding a supervisor to a group is coming soon.");
-		}
-		elseif ($this->request->getMethod() === Request::DELETE)
-		{
-			/**
-			 * DELETE /group/:id/supervisor
-			 * Removing a supervisor from a group.
-			 */
-			throw new HttpStatusException(501, "Removing a supervisor from a group is coming soon.");
-		}
 	}
 }
