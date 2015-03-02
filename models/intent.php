@@ -15,7 +15,7 @@ final class Model_Intent extends Model
 	 */
 	public static function deleteByHash($handler, $hash)
 	{
-		Database::prepare("DELETE FROM `Intent` WHERE `handler` = ? AND `hash` = ?", "sis")
+		Database::prepare("DELETE FROM `Intent` WHERE `handler` = ? AND `hash` = ?", "ss")
 			->execute($handler, $hash);
 	}
 
