@@ -95,7 +95,7 @@ final class Intent_Release_Project extends Intent
 		));
 
 		$group->clearCaches();
-
-
+		$project->clearCaches();
+		$user->clearCaches();
 	}
 }
