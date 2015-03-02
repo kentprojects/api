@@ -304,21 +304,16 @@ class Model_Project extends Model
 		}
 		else
 		{
-			if (!empty($this->group))
-			{
-				$group_id = ($this->group instanceof Model_Group) ? $this->group->getId() : $this->group;
-			}
-			else
-			{
-				$group_id = null;
-			}
+			$this->getGroup();
+			$this->getSupervisor();
+
 			Database::prepare(
 				"UPDATE `Project`
 				 SET `year` = ?, `group_id` = ?, `name` = ?, `supervisor_id` = ?
 				 WHERE `project_id` = ?",
 				"iisii"
 			)->execute(
-				(string)$this->year, $group_id, $this->name, $this->supervisor->getId(),
+				(string)$this->year, !empty($this->group) ? $group_id : null, $this->name, $this->supervisor->getId(),
 				$this->id
 			);
 			$this->updated = Date::format(Date::TIMESTAMP, time());

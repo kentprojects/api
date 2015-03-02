@@ -116,3 +116,8 @@ INSERT INTO `ACL` (`user_id`, `entity`, `create`, `read`, `update`, `delete`)
 	SELECT `supervisor_id`, CONCAT('project/', `project_id`), 1, 1, 1, 1 FROM `Project`
 ON DUPLICATE KEY UPDATE `create` = VALUES(`create`), `read` = VALUES(`read`), `update` = VALUES(`update`),
 	`delete` = VALUES(`delete`);
+
+# Supervisors in general
+INSERT INTO `ACL` (`user_id`, `entity`, `create`)
+	SELECT `user_id`, 'project', 1 FROM `User_Year_Map` WHERE `role_supervisor` = TRUE
+ON DUPLICATE KEY UPDATE `create` = VALUES(`create`);
