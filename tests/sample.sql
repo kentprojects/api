@@ -22,8 +22,7 @@ VALUES
 	(2, 'J.S.Crawford@kent.ac.uk', 'John', 'Crawford', 'staff', '2014-11-21 21:31:46', '2014-12-16 16:47:03'),
 	(3, 'mh471@kent.ac.uk', 'Matt', 'House', 'student', '2014-11-21 21:31:52', '2014-12-16 16:47:06'),
 	(4, 'jsd24@kent.ac.uk', 'James', 'Dryden', 'student', '2014-11-27 19:19:35', '2014-12-16 16:47:09'),
-	(5, 'mjw59@kent.ac.uk', 'Matthew', 'Weeks', 'student', '2014-11-27 20:12:15', '2014-12-16 16:47:09'),
-	(6, 'supervisor2@kent.ac.uk', 'Stuart', 'Supervisor', 'staff', '2014-11-28 11:10:05', '2014-12-16 16:47:14')
+	(5, 'supervisor2@kent.ac.uk', 'Stuart', 'Supervisor', 'staff', '2014-11-28 11:10:05', '2014-12-16 16:47:14')
 ON DUPLICATE KEY UPDATE `user_id` = `user_id`, `email` = `email`, `first_name` = VALUES(`first_name`),
 	`last_name` = VALUES(`last_name`), `role` = `role`, `created` = `created`, `updated` = `updated`;
 
@@ -41,8 +40,7 @@ VALUES
 	(2014, 2, FALSE, TRUE, TRUE),
 	(2014, 3, FALSE, FALSE, FALSE),
 	(2014, 4, FALSE, FALSE, FALSE),
-	(2014, 5, FALSE, FALSE, FALSE),
-	(2014, 6, FALSE, TRUE, TRUE)
+	(2014, 5, FALSE, TRUE, TRUE)
 ON DUPLICATE KEY UPDATE `year` = `year`, `user_id` = `user_id`, `role_convener` = VALUES(`role_convener`),
 	`role_supervisor` = VALUES(`role_supervisor`), `role_secondmarker` = VALUES(`role_secondmarker`);
 
@@ -54,7 +52,7 @@ ON DUPLICATE KEY UPDATE `group_id` = `group_id`, `year` = VALUES(`year`), `name`
 
 INSERT INTO `Group_Student_Map` (`group_id`, `user_id`)
 VALUES
-	(1, 3), (1, 4), (1, 5)
+	(1, 3), (1, 4)
 ON DUPLICATE KEY UPDATE `group_id` = `group_id`, `user_id` = `user_id`;
 
 INSERT INTO `Project` (`project_id`, `year`, `group_id`, `name`, `creator_id`, `supervisor_id`, `created`)
@@ -74,6 +72,10 @@ INSERT INTO `Metadata` (`root`, `key`, `value`) VALUES
 	('Model/User/2', 'interests', 'make tea'),
 	('Model/User/2', 'interests', 'refresh tea')
 ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);
+
+#
+# From here on, we run queries to infer statements.
+#
 
 # Everyone can read and update themselves.
 INSERT INTO `ACL` (`user_id`, `entity`, `read`, `update`)
