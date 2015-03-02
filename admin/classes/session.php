@@ -41,7 +41,7 @@ class Session
 	public static function get($key, $default = null)
 	{
 		return (static::has($key))
-			? $_SESSION[(string)$key]
+			? unserialize($_SESSION[(string)$key])
 			: $default;
 	}
 
@@ -79,7 +79,7 @@ class Session
 	 */
 	public static function set($key, $value)
 	{
-		$_SESSION[(string)$key] = $value;
+		$_SESSION[(string)$key] = serialize($value);
 	}
 }
 session_name("session");

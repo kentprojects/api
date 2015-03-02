@@ -96,9 +96,12 @@ abstract class View
 	 */
 	public function renderChildren()
 	{
-		foreach ($this->children as $child)
+		if (count($this->children) > 0)
 		{
-			echo $child;
+			foreach ($this->children as $child)
+			{
+				echo $child;
+			}
 		}
 	}
 

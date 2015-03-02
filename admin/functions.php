@@ -5,6 +5,7 @@
  * @link: http://kentprojects.com
  */
 define("ADMIN_PATH", __DIR__);
+require_once ADMIN_PATH . "/exceptions.php";
 
 /**
  * Register the autoloader so we can call on classes when we feel like it!

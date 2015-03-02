@@ -7,6 +7,8 @@
 class Admin_Response extends Response
 {
 	/**
+	 * Set the body with the contents of a view.
+	 *
 	 * @param View $view
 	 * @throws Exception
 	 * @return void

@@ -92,9 +92,7 @@ class Admin_Request extends Request_Internal
 
 			/** @var Admin_Controller_Error $controller */
 			$controller = new Admin_Controller_Error($this, $response);
-			$controller->before();
 			$controller->action($e);
-			$controller->after();
 
 			Log::error($e);
 		}

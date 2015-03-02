@@ -58,14 +58,17 @@ class HtmlElement extends View
 		echo '<', $this->tag;
 		if (count($this->attributes) > 0)
 		{
-			// TODO THIS
+			echo ' ';
+			foreach ($this->attributes as $name => $attribute)
+			{
+				echo ' ' . $name . '="' . $attribute . '"';
+			}
 		}
-
 		echo($this->countChildren() === 0 ? ' ' : ''), '/>';
 	}
 
 	public function renderBottom()
 	{
-
+		echo '</', $this->tag, '>';
 	}
 }
