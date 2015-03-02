@@ -27,6 +27,8 @@ apt-get autoremove -y
 # Build the development database.
 /vagrant/kentprojects.sh reloadDatabase
 #
+# Fix the Apache logs
+chown -R root:vagrant /var/log/apache2
 # Clear out the original Apache virtualhosts.
 rm /etc/apache2/sites-enabled/*
 # Link the KentProjects virtualhost.
