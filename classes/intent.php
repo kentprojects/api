@@ -137,6 +137,17 @@ abstract class Intent
 	}
 
 	/**
+	 * @param string $handler
+	 * @param array $data
+	 * @throws HttpStatusException
+	 * @return string
+	 */
+	public final function deduplicateClear($handler, array $data)
+	{
+		Model_Intent::deleteByHash($handler, md5(json_encode($data)));
+	}
+
+	/**
 	 * @param array $data
 	 * @throws HttpStatusException
 	 * @return string

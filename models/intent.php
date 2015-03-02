@@ -7,6 +7,19 @@
 final class Model_Intent extends Model
 {
 	/**
+	 * Delete any conflicting Intents with that hash.
+	 *
+	 * @param string $handler
+	 * @param string $hash
+	 * @return void
+	 */
+	public static function deleteByHash($handler, $hash)
+	{
+		Database::prepare("DELETE FROM `Intent` WHERE `handler` = ? AND `hash` = ?", "sis")
+			->execute($handler, $hash);
+	}
+
+	/**
 	 * Get the relevant Intent by it's ID.
 	 *
 	 * @param int $id

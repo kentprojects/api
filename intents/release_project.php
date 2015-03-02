@@ -90,8 +90,12 @@ final class Intent_Release_Project extends Intent
 		$project->removeGroup();
 		$project->save();
 
-		// TODO: Remove the original intent to undertake a project too.
+		$this->deduplicateClear("undertake_a_project", array(
+			"project_id" => $project->getId()
+		));
 
 		$group->clearCaches();
+
+
 	}
 }
