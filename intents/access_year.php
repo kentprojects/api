@@ -21,10 +21,8 @@ final class Intent_Access_Year extends Intent
 		$years = new UserYearMap($user);
 		if (count($years) > 0)
 		{
-			$currentYear = Model_Year::getCurrentYear();
-			$latestYear = $years->getLatestYear();
-
-			return $currentYear->getId() != $latestYear->year;
+			$currentYear = $years->getCurrentYear();
+			return !empty($currentYear);
 		}
 
 		return true;

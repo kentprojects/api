@@ -21,4 +21,16 @@ class GroupStudentMap extends ModelMap
 			"INSERT INTO `Group_Student_Map` (`group_id`, `user_id`) VALUES (?,?)"
 		);
 	}
+
+	/**
+	 * @return void
+	 */
+	public function clearCaches()
+	{
+		/** @var Model_User $user */
+		foreach ($this->data as $userId => $user)
+		{
+			$user->clearCaches();
+		}
+	}
 }

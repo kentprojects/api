@@ -249,6 +249,14 @@ class Model_Project extends Model
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function hasGroup()
+	{
+		return !empty($this->group);
+	}
+
+	/**
 	 * Render the project.
 	 *
 	 * @param Request_Internal $request

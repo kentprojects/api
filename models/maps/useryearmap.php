@@ -52,7 +52,10 @@ class UserYearMap implements Countable, IteratorAggregate
 			return;
 		}
 
-		$this->data = $results->all();
+		foreach ($results->all() as $year)
+		{
+			$this->data[$year->year] = $year;
+		}
 	}
 
 	/**
@@ -120,11 +123,20 @@ class UserYearMap implements Countable, IteratorAggregate
 	}
 
 	/**
+	 * @param int $modelId
 	 * @return stdClass
 	 */
-	public function getLatestYear()
+	public function get($modelId)
 	{
-		return end($this->data);
+		return array_key_exists($modelId, $this->data) ? $this->data[$modelId] : null;
+	}
+
+	/**
+	 * @return stdClass
+	 */
+	public function getCurrentYear()
+	{
+		return $this->get((string)Model_Year::getCurrentYear());
 	}
 
 	/**
@@ -160,7 +172,7 @@ class UserYearMap implements Countable, IteratorAggregate
 	 */
 	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
-		return $this->data;
+		return array_values($this->data);
 	}
 
 	/**
