@@ -87,7 +87,7 @@ final class Intent_Release_Project extends Intent
 			}
 		}
 
-		$project->setGroup(null);
+		$project->removeGroup();
 		$project->save();
 
 		// TODO: Remove the original intent to undertake a project too.

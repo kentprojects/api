@@ -257,6 +257,15 @@ class Model_Project extends Model
 	}
 
 	/**
+	 * Remove the group from the project.
+	 * @return void
+	 */
+	public function removeGroup()
+	{
+		$this->group = null;
+	}
+
+	/**
 	 * Render the project.
 	 *
 	 * @param Request_Internal $request
