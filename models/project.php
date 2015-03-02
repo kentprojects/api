@@ -233,7 +233,7 @@ class Model_Project extends Model
 			parent::render($request, $response, $acl, $internal),
 			array(
 				"year" => (string)$this->year,
-				"group" => is_object($this->group) ? $this->group->render($request, $response, $acl, $internal) : $this->group,
+				"group" => is_object($this->group) ? $this->group->render($request, $response, $acl, "project") : $this->group,
 				"name" => $this->name,
 				"description" => $this->getDescription(),
 				"creator" => $this->creator->render($request, $response, $acl, true),

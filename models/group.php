@@ -285,11 +285,17 @@ class Model_Group extends Model
 			)
 		);
 
-		if (!$internal)
+		if ($internal !== "project")
+		{
+			$data = array_merge($data, array(
+				"project" => !empty($this->project) ? $this->project->render($request, $response, $acl, true) : null
+			));
+		}
+
+		if ($internal !== true)
 		{
 			$this->getStudents();
 			$data = array_merge($data, array(
-				"project" => !empty($this->project) ? $this->project->render($request, $response, $acl, true) : null,
 				"students" => (count($this->students) > 0)
 					? $this->students->render($request, $response, $acl, true)
 					: array(),
