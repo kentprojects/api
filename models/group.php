@@ -111,23 +111,13 @@ class Model_Group extends Model
 	protected $students;
 
 	/**
-	 * The reason for the @noinspection lines is because when the Database builds the model, the other 'Model' values
-	 * are actually ids, and the models need fetching.
-	 *
 	 * @param Model_Year $year
 	 * @param string $name
 	 * @param Model_User $creator
 	 */
 	public function __construct(Model_Year $year = null, $name = null, Model_User $creator = null)
 	{
-		if ($this->getId() !== null)
-		{
-			/** @noinspection PhpParamsInspection */
-			$this->year = Model_Year::getById($this->year);
-			/** @noinspection PhpParamsInspection */
-			$this->creator = Model_User::getById($this->creator);
-		}
-		else
+		if ($this->getId() === null)
 		{
 			if (empty($year))
 			{
@@ -147,7 +137,6 @@ class Model_Group extends Model
 			}
 			$this->creator = $creator;
 		}
-
 		parent::__construct();
 	}
 
@@ -160,10 +149,15 @@ class Model_Group extends Model
 	}
 
 	/**
-	 * @return Model_User|null
+	 * @return Model_User
 	 */
 	public function getCreator()
 	{
+		if (is_numeric($this->creator))
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->creator = Model_User::getById($this->creator);
+		}
 		return $this->creator;
 	}
 
@@ -222,6 +216,11 @@ class Model_Group extends Model
 	 */
 	public function getYear()
 	{
+		if (is_numeric($this->year))
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->year = Model_Year::getById($this->year);
+		}
 		return $this->year;
 	}
 
@@ -241,30 +240,6 @@ class Model_Group extends Model
 	}
 
 	/**
-	 * @return array
-	 */
-	public function jsonSerialize()
-	{
-		return $this->validateFields(array_merge(
-			parent::jsonSerialize(),
-			array(
-				"year" => (string)$this->year,
-				"name" => $this->name
-			),
-			(!empty($this->project) ? array("project" => $this->project) : array()),
-			array(
-				"students" => $this->students,
-				"creator" => $this->creator,
-			),
-			$this->jsonPermissions(),
-			array(
-				"created" => $this->created,
-				"updated" => $this->updated
-			)
-		));
-	}
-
-	/**
 	 * Render the group.
 	 *
 	 * @param Request_Internal $request
@@ -275,7 +250,9 @@ class Model_Group extends Model
 	 */
 	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
+		$this->getCreator();
 		$this->getProject();
+		$this->getYear();
 
 		$data = array_merge(
 			parent::render($request, $response, $acl, $internal),

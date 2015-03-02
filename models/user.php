@@ -113,13 +113,9 @@ final class Model_User extends Model
 	protected $years;
 
 	/**
-	 * @constructor
+	 * @throws CacheException
+	 * @return void
 	 */
-	public function __construct()
-	{
-		parent::__construct();
-	}
-
 	public function clearCaches()
 	{
 		parent::clearCaches();

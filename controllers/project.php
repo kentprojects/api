@@ -106,7 +106,9 @@ final class Controller_Project extends Controller
 				"message" => "You do not have permission to delete this project."
 			));
 
-			throw new HttpStatusException(501, "Deleting a project is coming soon.");
+			Model_Project::delete($project);
+			$this->response->status(204);
+			return;
 		}
 		else
 		{

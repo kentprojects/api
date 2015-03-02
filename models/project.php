@@ -7,6 +7,17 @@
 class Model_Project extends Model
 {
 	/**
+	 * @param Model_Project $project
+	 * @return void
+	 */
+	public static function delete(Model_Project $project)
+	{
+		$project->getGroup();
+		Database::prepare("DELETE FROM `Project` WHERE `project_id` = ?", "i")->execute($project->getId());
+		$project->clearCaches();
+	}
+
+	/**
 	 * Get the relevant Project by it's group.
 	 *
 	 * @param Model_Group $group
@@ -121,6 +132,28 @@ class Model_Project extends Model
 			$this->creator = $creator;
 		}
 		parent::__construct();
+	}
+
+	/**
+	 * @throws CacheException
+	 * @return void
+	 */
+	public function clearCaches()
+	{
+		parent::clearCaches();
+		if (!empty($this->group))
+		{
+			if (is_numeric($this->group))
+			{
+				/** @noinspection PhpToStringImplementationInspection */
+				Cache::delete(Model_Group::cacheName() . "." . $this->group);
+			}
+			else
+			{
+				Cache::delete($this->group->cacheName());
+			}
+		}
+		Cache::delete($this->getCacheName("project"));
 	}
 
 	/**
