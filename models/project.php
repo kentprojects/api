@@ -313,8 +313,8 @@ class Model_Project extends Model
 				 WHERE `project_id` = ?",
 				"iisii"
 			)->execute(
-				(string)$this->year, !empty($this->group) ? $group_id : null, $this->name, $this->supervisor->getId(),
-				$this->id
+				(string)$this->year, !empty($this->group) ? $this->group->getId() : null, $this->name,
+				$this->supervisor->getId(), $this->id
 			);
 			$this->updated = Date::format(Date::TIMESTAMP, time());
 		}
