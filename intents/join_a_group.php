@@ -147,7 +147,13 @@ final class Intent_Join_A_Group extends Intent
 	 */
 	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
-		$group = $this->model->getUser()->getGroup();
+		$groupId = $this->data->group_id;
+		if (empty($groupId))
+		{
+			throw new HttpStatusException(500, "Failed to fetch group ID for this intent.");
+		}
+
+		$group = Model_Group::getById($groupId);
 		if (empty($group))
 		{
 			throw new HttpStatusException(500, "Failed to fetch group for this intent.");
