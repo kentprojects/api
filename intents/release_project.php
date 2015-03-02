@@ -92,6 +92,6 @@ final class Intent_Release_Project extends Intent
 
 		// TODO: Remove the original intent to undertake a project too.
 
-		$group->getStudents()->clearCaches();
+		$group->clearCaches();
 	}
 }

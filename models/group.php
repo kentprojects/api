@@ -143,6 +143,17 @@ class Model_Group extends Model
 	}
 
 	/**
+	 * @return void
+	 */
+	public function clearCaches()
+	{
+		$this->getStudents();
+
+		parent::clearCaches();
+		$this->students->clearCaches();
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getCreated()
