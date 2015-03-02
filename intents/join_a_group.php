@@ -138,13 +138,24 @@ final class Intent_Join_A_Group extends Intent
 	}
 
 	/**
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
+	 * @throws HttpStatusException
 	 * @return array
 	 */
-	public function jsonSerialize()
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
-		$json = parent::jsonSerialize();
-		$json["group"] = Model_Group::getById($this->data->group_id);
-		return $json;
+		$group = $this->model->getUser()->getGroup();
+		if (empty($group))
+		{
+			throw new HttpStatusException(500, "Failed to fetch group for this intent.");
+		}
+
+		$rendered = parent::render($request, $response, $acl, $internal);
+		$rendered["group"] = $group->render($request, $response, $acl, true);
+		return $rendered;
 	}
 
 	/**
