@@ -70,7 +70,7 @@ final class Intent_Release_Project extends Intent
 
 		if ($user->isStudent())
 		{
-			if ($group->getId() == $user->getGroup()->getId())
+			if ($group->getId() != $user->getGroup()->getId())
 			{
 				throw (new HttpStatusException(400, "Your group has not undertaken this project."))->setData(array(
 					"project_id" => $project->getId(),
