@@ -109,6 +109,7 @@ final class Controller_Group extends Controller
 
 			$this->acl->set("group", true, true, false, false);
 			$this->acl->delete("group/" . $group->getId());
+			$this->acl->save();
 
 			$this->response->status(204);
 			return;
