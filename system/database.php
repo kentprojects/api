@@ -4,12 +4,6 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-
-if (!defined("USE_DATABASE_STUB"))
-{
-	define("USE_DATABASE_STUB", false);
-}
-
 abstract class Database
 {
 	/**
@@ -30,7 +24,7 @@ abstract class Database
 	 * @param string $types The types of any variables
 	 * @param string $format The format of the results
 	 * @throws DatabaseException
-	 * @return DatabaseStub|_Database_Query
+	 * @return _Database_Query
 	 */
 	public static function prepare($query, $types = "", $format = null)
 	{
@@ -60,7 +54,10 @@ abstract class Database
 			$allowedcheck = str_replace($allowed, "", $types);
 			if (strlen($allowedcheck) > 0)
 			{
-				throw new DatabaseException("Unable to create prepared statement: There is an invalid type supplied: $allowedcheck", 0, $query, $types, $format);
+				throw new DatabaseException(
+					"Unable to create prepared statement: There is an invalid type supplied: $allowedcheck", 0,
+					$query, $types, $format
+				);
 			}
 		}
 
@@ -68,7 +65,10 @@ abstract class Database
 
 		if ($statement === false)
 		{
-			throw new DatabaseException("Unable to create prepared statement: " . self::$mysqli->error, self::$mysqli->errno, $query, $types, $format);
+			throw new DatabaseException(
+				"Unable to create prepared statement: " . self::$mysqli->error, self::$mysqli->errno,
+				$query, $types, $format
+			);
 		}
 
 		return new _Database_Query($query, $statement, $types, $format);
@@ -145,7 +145,9 @@ class _Database_Query
 		$success = $this->statement->execute();
 		if ($success === false)
 		{
-			throw new DatabaseException($this->statement->error, $this->statement->errno, $this->query, $this->types, func_get_args());
+			throw new DatabaseException(
+				$this->statement->error, $this->statement->errno, $this->query, $this->types, func_get_args()
+			);
 		}
 
 		$result = $this->statement->get_result();
@@ -156,7 +158,6 @@ class _Database_Query
 
 		while ($this->statement->more_results() && $this->statement->next_result())
 		{
-			;
 		}
 		$this->statement->close();
 
