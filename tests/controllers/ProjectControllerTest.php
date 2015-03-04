@@ -27,7 +27,7 @@ class ProjectControllerTest extends KentProjects_Controller_TestBase
 			Request::GET,
 			array(
 				"param" => array(
-					"id" => 2
+					"id" => 6
 				)
 			),
 			"convener"
