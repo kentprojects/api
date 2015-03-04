@@ -305,15 +305,9 @@ final class Model_User extends Model
 			));
 		}
 
-		if (!$internal)
-		{
-			$data = array_merge($data, array(
-				"bio" => $this->getDescription(),
-				"interests" => $this->getInterests()
-			));
-		}
-
 		$data = array_merge($data, array(
+			"bio" => $this->getDescription(),
+			"interests" => $this->getInterests()
 			"permissions" => $acl->get($this->getEntityName()),
 			"created" => $this->created,
 			"last_login" => $this->lastlogin,
