@@ -105,8 +105,6 @@ final class Controller_Auth extends Controller
 				"username" => "mjw59"
 			),
 		);
-		/** @noinspection SpellCheckingInspection */
-		$url = parse_url($_SERVER["HTTP_REFERER"]);
 
 		if (!array_key_exists($this->request->query("auth"), $fakeCodes))
 		{
@@ -124,6 +122,10 @@ final class Controller_Auth extends Controller
 			$user->save();
 			$this->setNewUserValues($user);
 		}
+
+		/** @noinspection SpellCheckingInspection */
+		$url = parse_url(!empty($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"]
+			: "http://" . (config("environment") === "development" ? "dev." : "") . "kentprojects.com");
 
 		throw $this->generateAuthUrl($url, $user);
 	}
