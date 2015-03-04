@@ -9,6 +9,7 @@
  */
 abstract class ModelMap implements Countable, IteratorAggregate
 {
+	protected $cacheName;
 	protected $data = array();
 	protected $foreignClass;
 	protected $source;
@@ -20,14 +21,17 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	/**
 	 * @param Model $sourceObject
 	 * @param string $foreignClass
+	 * @param string $cacheName
 	 * @param string $getSQL
 	 * @param string $clearSQL
 	 * @param string $saveSQL
 	 */
-	public function __construct(Model $sourceObject, $foreignClass, $getSQL = null, $clearSQL = null, $saveSQL = null)
+	public function __construct(Model $sourceObject, $foreignClass, $cacheName, $getSQL = null, $clearSQL = null, $saveSQL = null)
 	{
-		$this->source = $sourceObject;
 		$this->foreignClass = $foreignClass;
+		$this->source = $sourceObject;
+
+		$this->cacheName = $this->source->getCacheName($cacheName);
 
 		if (!empty($getSQL))
 		{
@@ -80,6 +84,29 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	}
 
 	/**
+	 * @throws CacheException
+	 * @return void
+	 */
+	public function clearCaches()
+	{
+		call_user_func_array(array("Cache", "delete"), $this->clearCacheStrings());
+	}
+
+	/**
+	 * @return array
+	 */
+	public function clearCacheStrings()
+	{
+		$strings = array();
+		foreach ($this->data as $modelId => $model)
+		{
+			/** @var Model $model */
+			$strings = array_merge($strings, $model->clearCacheStrings());
+		}
+		return $strings;
+	}
+
+	/**
 	 * @return int
 	 */
 	public function count()
@@ -98,17 +125,22 @@ abstract class ModelMap implements Countable, IteratorAggregate
 			throw new InvalidArgumentException("Missing getSQL for " . get_called_class());
 		}
 
-		$statement = Database::prepare($this->getSQL, "i");
-		$results = $statement->execute($this->source->getId());
-		if (count($results) == 0)
+		$foreignIds = Cache::get($this->cacheName);
+		if (empty($foreignIds))
 		{
-			return;
+			$results = Database::prepare($this->getSQL, "i")->execute($this->source->getId());
+			if (count($results) == 0)
+			{
+				return;
+			}
+			$foreignIds = $results->singlevals();
+			Cache::set($this->cacheName, $foreignIds, Cache::HOUR);
 		}
 
 		/** @var Model $class */
 		$class = $this->foreignClass;
 		$this->data = array();
-		foreach ($results->singlevals() as $foreignId)
+		foreach ($foreignIds as $foreignId)
 		{
 			$this->data[$foreignId] = $class::getById($foreignId);
 		}
@@ -158,7 +190,7 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	{
 		return array_values(
 			array_map(
-				function (Model $model) use ($request, $response, $acl, $internal)
+				function (Model $model) use ($request, &$response, $acl, $internal)
 				{
 					return $model->render($request, $response, $acl, $internal);
 				},
@@ -181,8 +213,8 @@ abstract class ModelMap implements Countable, IteratorAggregate
 			throw new InvalidArgumentException("Missing clearSQL for " . get_called_class());
 		}
 
-		$sourceId = $this->source->getId();
-		Database::prepare($this->clearSQL, "i")->execute($sourceId);
+		Database::prepare($this->clearSQL, "i")->execute($this->source->getId());
+		Cache::delete($this->cacheName);
 
 		if (empty($this->data))
 		{
@@ -199,7 +231,7 @@ abstract class ModelMap implements Countable, IteratorAggregate
 			{
 				$query[] = "(?,?)";
 				$types .= "ii";
-				array_push($values, $sourceId, $id);
+				array_push($values, $this->source->getId(), $id);
 			}
 
 			$this->clear();

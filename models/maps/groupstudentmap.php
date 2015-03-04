@@ -15,22 +15,10 @@ class GroupStudentMap extends ModelMap
 	public function __construct(Model_Group $group)
 	{
 		parent::__construct(
-			$group, "Model_User",
+			$group, "Model_User", "students",
 			"SELECT `user_id` FROM `Group_Student_Map` WHERE `group_id` = ?",
 			"DELETE FROM `Group_Student_Map` WHERE `group_id` = ?",
 			"INSERT INTO `Group_Student_Map` (`group_id`, `user_id`) VALUES (?,?)"
 		);
-	}
-
-	/**
-	 * @return void
-	 */
-	public function clearCaches()
-	{
-		/** @var Model_User $user */
-		foreach ($this->data as $userId => $user)
-		{
-			$user->clearCaches();
-		}
 	}
 }

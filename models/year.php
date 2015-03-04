@@ -7,6 +7,19 @@
 final class Model_Year extends Model
 {
 	/**
+	 * Create a new year!
+	 *
+	 * @param Model_User $user
+	 * @return Model_Year $year
+	 */
+	public static function create(Model_User $user)
+	{
+		/** @var _Database_State $result */
+		$result = Database::prepare("INSERT INTO `Year` (`year`) VALUES (DEFAULT(`year`));")->execute();
+		$year = static::getById($result->insert_id);
+	}
+
+	/**
 	 * @return Model_Year[]
 	 */
 	public static function getAll()
@@ -48,15 +61,7 @@ final class Model_Year extends Model
 	 */
 	public static function getCurrentYear()
 	{
-		$cacheKey = static::cacheName() . ".current";
-		$id = Cache::get($cacheKey);
-		if (empty($id))
-		{
-			$id = Database::prepare("SELECT `year` FROM `Year` ORDER BY `year` DESC LIMIT 1")
-				->execute()->singleval();
-			Cache::set($cacheKey, $id, Cache::HOUR);
-		}
-		return !empty($id) ? static::getById($id) : null;
+		return static::getById(static::getAcademicYearFromDate("today"));
 	}
 
 	/**
@@ -65,7 +70,7 @@ final class Model_Year extends Model
 	 * Otherwise, return the year minus one.
 	 *
 	 * @param string $date
-	 * @return Model_Year
+	 * @return int
 	 */
 	public static function getAcademicYearFromDate($date)
 	{
@@ -91,6 +96,15 @@ final class Model_Year extends Model
 	 */
 	protected $supervisors;
 
+	public function __construct()
+	{
+		if ($this->getId() === null)
+		{
+			throw new InvalidArgumentException("You cannot create a year like this.");
+		}
+		parent::__construct();
+	}
+
 	/**
 	 * If someone forces the year to be a string, at least it'll become the YEAR, and not fail.
 	 *
@@ -102,21 +116,18 @@ final class Model_Year extends Model
 	}
 
 	/**
-	 * @param Model_User $user
-	 * @return bool
+	 * @return array
 	 */
-	public function addStaff(Model_User $user)
+	public function clearCacheStrings()
 	{
-		if (!$user->isStaff())
-		{
-			throw new InvalidArgumentException("This user is not a member of staff");
-		}
-		$statement = Database::prepare(
-			"INSERT INTO `User_Year_Map` (`user_id`, `year`)
-			VALUES (?, ?)",
-			"ii"
+		return array_merge(
+			parent::clearCacheStrings(),
+			array(
+				$this->getCacheName("conveners"),
+				$this->getCacheName("secondmarkers"),
+				$this->getCacheName("supervisors")
+			)
 		);
-		return $statement->execute($user->getId(), $this->id)->affected_rows == 1;
 	}
 
 	/**
@@ -126,14 +137,20 @@ final class Model_Year extends Model
 	{
 		if (empty($this->conveners))
 		{
-			$this->conveners = array_map(
-				function ($convenerId)
-				{
-					return Model_User::getById($convenerId);
-				},
-				Database::prepare(
+			$userIds = Cache::get($this->getCacheName("conveners"));
+			if (empty($conveners))
+			{
+				$userIds = Database::prepare(
 					"SELECT `user_id` FROM `User_Year_Map` WHERE `year` = ? AND `role_convener` = 1", "i"
-				)->execute($this->getId())->singlevals()
+				)->execute($this->getId())->singlevals();
+				!empty($userIds) && Cache::set($this->getCacheName("conveners"), $userIds, 2 * Cache::HOUR);
+			}
+			$this->conveners = array_map(
+				function ($userId)
+				{
+					return Model_User::getById($userId);
+				},
+				$userIds
 			);
 		}
 		return $this->conveners;
@@ -154,36 +171,23 @@ final class Model_Year extends Model
 	{
 		if (empty($this->secondmarkers))
 		{
+			$userIds = Cache::get($this->getCacheName("secondmarkers"));
+			if (empty($conveners))
+			{
+				$userIds = Database::prepare(
+					"SELECT `user_id` FROM `User_Year_Map` WHERE `year` = ? AND `role_secondmarker` = 1", "i"
+				)->execute($this->getId())->singlevals();
+				!empty($userIds) && Cache::set($this->getCacheName("secondmarkers"), $userIds, 2 * Cache::HOUR);
+			}
 			$this->secondmarkers = array_map(
 				function ($userId)
 				{
 					return Model_User::getById($userId);
 				},
-				Database::prepare(
-					"SELECT `user_id` FROM `User_Year_Map` WHERE `year` = ? AND `role_secondmarker` = 1", "i"
-				)->execute($this->getId())->singlevals()
+				$userIds
 			);
 		}
 		return $this->secondmarkers;
-	}
-
-	/**
-	 * @return Model_User[]
-	 */
-	public function getStaff()
-	{
-		$users = array();
-		$statement = Database::prepare("SELECT `user_id` FROM `User_Year_Map` WHERE `year` = ?", "i");
-		$user_ids = $statement->execute($this->id)->singlevals();
-		foreach ($user_ids as $user_id)
-		{
-			$user = Model_Staff::getById($user_id);
-			if (!empty($user))
-			{
-				$users[] = $user;
-			}
-		}
-		return $users;
 	}
 
 	/**
@@ -193,33 +197,23 @@ final class Model_Year extends Model
 	{
 		if (empty($this->supervisors))
 		{
+			$userIds = Cache::get($this->getCacheName("supervisors"));
+			if (empty($conveners))
+			{
+				$userIds = Database::prepare(
+					"SELECT `user_id` FROM `User_Year_Map` WHERE `year` = ? AND `role_supervisor` = 1", "i"
+				)->execute($this->getId())->singlevals();
+				!empty($userIds) && Cache::set($this->getCacheName("supervisors"), $userIds, 2 * Cache::HOUR);
+			}
 			$this->supervisors = array_map(
 				function ($userId)
 				{
 					return Model_User::getById($userId);
 				},
-				Database::prepare(
-					"SELECT `user_id` FROM `User_Year_Map` WHERE `year` = ? AND `role_supervisor` = 1", "i"
-				)->execute($this->getId())->singlevals()
+				$userIds
 			);
 		}
 		return $this->supervisors;
-	}
-
-	/**
-	 * @param Model_User $user
-	 * @return bool
-	 */
-	public function removeStaff(Model_User $user)
-	{
-		if (!$user->isStaff())
-		{
-			throw new InvalidArgumentException("This user is not a member of staff");
-		}
-		$statement = Database::prepare(
-			"DELETE FROM `User_Year_Map` WHERE `user_id` = ? AND `year` = ?", "ii"
-		);
-		return $statement->execute($user->getId(), $this->id)->affected_rows == 1;
 	}
 
 	/**
@@ -229,15 +223,37 @@ final class Model_Year extends Model
 	 * @param Response $response
 	 * @param ACL $acl
 	 * @param boolean $internal
-	 * @return array
+	 * @return int|array
 	 */
 	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
+		if ($internal === true)
+		{
+			return intval($this->__toString());
+		}
+
 		return $this->validateFields(array_merge(
 			parent::render($request, $response, $acl, $internal),
-			array(
-				"projects" => 0,
-				"users" => 0
+			/**
+			 * Rendering a list of conveners, supervisors & secondmarkers for this year.
+			 */
+			array_map(
+				function ($users) use ($request, &$response, $acl)
+				{
+					return array_map(
+						function ($user) use ($request, &$response, $acl)
+						{
+							/** @var Model_User $user */
+							return $user->render($request, $response, $acl, true);
+						},
+						$users
+					);
+				},
+				array(
+					"conveners" => $this->getConveners(),
+					"supervisors" => $this->getSupervisors(),
+					"secondmarkers" => $this->getSecondMarkers()
+				)
 			)
 		));
 	}

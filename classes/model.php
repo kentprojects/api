@@ -126,9 +126,19 @@ abstract class Model
 	 * @throws CacheException
 	 * @return void
 	 */
-	public function clearCaches()
+	public final function clearCaches()
 	{
-		Cache::delete($this->getCacheName());
+		call_user_func_array(array("Cache", "delete"), $this->clearCacheStrings());
+	}
+
+	/**
+	 * @return array
+	 */
+	public function clearCacheStrings()
+	{
+		return array(
+			$this->getCacheName()
+		);
 	}
 
 	/**

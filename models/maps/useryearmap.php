@@ -8,7 +8,7 @@
  * This class is designed to bring two objects together by way of a map table.
  * This does not extend a ModelMap since it's a little... different...
  */
-class UserYearMap implements Countable, IteratorAggregate
+final class UserYearMap implements Countable, IteratorAggregate
 {
 	/**
 	 * @var array
@@ -20,6 +20,11 @@ class UserYearMap implements Countable, IteratorAggregate
 		"role_secondmarker"
 	);
 
+	/**
+	 * A list of caches to clear when saving.
+	 * @var string[]
+	 */
+	protected $cachesToClear = array();
 	/**
 	 * @var stdClass[]
 	 */
@@ -37,72 +42,104 @@ class UserYearMap implements Countable, IteratorAggregate
 		$this->data = array();
 		$this->user = $user;
 
-		$fields = implode(",", array_map(
-			function ($field)
-			{
-				return "`$field`";
-			},
-			static::$fields
-		));
-		$results = Database::prepare("SELECT $fields FROM `User_Year_Map` WHERE `user_id` = ?", "i")
-			->execute($this->user->getId());
-
-		if (count($results) == 0)
+		$yearMap = Cache::get($this->user->getCacheName("years"));
+		if (empty($yearMap))
 		{
-			return;
+			$fields = implode(",", array_map(
+				function ($field)
+				{
+					return "`$field`";
+				},
+				static::$fields
+			));
+			$results = Database::prepare("SELECT $fields FROM `User_Year_Map` WHERE `user_id` = ?", "i")
+				->execute($this->user->getId());
+
+			if (count($results) == 0)
+			{
+				return;
+			}
+
+			$yearMap = $results->all();
+			Cache::set($this->user->getCacheName("years"), $yearMap, Cache::HOUR);
 		}
 
-		foreach ($results->all() as $year)
+		foreach ($yearMap as $year)
 		{
 			$this->data[$year->year] = $year;
 		}
 	}
 
 	/**
-	 * @param array|stdClass $map
+	 * @param Model_Year $year
+	 * @param array|stdClass|null $map
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */
-	public function add($map)
+	public function add($year, $map = null)
 	{
-		if (is_object($map) && !($map instanceof stdClass))
+		if (empty($year))
 		{
-			throw new InvalidArgumentException("Class " . get_class($map) . " is not of stdClass.");
+			throw new InvalidArgumentException("Missing YEAR in " . get_called_class());
 		}
-		elseif (is_array($map))
+		elseif (!is_object($year) && !($year instanceof Model_Year))
 		{
-			$map = (object)$map;
+			throw new InvalidArgumentException("Class " . get_class($year) . " is not of Model_Year.");
+		}
+		elseif ($year->getId() === null)
+		{
+			throw new InvalidArgumentException("No ID in Year object.");
+		}
+
+		if (!empty($map))
+		{
+
+			if (is_object($map) && !($map instanceof stdClass))
+			{
+				throw new InvalidArgumentException("Class " . get_class($map) . " is not of stdClass.");
+			}
+			elseif (is_array($map))
+			{
+				$map = (object)$map;
+			}
+			else
+			{
+				throw new InvalidArgumentException("Invalid map parameter supplied to UserYearMap::add.");
+			}
+
+			foreach ($map as $key => $value)
+			{
+				if ($key === "year")
+				{
+					throw new InvalidArgumentException("Unknown key '$key' in MAP object.");
+				}
+				if (!in_array($key, static::$fields))
+				{
+					throw new InvalidArgumentException("Unknown key '$key' in MAP object.");
+				}
+			}
 		}
 		else
 		{
-			throw new InvalidArgumentException("Invalid map parameter supplied to UserYearMap::add.");
+			$map = (object)array("year" => $year->getId());
 		}
 
-		if (empty($map->year))
-		{
-			throw new InvalidArgumentException("Missing YEAR key in MAP object.");
-		}
-		elseif (array_key_exists($map->year, $this->data))
+		if (array_key_exists($map->year, $this->data))
 		{
 			return;
 		}
 
-		foreach ($map as $key => $value)
-		{
-			if (!in_array($key, static::$fields))
-			{
-				throw new InvalidArgumentException("Unknown key '$key' in MAP object.");
-			}
-		}
 		foreach (static::$fields as $field)
 		{
-			if (empty($map->$field))
+			if ($field === "year")
 			{
-				$map->$field = false;
+				continue;
 			}
+			$map->$field = !empty($map->$field);
 		}
 
-		$this->data[$map->year] = $map;
+		$this->data[$year->getId()] = $map;
+		$this->cachesToClear = array_merge($this->cachesToClear, $year->clearCacheStrings());
 	}
 
 	/**
@@ -119,6 +156,11 @@ class UserYearMap implements Countable, IteratorAggregate
 	 */
 	public function clear()
 	{
+		foreach ($this->data as $yearId => $yearData)
+		{
+			$year = Model_Year::getById($yearId);
+			$this->cachesToClear = array_merge($this->cachesToClear, $year->clearCacheStrings());
+		}
 		$this->data = array();
 	}
 
@@ -150,14 +192,15 @@ class UserYearMap implements Countable, IteratorAggregate
 	}
 
 	/**
-	 * @param string $year
+	 * @param Model_Year $year
 	 * @return void
 	 */
-	public function remove($year)
+	public function remove(Model_Year $year)
 	{
-		if (array_key_exists($year, $this->data))
+		if (array_key_exists($year->getId(), $this->data))
 		{
-			unset($this->data[$year]);
+			unset($this->data[$year->getId()]);
+			$this->cachesToClear = array_merge($this->cachesToClear, $year->clearCacheStrings());
 		}
 	}
 
@@ -185,6 +228,7 @@ class UserYearMap implements Countable, IteratorAggregate
 	public function save()
 	{
 		Database::prepare("DELETE FROM `User_Year_Map` WHERE `user_id` = ?", "i")->execute($this->user->getId());
+		Cache::delete($this->user->getCacheName("years"));
 
 		if (empty($this->data))
 		{
@@ -226,5 +270,7 @@ class UserYearMap implements Countable, IteratorAggregate
 
 		$statement = Database::prepare($query, $types);
 		call_user_func_array(array($statement, "execute"), $values);
+
+		!empty($this->cachesToClear) && call_user_func_array(array("Cache", "delete"), $this->cachesToClear);
 	}
 }

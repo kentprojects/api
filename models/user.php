@@ -164,6 +164,7 @@ final class Model_User extends Model
 		parent::clearCaches();
 		Cache::delete($this->getCacheName("group"));
 		Cache::delete($this->getCacheName("project"));
+		Cache::delete($this->getCacheName("years"));
 	}
 
 	/**

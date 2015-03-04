@@ -122,10 +122,14 @@ final class Model_Comment extends Model
 		parent::__construct();
 	}
 
-	public function clearCache()
+	public function clearCacheStrings()
 	{
-		Cache::delete($this->getCacheName());
-		Cache::delete(static::getCacheName() . ".root." . $this->root);
+		return array_merge(
+			parent::clearCacheStrings(),
+			array(
+				static::getCacheName() . ".root." . $this->root
+			)
+		);
 	}
 
 	/**

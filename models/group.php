@@ -149,15 +149,20 @@ class Model_Group extends Model
 	}
 
 	/**
-	 * @return void
+	 * @return array
 	 */
-	public function clearCaches()
+	public function clearCacheStrings()
 	{
 		$this->getStudents();
 
-		parent::clearCaches();
-		$this->students->clearCaches();
-		Cache::delete($this->getCacheName("project"));
+		return array_merge(
+			parent::clearCacheStrings(),
+			array(
+				$this->getCacheName("project"),
+				$this->getCacheName("students")
+			),
+			!empty($this->students) ? $this->students->clearCacheStrings() : array()
+		);
 	}
 
 	/**

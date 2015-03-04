@@ -117,6 +117,18 @@ final class Intent_Access_Year extends Intent
 		$this->mergeData($data);
 		$intent_creator_name = $intentAuthor->getName();
 
+		if ($intentAuthor->isStaff())
+		{
+			$roles = array();
+			foreach (array("role_convener", "role_supervisor", "role_secondmarker") as $role)
+			{
+				if (!empty($data[$role]) && ($data[$role] === true))
+				{
+					$roles[$role] = true;
+				}
+			}
+		}
+
 		$mail = new Postmark;
 		$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
 		$mail->setTo("matt.house@kentprojects.com", "Matt House");
@@ -128,9 +140,7 @@ final class Intent_Access_Year extends Intent
 				return;
 			case static::STATE_ACCEPTED:
 				$years = new UserYearMap($intentAuthor);
-				$years->add(array(
-					"year" => (string)Model_Year::getCurrentYear()
-				));
+				$years->add(Model_Year::getCurrentYear(), $roles);
 				$years->save();
 				Cache::delete($intentAuthor->getCacheName());
 

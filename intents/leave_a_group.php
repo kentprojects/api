@@ -26,18 +26,10 @@ final class Intent_Leave_A_Group extends Intent
 		}
 
 		/**
-		 * If you are in a group already.
+		 * If you are not in a group already, then fail.
 		 */
-		$groups = new StudentGroupMap($user);
-		if (count($groups) !== 1)
-		{
-			return false;
-		}
-
-		/**
-		 * All okay!
-		 */
-		return true;
+		$group = Model_Group::getByUser($user);
+		return !empty($group);
 	}
 
 	/**

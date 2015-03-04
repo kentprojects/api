@@ -135,25 +135,28 @@ class Model_Project extends Model
 	}
 
 	/**
-	 * @throws CacheException
-	 * @return void
+	 * @return array
 	 */
-	public function clearCaches()
+	public function clearCacheStrings()
 	{
-		parent::clearCaches();
+		$groupCaches = array();
 		if (!empty($this->group))
 		{
 			if (is_numeric($this->group))
 			{
 				/** @noinspection PhpToStringImplementationInspection */
-				Cache::delete(Model_Group::cacheName() . "." . $this->group);
+				$groupCaches[] = Model_Group::cacheName() . "." . $this->group;
 			}
 			else
 			{
-				Cache::delete($this->group->cacheName());
+				$groupCaches = $this->group->clearCacheStrings();
 			}
 		}
-		Cache::delete($this->getCacheName("project"));
+		/** @noinspection PhpToStringImplementationInspection */
+		return array_merge(
+			parent::clearCacheStrings(),
+			$groupCaches// , $this->getCacheName("project")
+		);
 	}
 
 	/**
