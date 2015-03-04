@@ -38,7 +38,7 @@ class ProjectControllerTest extends KentProjects_Controller_TestBase
 
 		$this->assertEquals(200, $response->status());
 		$project = json_decode($response->body());
-		$this->assertEquals(2, $project->id);
+		$this->assertEquals(6, $project->id);
 	}
 
 	/**

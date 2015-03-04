@@ -8,8 +8,8 @@ class ProjectModelTest extends KentProjects_Model_TestBase
 {
 	public function testGetById()
 	{
-		$project = Model_Project::getById(2);
+		$project = Model_Project::getById(6);
 		$this->assertNotEmpty($project, "Project doesn't exist.");
-		$this->assertEquals(2, $project->getId());
+		$this->assertEquals(6, $project->getId());
 	}
 }
