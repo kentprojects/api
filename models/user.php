@@ -307,7 +307,7 @@ final class Model_User extends Model
 
 		$data = array_merge($data, array(
 			"bio" => $this->getDescription(),
-			"interests" => $this->getInterests()
+			"interests" => $this->getInterests(),
 			"permissions" => $acl->get($this->getEntityName()),
 			"created" => $this->created,
 			"last_login" => $this->lastlogin,
