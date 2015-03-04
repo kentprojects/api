@@ -8,12 +8,6 @@ class ProjectControllerTest extends KentProjects_Controller_TestBase
 {
 	public function testGetProjects()
 	{
-		if (USE_DATABASE_STUB)
-		{
-			$this->markTestIncomplete("At the moment, the controller tests require a live database connection.");
-			return;
-		}
-
 		$request = $this->createSignedRequest(Request::GET, array(), "convener");
 		$response = new Response($request);
 
