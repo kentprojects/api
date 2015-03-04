@@ -152,6 +152,7 @@ final class Model_User extends Model
 			}
 			$this->role = $role;
 		}
+		parent::__construct();
 	}
 
 	/**
