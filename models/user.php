@@ -49,6 +49,7 @@ final class Model_User extends Model
 			$user = Database::prepare(
 				"SELECT
 					`user_id` AS 'id',
+					`uid`,
 					`email`,
 					`first_name`,
 					`last_name`,
@@ -66,10 +67,27 @@ final class Model_User extends Model
 		return $user;
 	}
 
+	public static function getByUid($uid)
+	{
+		$cacheKey = static::cacheName() . ".uid." . $uid;
+		$id = Cache::get($cacheKey);
+		if (empty($id))
+		{
+			$id = Database::prepare("SELECT `user_id` FROM `User` WHERE `uid` = ? AND `status` = 1", "s")
+				->execute($uid)->singleval();
+			!empty($id) && Cache::set($cacheKey, $id, Cache::HOUR);
+		}
+		return static::getById($id);
+	}
+
 	/**
 	 * @var int
 	 */
 	protected $id;
+	/**
+	 * @var string
+	 */
+	protected $uid;
 	/**
 	 * @var string
 	 */
@@ -111,6 +129,30 @@ final class Model_User extends Model
 	 * @var UserYearMap
 	 */
 	protected $years;
+
+	public function __construct($uid = null, $email = null, $role = null)
+	{
+		if ($this->getId() === null)
+		{
+			if (empty($uid))
+			{
+				trigger_error("Missing UID passed to the USER constructor", E_USER_ERROR);
+			}
+			$this->uid = $uid;
+
+			if (empty($email))
+			{
+				trigger_error("Missing EMAIL passed to the USER constructor", E_USER_ERROR);
+			}
+			$this->email = $email;
+
+			if (empty($role))
+			{
+				trigger_error("Missing ROLE passed to the USER constructor", E_USER_ERROR);
+			}
+			$this->role = $role;
+		}
+	}
 
 	/**
 	 * @throws CacheException
@@ -238,6 +280,7 @@ final class Model_User extends Model
 		$data = array_merge(
 			parent::render($request, $response, $acl, $internal),
 			array(
+				"uid" => $this->uid,
 				"email" => $this->email,
 				"name" => $this->getName(),
 				"first_name" => $this->first_name,
@@ -285,24 +328,14 @@ final class Model_User extends Model
 	 */
 	public function save()
 	{
-		if (empty($this->id))
+		if ($this->getId() === null)
 		{
-			if (empty($this->email))
-			{
-				throw new InvalidArgumentException("No email provided for the student.");
-			}
-			if (empty($this->role))
-			{
-				throw new InvalidArgumentException("No role provided for the student.");
-			}
-
 			/** @var _Database_State $result */
 			$result = Database::prepare(
-				"INSERT INTO `User` (`email`, `first_name`, `last_name`, `role`, `created`)
-				 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)",
-				"ssss"
+				"INSERT INTO `User` (`uid`, `email`, `first_name`, `last_name`, `role`, `created`)
+				 VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)", "sssss"
 			)->execute(
-				$this->email, $this->first_name, $this->last_name, $this->role
+				$this->uid, $this->email, $this->first_name, $this->last_name, $this->role
 			);
 			$this->id = $result->insert_id;
 			$this->created = $this->updated = Date::format(Date::TIMESTAMP, time());
@@ -310,13 +343,9 @@ final class Model_User extends Model
 		else
 		{
 			Database::prepare(
-				"UPDATE `User`
-				 SET `email` = ?, `first_name` = ?, `last_name` = ?
-				 WHERE `user_id` = ?",
-				"sssi"
+				"UPDATE `User` SET `email` = ?, `first_name` = ?, `last_name` = ? WHERE `user_id` = ?", "sssi"
 			)->execute(
-				$this->email, $this->first_name, $this->last_name,
-				$this->id
+				$this->email, $this->first_name, $this->last_name, $this->id
 			);
 			$this->updated = Date::format(Date::TIMESTAMP, time());
 		}
@@ -380,6 +409,10 @@ final class Model_User extends Model
 		if (!empty($data["bio"]))
 		{
 			$this->setDescription($data["bio"]);
+		}
+		if (!empty($data["email"]))
+		{
+			$this->setEmail($data["email"]);
 		}
 		if (!empty($data["first_name"]))
 		{

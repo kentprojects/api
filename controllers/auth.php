@@ -14,6 +14,10 @@ final class Controller_Auth extends Controller
 	 * @var string
 	 */
 	protected $prefixCacheKey = "auth.confirm.";
+	/**
+	 * @var string
+	 */
+	protected $suffixEmailDomain = "kent.ac.uk";
 
 	/**
 	 * GET /auth/confirm
@@ -72,26 +76,32 @@ final class Controller_Auth extends Controller
 		$fakeCodes = array(
 			"f4dfeada0e91e1791a80da1bb26a7d96" => array(
 				"role" => "staff",
+				"uid" => "jch27",
 				"username" => "J.C.Hernandez-Castro"
 			),
 			"1e9a755d73865da9068f079d81402ce7" => array(
 				"role" => "staff",
+				"uid" => "jsc",
 				"username" => "J.S.Crawford"
 			),
 			"6f2653c2a1c64220e3d2a713cc52b438" => array(
 				"role" => "staff",
+				"uid" => "sup2",
 				"username" => "supervisor2"
 			),
 			"1f18ed87771daf095e090916cb9423e4" => array(
 				"role" => "student",
+				"uid" => "mh471",
 				"username" => "mh471"
 			),
 			"1460357d62390ab9b3b33fa1a0618a8f" => array(
 				"role" => "student",
+				"uid" => "jsd24",
 				"username" => "jsd24"
 			),
 			"930144ea545ce754789b15074106bc36" => array(
 				"role" => "student",
+				"uid" => "mjw59",
 				"username" => "mjw59"
 			),
 		);
@@ -105,17 +115,54 @@ final class Controller_Auth extends Controller
 
 		$authUser = $fakeCodes[$this->request->query("auth")];
 
-		$user = Model_User::getByEmail($authUser["username"] . "@kent.ac.uk");
+		$user = Model_User::getByUid($authUser["uid"]);
 		if (empty($user))
 		{
-			$user = new Model_User;
-			$user->setEmail($authUser["username"] . "@kent.ac.uk");
-			$user->setRole($authUser["role"]);
+			$user = new Model_User(
+				$authUser["uid"], $authUser["username"] . "@" . $this->suffixEmailDomain, $authUser["role"]
+			);
 			$user->save();
 			$this->setNewUserValues($user);
 		}
 
 		throw $this->generateAuthUrl($url, $user);
+	}
+
+	/**
+	 * GET /auth/logout
+	 *
+	 * @throws HttpRedirectException
+	 */
+	public function action_logout()
+	{
+		if (config("environment") === "development")
+		{
+			throw new HttpRedirectException(302, "https://api.kentprojects.com/auth/logout?return=dev");
+		}
+		else
+		{
+			switch ($this->request->query("return"))
+			{
+				case "dev":
+					$redirect = "http://dev.kentprojects.com";
+					break;
+				default:
+					$redirect = "http://www.kentprojects.com";
+			}
+
+			/**
+			 * @require The external SimpleSAML2 library.
+			 */
+			/** @noinspection PhpIncludeInspection */
+			/** @noinspection SpellCheckingInspection */
+			require_once "/var/www/simplesaml/lib/_autoload.php";
+
+			/** @noinspection PhpUndefinedClassInspection */
+			$provider = new SimpleSAML_Auth_Simple("default-sp");
+			/** @noinspection PhpUndefinedMethodInspection */
+			$provider->logout($redirect);
+		}
+		throw new HttpStatusException(724, "This line should be unreachable.");
 	}
 
 	/**
@@ -233,14 +280,11 @@ final class Controller_Auth extends Controller
 			exit(1);
 		}
 
-		$user = Model_User::getByEmail($email);
+		$user = Model_User::getByUid($uid);
 		if (empty($user))
 		{
-			$user = new Model_User;
-			$user->setEmail($email);
-			$user->setRole($role);
+			$user = new Model_User($uid, $email, $role);
 			$user->save();
-
 			$this->setNewUserValues($user);
 		}
 
