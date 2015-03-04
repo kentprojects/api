@@ -156,15 +156,18 @@ final class Model_User extends Model
 	}
 
 	/**
-	 * @throws CacheException
-	 * @return void
+	 * @return array
 	 */
-	public function clearCaches()
+	public function clearCacheStrings()
 	{
-		parent::clearCaches();
-		Cache::delete($this->getCacheName("group"));
-		Cache::delete($this->getCacheName("project"));
-		Cache::delete($this->getCacheName("years"));
+		return array_merge(
+			parent::clearCacheStrings(),
+			array(
+				$this->getCacheName("group"),
+				$this->getCacheName("project"),
+				$this->getCacheName("years")
+			)
+		);
 	}
 
 	/**
