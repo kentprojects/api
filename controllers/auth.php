@@ -132,6 +132,8 @@ final class Controller_Auth extends Controller
 	 * GET /auth/logout
 	 *
 	 * @throws HttpRedirectException
+	 * @throws HttpStatusException
+	 * @return void
 	 */
 	public function action_logout()
 	{
