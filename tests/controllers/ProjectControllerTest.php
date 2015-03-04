@@ -54,7 +54,7 @@ class ProjectControllerTest extends KentProjects_Controller_TestBase
 					"description" => $description
 				),
 				"param" => array(
-					"id" => 2
+					"id" => 6
 				)
 			),
 			"supervisor"
@@ -65,7 +65,7 @@ class ProjectControllerTest extends KentProjects_Controller_TestBase
 
 		$this->assertEquals(200, $response->status());
 		$project = json_decode($response->body());
-		$this->assertEquals(2, $project->id);
+		$this->assertEquals(6, $project->id);
 		$this->assertEquals($description, $project->description);
 	}
 }
