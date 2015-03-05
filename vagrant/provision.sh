@@ -13,7 +13,7 @@ apt-get update
 echo "mysql-server mysql-server/root_password password password" | debconf-set-selections
 echo "mysql-server mysql-server/root_password_again password password" | debconf-set-selections
 # Install MySQL, Apache, Curl, Screen and PHP.
-apt-get install -y mysql-server apache2 curl screen && \
+apt-get install -y mysql-server apache2 curl htop screen && \
 apt-get install -y php5 php5-cli php5-curl php5-mysqlnd php5-json
 # If one of them failed, then abort.
 if [ $? -ne 0 ]; then
@@ -43,3 +43,8 @@ chown www-data:www-data /var/www/logs
 #
 # Add `api.dev.kentprojects.com` to the hosts file.
 echo "127.0.0.1 api.kentprojects.local" >> /etc/hosts
+#
+# Start running the notifications pipe.
+sudo mkfifo /var/www/notifications-dev-pipe
+VAGRANT=true sudo nohup /vagrant/notifications.sh >/dev/null &
+# sudo disown

@@ -50,6 +50,8 @@ final class Controller_Me extends Controller
 				$details["project"] = Model_Project::getByGroup($details["group"]);
 			}
 		}
+
+		$details["notifications"] = new UserNotificationMap($user);
 		$details["settings"] = $this->auth->getToken()->getSettings();
 
 		$this->response->status(200);

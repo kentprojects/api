@@ -156,6 +156,14 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getIds()
+	{
+		return array_keys($this->data);
+	}
+
+	/**
 	 * Useful so the ModelMap can partake in a foreach loop.
 	 *
 	 * @return array
