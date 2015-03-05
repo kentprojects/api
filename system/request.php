@@ -362,6 +362,9 @@ class Request_Internal extends Request
 	 * @var array
 	 */
 	protected $param = array();
+	/**
+	 * @var bool
+	 */
 	protected $run = false;
 
 	/**

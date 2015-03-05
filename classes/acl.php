@@ -115,6 +115,14 @@ final class ACL implements Countable
 	}
 
 	/**
+	 * @return Model_User
+	 */
+	public function getUser()
+	{
+		return $this->user;
+	}
+
+	/**
 	 * Save the user's permissions.
 	 * @return void
 	 */

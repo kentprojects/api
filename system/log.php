@@ -134,7 +134,7 @@ final class Log
 			 * Write all the logs to a file, adding some whitespace to the bottom.
 			 * Release the lock and close the file handle.
 			 */
-			$fh = fopen($fl, "a");
+			$fh = fopen($fl, "a+b");
 			flock($fh, LOCK_EX);
 			fwrite($fh, implode("\n", $log));
 			fflush($fh);
