@@ -8,24 +8,24 @@
 # nohup makes sure it keeps running when you close the terminal
 # disown makes the terminal forget it exists
 #
-if [ -z "$PRODUCTION" ]; then
+if false; then
     PIPE=/var/www/notifications-pipe
     SCRIPT=/var/www/kentprojects-api/notifications.php
-elif [ -z "$VAGRANT" ]; then
-    PIPE=/var/www/notifications-dev-pipe
-    SCRIPT=/vagrant/notifications.php
 else
     PIPE=/var/www/notifications-dev-pipe
     SCRIPT=/var/www/kentprojects-api-dev/notifications.php
 fi
 
+echo "$PIPE\n$SCRIPT"
+
 if [ ! -p "$PIPE" ]; then
-	rm -f "$PIPE"
-	mkfifo "$PIPE"
+    sudo rm -f "$PIPE"
+    sudo mkfifo "$PIPE"
+    sudo chown www-data:www-data "$PIPE"
 fi
 
 exec 3<>"$PIPE"
 
 while read OPTIONS; do
-	php "$SCRIPT" $OPTIONS
+	sudo -u www-data php "$SCRIPT" $OPTIONS
 done <&3

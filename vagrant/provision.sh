@@ -45,6 +45,7 @@ chown www-data:www-data /var/www/logs
 echo "127.0.0.1 api.kentprojects.local" >> /etc/hosts
 #
 # Start running the notifications pipe.
-sudo mkfifo /var/www/notifications-dev-pipe
-VAGRANT=true sudo nohup /vagrant/notifications.sh >/dev/null &
-# sudo disown
+mkdir -p /var/www/kentprojects-api-dev && chown www-data:www-data /var/www/kentprojects-api-dev && \
+  ln -s /vagrant/notifications.php /var/www/kentprojects-api-dev/notifications.php
+nohup /vagrant/notifications.sh >/dev/null &
+# disown

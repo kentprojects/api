@@ -15,13 +15,19 @@
  */
 require_once __DIR__ . "/functions.php";
 Timing::start("notifications");
-$_GET = array();
+$data = new stdClass;
 
 try
 {
 	if (empty($argv[1]))
 	{
 		throw new InvalidArgumentException("No parameters passed to the notification script.");
+	}
+
+	if ($argv[1] === "Hello")
+	{
+		Log::debug("Why hello, dear chap!");
+		exit();
 	}
 
 	$data = json_decode($argv[1]);
@@ -97,6 +103,16 @@ try
 	 */
 	foreach ($data->targets as $target)
 	{
+		if ($target === "conveners")
+		{
+			$year = Model_Year::getCurrentYear();
+			foreach ($year->getConveners() as $convener)
+			{
+				$targetIds[] = $convener->getId();
+			}
+			continue;
+		}
+
 		$splitTarget = explode("/", $target);
 		if (count($splitTarget) !== 2)
 		{
@@ -107,12 +123,24 @@ try
 		{
 			case "group":
 				$group = Model_Group::getById($splitTarget[1]);
+				foreach ($group->getStudents() as $student)
+				{
+					/** @var Model_User $student */
+					$targetIds[] = $student->getId();
+				}
 				break;
 			case "project":
 				$project = Model_Project::getById($splitTarget[1]);
+				$targetIds[] = $project->getSupervisor()->getId();
+				foreach ($project->getGroup()->getStudents() as $student)
+				{
+					/** @var Model_User $student */
+					$targetIds[] = $student->getId();
+				}
 				break;
 			case "user":
 				$user = Model_User::getById($splitTarget[1]);
+				$targetIds[] = $user->getId();
 				break;
 			default:
 				throw new InvalidArgumentException(
@@ -120,15 +148,23 @@ try
 				);
 		}
 	}
+
+	$targetIds = array_unique($targetIds, SORT_NUMERIC);
+
+	$notification->save();
+
+	Log::debug($notification, $targetIds);
+
+	Model_Notification::addTargets($notification, $targetIds);
 }
 catch (Exception $e)
 {
-	Log::error($e->getMessage(), $_GET);
+	Log::error($e->getMessage(), $data);
 }
 
 Timing::stop("notifications");
 if (config("environment") === "development")
 {
-	Log::debug($_GET, Timing::export());
+	Log::debug($data, Timing::export());
 }
 Log::write();

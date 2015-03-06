@@ -145,7 +145,7 @@ final class Log
 		static::$logs = array();
 	}
 }
-if (!empty($_SERVER["VAGRANT_ENV"]))
+if (!is_writable(APPLICATION_PATH . "/logs/"))
 {
 	Log::$directory = "/var/www/logs/";
 }

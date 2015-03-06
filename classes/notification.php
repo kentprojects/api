@@ -25,12 +25,12 @@ final class Notification
 			throw new InvalidArgumentException("This actor has no ID.");
 		}
 
-		$allowedReferenceKeys = array("group_id", "project_id", "user_id", "year");
-
 		$parameters = array(
 			"type" => $type,
-			"actor" => $actor->getId()
+			"actor_id" => $actor->getId()
 		);
+
+		$allowedReferenceKeys = array("group_id", "project_id", "user_id", "year");
 
 		foreach ($references as $reference => $id)
 		{

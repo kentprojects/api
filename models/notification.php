@@ -7,6 +7,9 @@
 class Model_Notification extends Model
 {
 	protected static $typeStrings = array(
+		"user_got_a_notification" => array(
+			"default" => "You just got a notification. Yippee!"
+		),
 		"user_wants_to_access_a_year" => array(
 			"default" => "ACTOR_NAME would like access to YEAR."
 		),
@@ -111,6 +114,38 @@ class Model_Notification extends Model
 	}
 
 	/**
+	 * @param Model_Notification $notification
+	 * @param array $userIds
+	 * @throws InvalidArgumentException
+	 * @return void
+	 */
+	public static function addTargets(Model_Notification $notification, array $userIds)
+	{
+		if ($notification->getId() === null)
+		{
+			throw new InvalidArgumentException("Missing notification ID.");
+		}
+		if (empty($userIds))
+		{
+			throw new InvalidArgumentException("Missing user IDs.");
+		}
+
+		$query = array("INSERT INTO", "`User_Notification_Map`", "(`notification_id`, `user_id`)", "VALUES");
+		$types = "";
+		$values = array();
+
+		foreach ($userIds as $userId)
+		{
+			$query[] = "(?, ?)";
+			$types .= "ii";
+			array_push($values, $notification->getId(), $userId);
+		}
+
+		$statement = Database::prepare(implode(" ", $query), $types);
+		call_user_func_array(array($statement, "execute"), $values);
+	}
+
+	/**
 	 * @var int
 	 */
 	protected $id;
@@ -152,7 +187,7 @@ class Model_Notification extends Model
 	 * @param string $type
 	 * @param Model_User $actor
 	 */
-	public function __construct($type, Model_User $actor = null)
+	public function __construct($type = null, Model_User $actor = null)
 	{
 		if ($this->getId() === null)
 		{
@@ -180,7 +215,7 @@ class Model_Notification extends Model
 	 */
 	public function getActor()
 	{
-		if (empty($this->actor))
+		if (!empty($this->actor) && is_numeric($this->actor))
 		{
 			/** @noinspection PhpParamsInspection */
 			$this->actor = Model_User::getById($this->actor);
