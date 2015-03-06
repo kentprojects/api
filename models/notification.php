@@ -215,6 +215,19 @@ class Model_Notification extends Model
 	}
 
 	/**
+	 * @return array
+	 */
+	public function clearCacheStrings()
+	{
+		return array_merge(
+			parent::clearCacheStrings(),
+			array(
+				$this->getCacheName("string")
+			)
+		);
+	}
+
+	/**
 	 * @return Model_User
 	 */
 	public function getActor()
@@ -351,11 +364,18 @@ class Model_Notification extends Model
 		$this->getProject();
 		$this->getUser();
 
+		$string = Cache::get($this->getCacheName("string"));
+		if (empty($string))
+		{
+			$string = $this->renderNotificationString($acl->getUser());
+			!empty($string) && Cache::set($this->getCacheName("string"), $string, Cache::DAY);
+		}
+
 		return $this->validateFields(array_merge(
 			parent::render($request, $response, $acl, $internal),
 			array(
 				"type" => $this->type,
-				"text" => $this->renderNotificationString($acl->getUser()),
+				"text" => $string,
 				"actor" => $this->actor->render($request, $response, $acl, true),
 				"group" => !empty($this->group) ? $this->group->render($request, $response, $acl, true) : null,
 				"project" => !empty($this->project) ? $this->project->render($request, $response, $acl, true) : null,
