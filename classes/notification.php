@@ -12,11 +12,11 @@ final class Notification
 	 * @param array $references
 	 * @param array $targets
 	 * @throws InvalidArgumentException
-	 * @return void
+	 * @return boolean|string
 	 */
 	public static function queue($type, Model_User $actor, array $references, array $targets)
 	{
-		if (!Model_Notification::isValidType($type))
+		if (($type !== "test") && !Model_Notification::isValidType($type))
 		{
 			throw new InvalidArgumentException("Unknown TYPE '{$type}' to create a notification with.");
 		}
@@ -47,6 +47,16 @@ final class Notification
 		 */
 		foreach ($targets as $target)
 		{
+			if ($target === "conveners")
+			{
+				$year = Model_Year::getCurrentYear();
+				foreach ($year->getConveners() as $convener)
+				{
+					$targetIds[] = $convener->getId();
+				}
+				continue;
+			}
+
 			$splitTarget = explode("/", $target);
 			if (count($splitTarget) !== 2)
 			{
@@ -67,6 +77,11 @@ final class Notification
 			}
 		}
 
+		if ($type === "test")
+		{
+			return json_encode($parameters);
+		}
+
 		if (config("environment") === "production")
 		{
 			$pipe = "/var/www/notifications-pipe";
@@ -82,5 +97,7 @@ final class Notification
 		fflush($fh);
 		flock($fh, LOCK_UN);
 		fclose($fh);
+
+		return true;
 	}
 }

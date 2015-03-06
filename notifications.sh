@@ -8,13 +8,9 @@
 # nohup makes sure it keeps running when you close the terminal
 # disown makes the terminal forget it exists
 #
-if false; then
-    PIPE=/var/www/notifications-pipe
-    SCRIPT=/var/www/kentprojects-api/notifications.php
-else
-    PIPE=/var/www/notifications-dev-pipe
-    SCRIPT=/var/www/kentprojects-api-dev/notifications.php
-fi
+
+PIPE=/var/www/notifications-pipe
+SCRIPT=/vagrant/notifications.php
 
 echo "$PIPE\n$SCRIPT"
 

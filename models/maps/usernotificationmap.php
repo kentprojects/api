@@ -30,7 +30,7 @@ final class UserNotificationMap extends ModelMap
 				return;
 			}
 			$notificationIds = $results->all();
-			Cache::set($this->cacheName, $notificationIds, Cache::HOUR);
+			!empty($notificationIds) && Cache::set($this->cacheName, $notificationIds, Cache::HOUR);
 		}
 
 		$this->data = array();

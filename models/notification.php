@@ -130,6 +130,7 @@ class Model_Notification extends Model
 			throw new InvalidArgumentException("Missing user IDs.");
 		}
 
+		$caches = array();
 		$query = array("INSERT INTO", "`User_Notification_Map`", "(`notification_id`, `user_id`)", "VALUES");
 		$types = "";
 		$values = array();
@@ -139,10 +140,13 @@ class Model_Notification extends Model
 			$query[] = "(?, ?)";
 			$types .= "ii";
 			array_push($values, $notification->getId(), $userId);
+			$caches[] = Model_User::cacheName() . "." . $userId . ".notifications";
 		}
 
 		$statement = Database::prepare(implode(" ", $query), $types);
 		call_user_func_array(array($statement, "execute"), $values);
+
+		call_user_func_array(array("Cache", "delete"), $caches);
 	}
 
 	/**

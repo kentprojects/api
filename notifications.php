@@ -152,19 +152,20 @@ try
 	$targetIds = array_unique($targetIds, SORT_NUMERIC);
 
 	$notification->save();
-
 	Log::debug($notification, $targetIds);
-
 	Model_Notification::addTargets($notification, $targetIds);
+
+	Timing::stop("notifications");
+	if (config("environment") === "development")
+	{
+		Log::debug($data, Timing::export());
+	}
+	Log::write();
+	exit();
 }
 catch (Exception $e)
 {
 	Log::error($e->getMessage(), $data);
+	Log::write();
+	exit(1);
 }
-
-Timing::stop("notifications");
-if (config("environment") === "development")
-{
-	Log::debug($data, Timing::export());
-}
-Log::write();
