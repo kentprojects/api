@@ -25,7 +25,6 @@ final class Controller_Me extends Controller
 	public function action_index()
 	{
 		$this->validateMethods(Request::GET, Request::PUT);
-
 		if ($this->request->param("id") !== null)
 		{
 			throw new HttpStatusException(400, "No ID should be passed to the ME controller.");
@@ -59,6 +58,38 @@ final class Controller_Me extends Controller
 	}
 
 	/**
+	 * /me/notifications
+	 * /me/:id/notifications
+	 *
+	 * GET
+	 *
+	 * Gets a list of notifications for the user.
+	 * Append `?unread=1` to get only unread notifications.
+	 * Check the header `X-Notification-Count` for a count if required.
+	 *
+	 * @throws HttpStatusException
+	 * @return void
+	 */
+	public function action_notifications()
+	{
+		$this->validateMethods(Request::GET);
+		if ($this->request->param("id") !== null)
+		{
+			throw new HttpStatusException(400, "No ID should be passed to the ME controller.");
+		}
+
+		$notifications = new UserNotificationMap($this->auth->getUser());
+		if ($this->request->query("unread") !== null)
+		{
+			$notifications = $notifications->getUnread();
+		}
+
+		$this->response->status(200);
+		$this->response->header("X-Notification-Count", count($notifications));
+		$this->response->body($notifications);
+	}
+
+	/**
 	 * /me/settings
 	 * /me/:id/settings
 	 *
@@ -72,7 +103,6 @@ final class Controller_Me extends Controller
 	public function action_settings()
 	{
 		$this->validateMethods(Request::GET, Request::PUT);
-
 		if ($this->request->param("id") !== null)
 		{
 			throw new HttpStatusException(400, "No ID should be passed to the ME controller.");

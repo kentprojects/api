@@ -43,6 +43,23 @@ final class UserNotificationMap extends ModelMap
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getUnread()
+	{
+		return array_values(
+			array_filter(
+				$this->data,
+				function ($notification)
+				{
+					/** @var Model_Notification $notification */
+					return $notification->isUnread();
+				}
+			)
+		);
+	}
+
+	/**
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */

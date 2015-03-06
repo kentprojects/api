@@ -349,6 +349,14 @@ class Model_Notification extends Model
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isUnread()
+	{
+		return empty($this->read);
+	}
+
+	/**
 	 * Render the group.
 	 *
 	 * @param Request_Internal $request
