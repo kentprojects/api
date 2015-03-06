@@ -8,6 +8,24 @@ GET /me HTTP/1.1
 
 ```json
 {
+    "user": {
+        "id": 3,
+        "email": "mh471@kent.ac.uk",
+        "name": "Matt House",
+        "first_name": "Matt",
+        "last_name": "House",
+        "role": "student",
+        "bio": null,
+        "permissions": {
+            "create": 0,
+            "read": 0,
+            "update": 0,
+            "delete": 0
+        },
+        "created": "2014-11-21 21:31:52",
+        "lastlogin": "2014-01-01 00:00:00",
+        "updated": "2014-12-16 16:47:06"
+    },
     "group": {
         "id": 1,
         "year": "2014",
@@ -111,23 +129,157 @@ GET /me HTTP/1.1
         "created": "2015-02-09 11:02:31",
         "updated": "2015-02-13 13:04:23"
     },
-    "user": {
-        "id": 3,
-        "email": "mh471@kent.ac.uk",
-        "name": "Matt House",
-        "first_name": "Matt",
-        "last_name": "House",
-        "role": "student",
-        "bio": null,
-        "permissions": {
-            "create": 0,
-            "read": 0,
-            "update": 0,
-            "delete": 0
-        },
-        "created": "2014-11-21 21:31:52",
-        "lastlogin": "2014-01-01 00:00:00",
-        "updated": "2014-12-16 16:47:06"
-    }
+    "notifications": [
+        {
+            "id": 3,
+            "type": "user_got_a_notification",
+            "text": "You just got a notification. Yippee!",
+            "actor": {
+                "id": 4,
+                "uid": "jsd24",
+                "email": "jsd24@kent.ac.uk",
+                "name": "James Dryden",
+                "first_name": "James",
+                "last_name": "Dryden",
+                "role": "student",
+                "bio": null,
+                "interests": [
+
+                ],
+                "permissions": {
+                    "create": false,
+                    "read": true,
+                    "update": true,
+                    "delete": false
+                },
+                "created": "2014-11-27 19:19:35",
+                "last_login": "2014-01-01 00:00:00",
+                "updated": "2015-03-06 10:14:07"
+            },
+            "group": null,
+            "project": null,
+            "user": null,
+            "year": "",
+            "created": "2015-03-06 13:05:26",
+            "read": null
+        }
+    ],
+    "settings": [
+
+    ]
 }
 ```
+
+----
+
+## Get a user's notifications
+
+When a notification is generated, we want to get to the user as soon as possible.
+
+Therefore, we can check for new notifications like so:
+
+```http
+GET /me/notifications HTTP/1.1
+```
+
+This will return a JSON array of notifications, as well as some useful headers too:
+
+```http
+HTTP/1.1 200 OK
+X-Notification-Count: 1
+```
+
+```json
+[
+    {
+        "id": 3,
+        "type": "user_got_a_notification",
+        "text": "You just got a notification. Yippee!",
+        "actor": {
+            "id": 4,
+            "uid": "jsd24",
+            "email": "jsd24@kent.ac.uk",
+            "name": "James Dryden",
+            "first_name": "James",
+            "last_name": "Dryden",
+            "role": "student",
+            "bio": null,
+            "interests": [
+
+            ],
+            "permissions": {
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+            },
+            "created": "2014-11-27 19:19:35",
+            "last_login": "2014-01-01 00:00:00",
+            "updated": "2015-03-06 10:14:07"
+        },
+        "group": null,
+        "project": null,
+        "user": null,
+        "year": "",
+        "created": "2015-03-06 13:05:26",
+        "read": null
+    }
+]
+```
+
+The header `X-Notification-Count` contains a count of the notifications you should have received.
+
+### Only get unread notifications
+
+```http
+GET /me/notifications?unread=1 HTTP/1.1
+```
+
+This will return a very similar JSON array of notifications, as well as some useful headers too:
+
+```http
+HTTP/1.1 200 OK
+X-Notification-Count: 1
+```
+
+```json
+[
+    {
+        "id": 3,
+        "type": "user_got_a_notification",
+        "text": "You just got a notification. Yippee!",
+        "actor": {
+            "id": 4,
+            "uid": "jsd24",
+            "email": "jsd24@kent.ac.uk",
+            "name": "James Dryden",
+            "first_name": "James",
+            "last_name": "Dryden",
+            "role": "student",
+            "bio": null,
+            "interests": [
+
+            ],
+            "permissions": {
+                "create": false,
+                "read": true,
+                "update": true,
+                "delete": false
+            },
+            "created": "2014-11-27 19:19:35",
+            "last_login": "2014-01-01 00:00:00",
+            "updated": "2015-03-06 10:14:07"
+        },
+        "group": null,
+        "project": null,
+        "user": null,
+        "year": "",
+        "created": "2015-03-06 13:05:26",
+        "read": null
+    }
+]
+```
+
+Again, the header `X-Notification-Count` contains a count of the notifications you should have received. If you want the
+unread notifications request to be quicker you should make a `HEAD` request and just check this header! (Yes, `HEAD`
+requests are totally viable with this platform!)
