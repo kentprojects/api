@@ -222,7 +222,7 @@ case "$1" in
 	*)
 		printf "A simple utility to help you work with the KentProjects codebase!\n\n"
 		printf "Usage: ./kentprojects.sh ACTION\n"
-		printf "deploy: Deploy this branch.\n"
+		printf "deploy: Push item from 'develop' to 'master'.\n"
 		printf "hotfix: Working on a quick fix for the 'master' branch?.\n"
 		printf "test: Run the KentProjects tests.\n"
 		;;

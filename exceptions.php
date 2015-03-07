@@ -201,6 +201,10 @@ final class IntentException extends Exception
  */
 final class PHPException extends Exception
 {
+	protected $context;
+	protected $file;
+	protected $line;
+
 	/**
 	 * @param int $error_no
 	 * @param string $error_string
@@ -212,6 +216,8 @@ final class PHPException extends Exception
 	public function __construct($error_no, $error_string, $error_file, $error_line, $error_context, Exception $previous = null)
 	{
 		parent::__construct($error_string, $error_no, $previous);
+
+		$this->context = $error_context;
 		$this->file = $error_file;
 		$this->line = $error_line;
 	}
