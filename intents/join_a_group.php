@@ -65,13 +65,13 @@ final class Intent_Join_A_Group extends Intent
 	 * This represents somebody who wishes to join a group.
 	 *
 	 * @param array $data
+	 * @param Model_User $actor
 	 * @throws HttpStatusException
 	 * @throws IntentException
-	 * @return void
 	 */
-	public function create(array $data)
+	public function create(array $data, Model_User $actor)
 	{
-		parent::create($data);
+		parent::create($data, $actor);
 
 		if (empty($data["group_id"]))
 		{
@@ -97,6 +97,11 @@ final class Intent_Join_A_Group extends Intent
 		));
 		$this->mergeData($data);
 		$this->save();
+
+		Notification::queue(
+			"user_wants_to_join_a_group", $this->model->getUser(),
+			array("group" => $group->getId()), array("group/" . $group->getId())
+		);
 
 		$group_creator_name = $group->getCreator()->getFirstName();
 		$group_name = $group->getName();
@@ -158,12 +163,12 @@ final class Intent_Join_A_Group extends Intent
 
 	/**
 	 * @param array $data
+	 * @param Model_User $actor
 	 * @throws IntentException
-	 * @return void
 	 */
-	public function update(array $data)
+	public function update(array $data, Model_User $actor)
 	{
-		parent::update($data);
+		parent::update($data, $actor);
 
 		if (empty($this->data->group_id))
 		{
@@ -208,6 +213,21 @@ final class Intent_Join_A_Group extends Intent
 				$acl->set("group/" . $group->getId(), false, true, true, true);
 				$acl->save();
 
+				/**
+				 * Since only the group creator can manage this stuff, we can be sure the group creator is the ACTOR
+				 * for this notification.
+				 */
+				Notification::queue(
+					"user_approved_another_to_join_a_group", $group->getCreator(),
+					array(
+						"group" => $group->getId(),
+						"user" => $this->model->getUser()->getId()
+					),
+					array(
+						"group/" . $group->getId()
+					)
+				);
+
 				$this->model->getUser()->clearCaches();
 
 				$mail->setBody(array(
@@ -220,6 +240,18 @@ final class Intent_Join_A_Group extends Intent
 				$mail->send();
 				break;
 			case static::STATE_REJECTED:
+				Notification::queue(
+					"user_rejected_another_to_join_a_group", $group->getCreator(),
+					array(
+						"group" => $group->getId(),
+						"user" => $this->model->getUser()->getId()
+					),
+					array(
+						"group/" . $group->getId(),
+						"user/" . $this->model->getUser()->getId()
+					)
+				);
+
 				$mail->setBody(array(
 					"Hey {$intent_creator_name},\n\n",
 					"{$group_creator_name} was a total dick and has rejected your request to join '{$group_name}'.\n",

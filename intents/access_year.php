@@ -59,13 +59,13 @@ final class Intent_Access_Year extends Intent
 	 * This represents somebody who wishes to join the current year.
 	 *
 	 * @param array $data
+	 * @param Model_User $actor
 	 * @throws HttpStatusException
 	 * @throws IntentException
-	 * @return void
 	 */
-	public function create(array $data)
+	public function create(array $data, Model_User $actor)
 	{
-		parent::create($data);
+		parent::create($data, $actor);
 
 		$currentYear = Model_Year::getCurrentYear();
 		$this->deduplicate(array(
@@ -74,7 +74,12 @@ final class Intent_Access_Year extends Intent
 		$this->mergeData($data);
 		$this->save();
 
-		$intent_creator_name = $this->model->getUser()->getName();
+		Notification::queue(
+			"user_wants_to_access_a_year", $actor,
+			array("year" => (string)$currentYear), array("conveners")
+		);
+
+		$intent_creator_name = $actor->getName();
 		$path = sprintf("intents.php?action=view&id=%d", $this->model->getId());
 
 		$body = array(
@@ -104,22 +109,22 @@ final class Intent_Access_Year extends Intent
 
 	/**
 	 * @param array $data
-	 * @throws HttpStatusException
+	 * @param Model_User $actor
+	 * @throws CacheException
 	 * @throws IntentException
-	 * @return void
 	 */
-	public function update(array $data)
+	public function update(array $data, Model_User $actor)
 	{
-		parent::update($data);
+		parent::update($data, $actor);
 
 		$intentAuthor = $this->model->getUser();
 
 		$this->mergeData($data);
 		$intent_creator_name = $intentAuthor->getName();
 
+		$roles = array();
 		if ($intentAuthor->isStaff())
 		{
-			$roles = array();
 			foreach (array("role_convener", "role_supervisor", "role_secondmarker") as $role)
 			{
 				if (!empty($data[$role]) && ($data[$role] === true))
@@ -128,6 +133,8 @@ final class Intent_Access_Year extends Intent
 				}
 			}
 		}
+
+		$currentYear = Model_Year::getCurrentYear();
 
 		$mail = new Postmark;
 		$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
@@ -140,9 +147,21 @@ final class Intent_Access_Year extends Intent
 				return;
 			case static::STATE_ACCEPTED:
 				$years = new UserYearMap($intentAuthor);
-				$years->add(Model_Year::getCurrentYear(), $roles);
+				$years->add($currentYear, $roles);
 				$years->save();
 				Cache::delete($intentAuthor->getCacheName());
+
+				Notification::queue(
+					"user_approved_access_to_year", $actor,
+					array(
+						"user" => $this->model->getUser(),
+						"year" => (string)$currentYear
+					),
+					array(
+						"conveners",
+						"user/" . $this->model->getUser()
+					)
+				);
 
 				$mail->setBody(array(
 					"Hey {$intent_creator_name},\n\n",
@@ -154,6 +173,18 @@ final class Intent_Access_Year extends Intent
 				$mail->send();
 				break;
 			case static::STATE_REJECTED:
+				Notification::queue(
+					"user_rejected_access_to_year", $actor,
+					array(
+						"user" => $this->model->getUser(),
+						"year" => (string)$currentYear
+					),
+					array(
+						"conveners",
+						"user/" . $this->model->getUser()
+					)
+				);
+
 				$mail->setBody(array(
 					"Hey {$intent_creator_name},\n\n",
 					"You have been declined access to the year.\n",

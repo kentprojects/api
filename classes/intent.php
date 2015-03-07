@@ -125,10 +125,10 @@ abstract class Intent
 	 * Run some pre-requisite stuff.
 	 *
 	 * @param array $data
+	 * @param Model_User $actor
 	 * @throws IntentException
-	 * @return void
 	 */
-	public function create(array $data)
+	public function create(array $data, Model_User $actor)
 	{
 		if ($this->model->getId() !== null)
 		{
@@ -165,10 +165,10 @@ abstract class Intent
 
 	/**
 	 * @param array $data
+	 * @param Model_User $actor
 	 * @throws Exception
-	 * @return void
 	 */
-	public function delete(array $data)
+	public function delete(array $data, Model_User $actor)
 	{
 		throw new Exception("Why are you calling a delete method of an Intent?");
 	}
@@ -274,10 +274,10 @@ abstract class Intent
 
 	/**
 	 * @param array $data
+	 * @param Model_User $actor
 	 * @throws IntentException
-	 * @return void
 	 */
-	public function update(array $data)
+	public function update(array $data, Model_User $actor)
 	{
 		if ($this->model->getId() === null)
 		{

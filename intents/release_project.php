@@ -42,13 +42,13 @@ final class Intent_Release_Project extends Intent
 	 * This represents somebody who wishes to join a group.
 	 *
 	 * @param array $data
+	 * @param Model_User $actor
 	 * @throws HttpStatusException
 	 * @throws IntentException
-	 * @return void
 	 */
-	public function create(array $data)
+	public function create(array $data, Model_User $actor)
 	{
-		parent::create($data);
+		parent::create($data, $actor);
 
 		if (empty($data["project_id"]))
 		{
@@ -89,6 +89,15 @@ final class Intent_Release_Project extends Intent
 
 		$project->removeGroup();
 		$project->save();
+
+		Notification::queue(
+			"group_released_project", $this->model->getUser(),
+			array("group" => $group->getId()),
+			array(
+				"group/" . $group->getId(),
+				"user/" . $project->getSupervisor()->getId()
+			)
+		);
 
 		$this->deduplicateClear("undertake_a_project", array(
 			"project_id" => $project->getId()

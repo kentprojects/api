@@ -78,13 +78,13 @@ final class Intent_Undertake_A_Project extends Intent
 	 * This represents somebody who wishes to join a group.
 	 *
 	 * @param array $data
+	 * @param Model_User $actor
 	 * @throws HttpStatusException
 	 * @throws IntentException
-	 * @return void
 	 */
-	public function create(array $data)
+	public function create(array $data, Model_User $actor)
 	{
-		parent::create($data);
+		parent::create($data, $actor);
 
 		if (empty($data["project_id"]))
 		{
@@ -107,7 +107,20 @@ final class Intent_Undertake_A_Project extends Intent
 		$this->mergeData($data);
 		$this->save();
 
-		$group_name = $this->model->getUser()->getGroup()->getName();
+		$group = $this->model->getUser()->getGroup();
+
+		Notification::queue(
+			"group_wants_to_undertake_a_project", $this->model->getUser(),
+			array(
+				"group" => $group->getId(),
+				"project" => $project->getId()
+			),
+			array(
+				"user/" . $project->getSupervisor()->getId()
+			)
+		);
+
+		$group_name = $group->getName();
 		$intent_creator_name = $this->model->getUser()->getName();
 		$project_supervisor_name = $project->getSupervisor()->getFirstName();
 		$project_name = $project->getName();
@@ -180,13 +193,12 @@ final class Intent_Undertake_A_Project extends Intent
 
 	/**
 	 * @param array $data
-	 * @throws HttpStatusException
+	 * @param Model_User $actor
 	 * @throws IntentException
-	 * @return void
 	 */
-	public function update(array $data)
+	public function update(array $data, Model_User $actor)
 	{
-		parent::update($data);
+		parent::update($data, $actor);
 
 		if (empty($this->data->project_id))
 		{
@@ -221,6 +233,18 @@ final class Intent_Undertake_A_Project extends Intent
 			case static::STATE_ACCEPTED:
 				$project->setGroup($group);
 				$project->save();
+
+				Notification::queue(
+					"group_undertaken_project_approved", $project->getSupervisor(),
+					array(
+						"group" => $group->getId(),
+						"project" => $project->getId()
+					),
+					array(
+						"project/" . $project->getId()
+					)
+				);
+
 				$mail->setBody(array(
 					"Hey {$intent_creator_name},\n\n",
 					"{$project_supervisor_name} was lovely and allowed you to undertake '{$project_name}'.\n",
@@ -231,6 +255,18 @@ final class Intent_Undertake_A_Project extends Intent
 				$mail->send();
 				break;
 			case static::STATE_REJECTED:
+				Notification::queue(
+					"group_undertaken_project_rejected", $project->getSupervisor(),
+					array(
+						"group" => $group->getId(),
+						"project" => $project->getId()
+					),
+					array(
+						"group/" . $group->getId(),
+						"user/" . $project->getSupervisor()->getId()
+					)
+				);
+
 				$mail->setBody(array(
 					"Hey {$intent_creator_name},\n\n",
 					"{$project_supervisor_name} was incredibly rude and has rejected your request to join '{$project_name}'.\n",

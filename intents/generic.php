@@ -34,13 +34,13 @@ final class Intent_Generic extends Intent
 
 	/**
 	 * @param array $data
+	 * @param Model_User $actor
 	 * @throws HttpStatusException
 	 * @throws IntentException
-	 * @return void
 	 */
-	public function create(array $data)
+	public function create(array $data, Model_User $actor)
 	{
-		parent::create($data);
+		parent::create($data, $actor);
 
 		if (empty($data["user_id"]))
 		{
@@ -57,6 +57,11 @@ final class Intent_Generic extends Intent
 			"user_id" => $user->getId()
 		)));
 		$this->save();
+
+		Notification::queue(
+			"user_got_a_notification", $this->model->getUser(),
+			array(), array("user/" . $this->model->getUser()->getId())
+		);
 
 		/**
 		 * This is where one would mail out, or at least add to a queue!
@@ -88,13 +93,12 @@ final class Intent_Generic extends Intent
 
 	/**
 	 * @param array $data
-	 * @throws HttpStatusException
+	 * @param Model_User $actor
 	 * @throws IntentException
-	 * @return void
 	 */
-	public function update(array $data)
+	public function update(array $data, Model_User $actor)
 	{
-		parent::update($data);
+		parent::update($data, $actor);
 
 		$this->mergeData($data);
 		$this->save();

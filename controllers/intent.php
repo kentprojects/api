@@ -50,7 +50,7 @@ final class Controller_Intent extends Controller
 			{
 				throw new HttpStatusException(403, "You do not have permission to create this intent.");
 			}
-			$intent->create($params["data"]);
+			$intent->create($params["data"],);
 
 			$this->response->status(201);
 			$this->response->body($intent);
@@ -94,7 +94,7 @@ final class Controller_Intent extends Controller
 			{
 				$intent->state("intent:state:" . strtolower($this->request->post("state")));
 			}
-			$intent->update($this->request->post("data", array()));
+			$intent->update($this->request->post("data", array()),);
 		}
 
 		Log::debug($intent);

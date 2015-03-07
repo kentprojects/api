@@ -36,13 +36,13 @@ final class Intent_Leave_A_Group extends Intent
 	 * This represents somebody who wishes to join a group.
 	 *
 	 * @param array $data
+	 * @param Model_User $actor
 	 * @throws HttpStatusException
 	 * @throws IntentException
-	 * @return void
 	 */
-	public function create(array $data)
+	public function create(array $data, Model_User $actor)
 	{
-		parent::create($data);
+		parent::create($data, $actor);
 
 		if (empty($data["group_id"]))
 		{
@@ -64,6 +64,11 @@ final class Intent_Leave_A_Group extends Intent
 		}
 		$students->remove($this->model->getUser());
 		$students->save();
+
+		Notification::queue(
+			"user_left_a_group", $this->model->getUser(),
+			array("group" => $group->getId()), array("group/" . $group->getId())
+		);
 
 		$this->deduplicateClear("join_a_group", array(
 			"group_id" => $group->getId()

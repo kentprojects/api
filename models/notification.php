@@ -13,9 +13,27 @@ class Model_Notification extends Model
 		"user_wants_to_access_a_year" => array(
 			"default" => "ACTOR_NAME would like access to YEAR."
 		),
+		"user_approved_access_to_year" => array(
+			"default" => "USER_NAME was granted access to YEAR.",
+			"actor" => "You granted USER_NAME access to YEAR.",
+			"user" => "ACTOR_NAME granted you access to YEAR."
+		),
+		"user_rejected_access_to_year" => array(
+			"default" => "USER_NAME was granted access to YEAR.",
+			"actor" => "You granted USER_NAME access to YEAR.",
+			"user" => "ACTOR_NAME granted you access to YEAR."
+		),
 		"user_wants_to_join_a_group" => array(
 			"default" => "ACTOR_NAME would like to join GROUP_NAME.",
 			"group_member" => "ACTOR_NAME would like to join your group."
+		),
+		"user_approved_another_to_join_a_group" => array(
+			"default" => "ACTOR_NAME approved USER_NAME to join GROUP_NAME.",
+			"group_member" => "ACTOR_NAME approved USER_NAME to join your group."
+		),
+		"user_rejected_another_to_join_a_group" => array(
+			"default" => "ACTOR_NAME rejected USER_NAME to join GROUP_NAME.",
+			"group_member" => "ACTOR_NAME rejected USER_NAME to join your group."
 		),
 		"user_joined_a_group" => array(
 			"default" => "ACTOR_NAME joined GROUP_NAME.",
@@ -26,12 +44,17 @@ class Model_Notification extends Model
 			"group_member" => "ACTOR_NAME left your group."
 		),
 		"group_wants_to_undertake_a_project" => array(
-			"default" => "GROUP_NAME would like to do PROJECT_NAME.",
-			"group_member" => ""
+			"default" => "GROUP_NAME would like to do PROJECT_NAME."
 		),
 		"group_undertaken_project_approved" => array(
-			"default" => "GROUP_NAME is doing PROJECT_NAME.",
-			"group_member" => "Your group has been approved to do PROJECT_NAME."
+			"default" => "GROUP_NAME has been approved to do PROJECT_NAME.",
+			"group_member" => "Your group has been approved to do PROJECT_NAME.",
+			"supervisor" => "You approved GROUP_NAME to do PROJECT_NAME."
+		),
+		"group_undertaken_project_rejected" => array(
+			"default" => "GROUP_NAME has been rejected to do PROJECT_NAME.",
+			"group_member" => "Your group has been rejected to do PROJECT_NAME.",
+			"supervisor" => "You rejected GROUP_NAME to do PROJECT_NAME."
 		),
 		"group_released_project" => array(
 			"default" => "GROUP_NAME is no longer doing PROJECT_NAME.",
@@ -425,6 +448,13 @@ class Model_Notification extends Model
 				if ($this->project->getSupervisor()->getId() == $user->getId())
 				{
 					$string = $strings["supervisor"];
+				}
+			}
+			elseif (array_key_exists("user", $strings) && !empty($this->user))
+			{
+				if ($this->user->getId() == $user->getId())
+				{
+					$string = $strings["user"];
 				}
 			}
 		}
