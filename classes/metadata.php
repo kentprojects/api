@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-class Metadata implements ArrayAccess, Countable
+final class Metadata implements ArrayAccess, Countable
 {
 	protected $data = array();
 	protected $root;
