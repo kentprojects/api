@@ -112,8 +112,8 @@ final class Intent_Undertake_A_Project extends Intent
 		Notification::queue(
 			"group_wants_to_undertake_a_project", $this->model->getUser(),
 			array(
-				"group" => $group->getId(),
-				"project" => $project->getId()
+				"group_id" => $group->getId(),
+				"project_id" => $project->getId()
 			),
 			array(
 				"user/" . $project->getSupervisor()->getId()
@@ -237,8 +237,8 @@ final class Intent_Undertake_A_Project extends Intent
 				Notification::queue(
 					"group_undertaken_project_approved", $project->getSupervisor(),
 					array(
-						"group" => $group->getId(),
-						"project" => $project->getId()
+						"group_id" => $group->getId(),
+						"project_id" => $project->getId()
 					),
 					array(
 						"project/" . $project->getId()
@@ -258,8 +258,8 @@ final class Intent_Undertake_A_Project extends Intent
 				Notification::queue(
 					"group_undertaken_project_rejected", $project->getSupervisor(),
 					array(
-						"group" => $group->getId(),
-						"project" => $project->getId()
+						"group_id" => $group->getId(),
+						"project_id" => $project->getId()
 					),
 					array(
 						"group/" . $group->getId(),

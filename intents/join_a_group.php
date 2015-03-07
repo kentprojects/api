@@ -100,7 +100,7 @@ final class Intent_Join_A_Group extends Intent
 
 		Notification::queue(
 			"user_wants_to_join_a_group", $this->model->getUser(),
-			array("group" => $group->getId()), array("group/" . $group->getId())
+			array("group_id" => $group->getId()), array("group/" . $group->getId())
 		);
 
 		$group_creator_name = $group->getCreator()->getFirstName();
@@ -220,8 +220,8 @@ final class Intent_Join_A_Group extends Intent
 				Notification::queue(
 					"user_approved_another_to_join_a_group", $group->getCreator(),
 					array(
-						"group" => $group->getId(),
-						"user" => $this->model->getUser()->getId()
+						"group_id" => $group->getId(),
+						"user_id" => $this->model->getUser()->getId()
 					),
 					array(
 						"group/" . $group->getId()
@@ -243,8 +243,8 @@ final class Intent_Join_A_Group extends Intent
 				Notification::queue(
 					"user_rejected_another_to_join_a_group", $group->getCreator(),
 					array(
-						"group" => $group->getId(),
-						"user" => $this->model->getUser()->getId()
+						"group_id" => $group->getId(),
+						"user_id" => $this->model->getUser()->getId()
 					),
 					array(
 						"group/" . $group->getId(),
