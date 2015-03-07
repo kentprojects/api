@@ -6,16 +6,17 @@
  *
  * The idea behind this script is one queues a call to this script and passes it a JSON object of parameters.
  *
- * $ php notifications.php {type:"user_wants_to_access_a_year", actor_id:22, year:2014, targets: ["convener"]}
  * $ php notifications.php
- *     {type:"user_wants_to_join_a_group", actor_id: 4, group_id: 6, targets: ["group/6", "user/2"]}
+ *     {type:"user_wants_to_access_a_year", actor_id:22, references:{year:2014}, targets:["convener"]}
+ * $ php notifications.php
+ *     {type:"user_wants_to_join_a_group", actor_id: 4, references:{group_id: 6}, targets:["group/6", "user/2"]}
  *
  * This script will try to be clever and send a notification to as many people are possible, depending on the targets.
  * #NahThatAin'tMe
  */
 require_once __DIR__ . "/functions.php";
 Timing::start("notifications");
-$data = new stdClass;
+$parameters = array();
 
 try
 {
@@ -30,36 +31,42 @@ try
 		exit();
 	}
 
-	$data = json_decode($argv[1]);
-	if (empty($data))
+	$parameters = json_decode($argv[1], true);
+	if (empty($parameters))
 	{
 		throw new InvalidArgumentException("Invalid JSON passed to the notification script.");
 	}
 
-	if (empty($data->type))
+	if (empty($parameters["type"]))
 	{
 		throw new InvalidArgumentException("No type parameter passed to the notification script.");
 	}
-	elseif (empty($data->actor_id))
+	elseif (empty($parameters["actor_id"]))
 	{
 		throw new InvalidArgumentException("No actor_id parameter passed to the notification script.");
 	}
-	elseif (empty($data->targets))
+	elseif (empty($parameters["references"]))
+	{
+		$parameters["references"] = array();
+	}
+	elseif (empty($parameters["targets"]))
 	{
 		throw new InvalidArgumentException("No targets parameter passed to the notification script.");
 	}
 
-	$actor = Model_User::getById($data->actor_id);
+	$actor = Model_User::getById($parameters["actor_id"]);
 	if (empty($actor))
 	{
 		throw new InvalidArgumentException("Actor not found for notification script. Aborting.");
 	}
 
-	$notification = new Model_Notification($data->type, $actor);
+	Notification::validate($parameters["type"], $actor, $parameters["references"], $parameters["targets"]);
 
-	if (!empty($data->group_id))
+	$notification = new Model_Notification($parameters["type"], $actor);
+
+	if (!empty($parameters["references"]["group_id"]))
 	{
-		$group = Model_Group::getById($data->group_id);
+		$group = Model_Group::getById($parameters["references"]["group_id"]);
 		if (empty($group))
 		{
 			throw new InvalidArgumentException("Group not found for notification script. Aborting.");
@@ -67,9 +74,9 @@ try
 		$notification->setGroup($group);
 	}
 
-	if (!empty($data->project_id))
+	if (!empty($parameters["references"]["project_id"]))
 	{
-		$project = Model_Project::getById($data->project_id);
+		$project = Model_Project::getById($parameters["references"]["project_id"]);
 		if (empty($project))
 		{
 			throw new InvalidArgumentException("Project not found for notification script. Aborting.");
@@ -77,9 +84,9 @@ try
 		$notification->setProject($project);
 	}
 
-	if (!empty($data->user_id))
+	if (!empty($parameters["references"]["user_id"]))
 	{
-		$user = Model_User::getById($data->user_id);
+		$user = Model_User::getById($parameters["references"]["user_id"]);
 		if (empty($user))
 		{
 			throw new InvalidArgumentException("User not found for notification script. Aborting.");
@@ -87,9 +94,9 @@ try
 		$notification->setUser($user);
 	}
 
-	if (!empty($data->year))
+	if (!empty($parameters["references"]["year"]))
 	{
-		$year = Model_Year::getById($data->year);
+		$year = Model_Year::getById($parameters["references"]["year"]);
 		if (empty($year))
 		{
 			throw new InvalidArgumentException("Year not found for notification script. Aborting.");
@@ -98,10 +105,7 @@ try
 	}
 
 	$targetIds = array();
-	/**
-	 * This foreach is identical to Notification::queue and SHOULD STAY THAT WAY!
-	 */
-	foreach ($data->targets as $target)
+	foreach ($parameters["targets"] as $target)
 	{
 		if ($target === "conveners")
 		{
@@ -114,10 +118,6 @@ try
 		}
 
 		$splitTarget = explode("/", $target);
-		if (count($splitTarget) !== 2)
-		{
-			throw new InvalidArgumentException("Invalid target '{$target}' passed to notification script. Aborting.");
-		}
 
 		switch ($splitTarget[0])
 		{
@@ -158,14 +158,14 @@ try
 	Timing::stop("notifications");
 	if (config("environment") === "development")
 	{
-		Log::debug($data, Timing::export());
+		Log::debug($parameters, Timing::export());
 	}
 	Log::write();
 	exit();
 }
 catch (Exception $e)
 {
-	Log::error($e->getMessage(), $data);
+	Log::error($e->getMessage(), $parameters);
 	Log::write();
 	exit(1);
 }
