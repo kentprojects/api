@@ -164,6 +164,7 @@ final class Model_User extends Model
 			parent::clearCacheStrings(),
 			array(
 				$this->getCacheName("group"),
+				$this->getCacheName("notifications"),
 				$this->getCacheName("project"),
 				$this->getCacheName("years")
 			)

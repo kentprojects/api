@@ -50,7 +50,7 @@ final class Controller_Me extends Controller
 			}
 		}
 
-		$details["notifications"] = new UserNotificationMap($user);
+		// $details["notifications"] = new UserNotificationMap($user);
 		$details["settings"] = $this->auth->getToken()->getSettings();
 
 		$this->response->status(200);
