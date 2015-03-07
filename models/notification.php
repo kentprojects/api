@@ -276,7 +276,7 @@ class Model_Notification extends Model
 	 */
 	public function getGroup()
 	{
-		if (empty($this->group))
+		if (is_numeric($this->group))
 		{
 			/** @noinspection PhpParamsInspection */
 			$this->group = Model_Group::getById($this->group);
@@ -297,7 +297,7 @@ class Model_Notification extends Model
 	 */
 	public function getProject()
 	{
-		if (empty($this->project))
+		if (is_numeric($this->project))
 		{
 			/** @noinspection PhpParamsInspection */
 			$this->project = Model_Project::getById($this->project);
@@ -326,7 +326,7 @@ class Model_Notification extends Model
 	 */
 	public function getUser()
 	{
-		if (empty($this->user))
+		if (is_numeric($this->user))
 		{
 			/** @noinspection PhpParamsInspection */
 			$this->user = Model_User::getById($this->user);
@@ -339,7 +339,7 @@ class Model_Notification extends Model
 	 */
 	public function getYear()
 	{
-		if (empty($this->year))
+		if (is_numeric($this->year))
 		{
 			/** @noinspection PhpParamsInspection */
 			$this->year = Model_Year::getById($this->year);
@@ -411,7 +411,7 @@ class Model_Notification extends Model
 				"group" => !empty($this->group) ? $this->group->render($request, $response, $acl, true) : null,
 				"project" => !empty($this->project) ? $this->project->render($request, $response, $acl, true) : null,
 				"user" => !empty($this->user) ? $this->user->render($request, $response, $acl, true) : null,
-				"year" => (string)$this->year,
+				"year" => !empty($this->year) ? (string)$this->year : null,
 				"created" => $this->created,
 				"read" => $this->read
 			)
