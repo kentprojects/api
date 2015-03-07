@@ -109,18 +109,16 @@ final class Intent_Undertake_A_Project extends Intent
 
 		$group = $this->model->getUser()->getGroup();
 
-		/**
-		 * Notification::queue(
-		 * "group_wants_to_undertake_a_project", $this->model->getUser(),
-		 * array(
-		 * "group" => $group->getId(),
-		 * "project" => $project->getId()
-		 * ),
-		 * array(
-		 * "user/" . $project->getSupervisor()->getId()
-		 * )
-		 * );
-		 */
+		Notification::queue(
+			"group_wants_to_undertake_a_project", $this->model->getUser(),
+			array(
+				"group" => $group->getId(),
+				"project" => $project->getId()
+			),
+			array(
+				"user/" . $project->getSupervisor()->getId()
+			)
+		);
 
 		$group_name = $group->getName();
 		$intent_creator_name = $this->model->getUser()->getName();
