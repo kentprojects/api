@@ -3,6 +3,11 @@
 # @license: Copyright KentProjects
 # @link: http://kentprojects.com
 #
+general:
+  branches:
+    only:
+      - master
+      - develop
 machine:
 # Machine specifics.
   php:
