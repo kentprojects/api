@@ -12,10 +12,6 @@ abstract class Model
 	 * @var array
 	 */
 	private static $limitFields = array();
-	/**
-	 * An array of the models already rendered;
-	 */
-	protected static $rendered = array();
 
 	/**
 	 * Builds a new model like the Database does.
@@ -97,16 +93,6 @@ abstract class Model
 	public static function returnFields(array $fields)
 	{
 		self::$limitFields[get_called_class()] = array_merge(array("id"), $fields);
-	}
-
-	protected static function rendered($entity)
-	{
-		if (array_key_exists($entity, static::$rendered))
-		{
-			return true;
-		}
-		static::$rendered[$entity] = true;
-		return false;
 	}
 
 	/**
