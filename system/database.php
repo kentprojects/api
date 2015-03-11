@@ -37,7 +37,7 @@ abstract class Database
 				config("database", "database")
 			);
 
-			if (static::$mysqli->connect_error)
+			if (static::$mysqli->connect_error > 0)
 			{
 				throw new DatabaseException(
 					static::$mysqli->connect_error, static::$mysqli->connect_errno,
@@ -51,11 +51,11 @@ abstract class Database
 		if (!empty($types))
 		{
 			$allowed = str_split(static::$types);
-			$allowedcheck = str_replace($allowed, "", $types);
-			if (strlen($allowedcheck) > 0)
+			$allowedCheck = str_replace($allowed, "", $types);
+			if (strlen($allowedCheck) > 0)
 			{
 				throw new DatabaseException(
-					"Unable to create prepared statement: There is an invalid type supplied: $allowedcheck", 0,
+					"Unable to create prepared statement: There is an invalid type supplied: $allowedCheck", 0,
 					$query, $types, $format
 				);
 			}
