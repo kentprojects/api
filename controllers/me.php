@@ -61,24 +61,40 @@ final class Controller_Me extends Controller
 	 * /me/notifications
 	 * /me/:id/notifications
 	 *
-	 * GET
+	 * GET / PUT
 	 *
 	 * Gets a list of notifications for the user.
 	 * Append `?unread=1` to get only unread notifications.
 	 * Check the header `X-Notification-Count` for a count if required.
+	 *
+	 * To mark notifications as read, send a PUT request to /me/notifications with a JSON array of IDs:
+	 *   PUT /me/notifications
+	 *   { ids: [ 1, 2, 3, 4, 5 ] }
 	 *
 	 * @throws HttpStatusException
 	 * @return void
 	 */
 	public function action_notifications()
 	{
-		$this->validateMethods(Request::GET);
+		$this->validateMethods(Request::GET, Request::PUT);
 		if ($this->request->param("id") !== null)
 		{
 			throw new HttpStatusException(400, "No ID should be passed to the ME controller.");
 		}
 
 		$notifications = new UserNotificationMap($this->auth->getUser());
+
+		if ($this->request->getMethod() === Request::PUT)
+		{
+			$ids = $this->request->post("ids", array());
+			if (empty($ids) || !is_array($ids))
+			{
+				throw new HttpStatusException(400, "Please supply an array of IDs to mark notifications as read.");
+			}
+
+			$notifications->markAsReadByIds($ids);
+		}
+
 		if ($this->request->query("unread") !== null)
 		{
 			$notifications = $notifications->getUnread();

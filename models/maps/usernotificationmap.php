@@ -60,6 +60,23 @@ final class UserNotificationMap extends ModelMap
 	}
 
 	/**
+	 * @param array $ids
+	 */
+	public function markAsReadByIds(array $ids)
+	{
+		foreach ($ids as $id)
+		{
+			if (array_key_exists($id, $this->data))
+			{
+				/** @var Model_Notification $notification */
+				$notification = $this->data[$id];
+				$notification->setRead(Date::format(Date::TIMESTAMP));
+				$this->data[$id] = $notification;
+			}
+		}
+	}
+
+	/**
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */
