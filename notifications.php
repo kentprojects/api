@@ -74,6 +74,16 @@ try
 		$notification->setGroup($group);
 	}
 
+	if (!empty($parameters["references"]["intent_id"]))
+	{
+		$intent = Model_Intent::getById($parameters["references"]["intent_id"]);
+		if (empty($intent))
+		{
+			throw new InvalidArgumentException("Intent not found for notification script. Aborting.");
+		}
+		$notification->setIntent($intent);
+	}
+
 	if (!empty($parameters["references"]["project_id"]))
 	{
 		$project = Model_Project::getById($parameters["references"]["project_id"]);

@@ -67,7 +67,8 @@ final class Intent_Leave_A_Group extends Intent
 
 		Notification::queue(
 			"user_left_a_group", $this->model->getUser(),
-			array("group_id" => $group->getId()), array("group/" . $group->getId())
+			array("group_id" => $group->getId()),
+			array("group/" . $group->getId())
 		);
 
 		$this->deduplicateClear("join_a_group", array(

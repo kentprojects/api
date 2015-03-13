@@ -7,11 +7,6 @@
 final class Controller_Comment extends Controller
 {
 	/**
-	 * @var string[]
-	 */
-	private $allowedEntities = array("group", "project", "user");
-
-	/**
 	 * /comment
 	 * /comment/:id
 	 *
@@ -53,6 +48,11 @@ final class Controller_Comment extends Controller
 			));
 
 			$params["root"] = $this->validateRoot($params["root"]);
+			$this->validateUser(array(
+				"entity" => $params["root"],
+				"action" => ACL::READ,
+				"message" => "You do not have permission to read items related to {$root}."
+			));
 			$comment = new Model_Comment($params["root"], $this->auth->getUser(), $params["comment"]);
 			$comment->save();
 
@@ -120,6 +120,11 @@ final class Controller_Comment extends Controller
 		}
 
 		$root = $this->validateRoot($this->request->query("root"));
+		$this->validateUser(array(
+			"entity" => $root,
+			"action" => ACL::READ,
+			"message" => "You do not have permission to read items related to {$root}."
+		));
 
 		$this->response->status(200);
 		$this->response->body(Model_Comment::getByRoot($root));
@@ -138,8 +143,10 @@ final class Controller_Comment extends Controller
 			throw new InvalidArgumentException("Invalid root format.");
 		}
 
+		$allowedEntities = array("group", "project", "user");
 		list($entity, $id) = $split;
-		if (empty($entity) || !in_array($entity, $this->allowedEntities))
+
+		if (empty($entity) || !in_array($entity, $allowedEntities))
 		{
 			throw new InvalidArgumentException("Invalid root entity.");
 		}
@@ -148,14 +155,6 @@ final class Controller_Comment extends Controller
 			throw new InvalidArgumentException("Invalid root entity ID.");
 		}
 
-		$root = "{$entity}/{$id}";
-
-		$this->validateUser(array(
-			"entity" => $root,
-			"action" => ACL::READ,
-			"message" => "You do not have permission to read items related to {$root}."
-		));
-
-		return $root;
+		return "{$entity}/{$id}";
 	}
 }

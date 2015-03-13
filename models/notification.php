@@ -6,6 +6,11 @@
  */
 class Model_Notification extends Model
 {
+	/**
+	 * If you add any new types, please update the docs!
+	 *
+	 * @var array
+	 */
 	protected static $typeStrings = array(
 		"user_got_a_notification" => array(
 			"default" => "You just got a notification. Yippee!"
@@ -189,6 +194,10 @@ class Model_Notification extends Model
 	 */
 	protected $group;
 	/**
+	 * @var Intent
+	 */
+	protected $intent;
+	/**
 	 * @var Model_Project
 	 */
 	protected $project;
@@ -293,6 +302,19 @@ class Model_Notification extends Model
 	}
 
 	/**
+	 * @return Intent
+	 */
+	public function getIntent()
+	{
+		if (is_numeric($this->intent))
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->intent = Intent::getById($this->intent);
+		}
+		return $this->intent;
+	}
+
+	/**
 	 * @return Model_Project
 	 */
 	public function getProject()
@@ -392,6 +414,7 @@ class Model_Notification extends Model
 	{
 		$this->getActor();
 		$this->getGroup();
+		$this->getIntent();
 		$this->getProject();
 		$this->getUser();
 
@@ -409,6 +432,7 @@ class Model_Notification extends Model
 				"text" => $string,
 				"actor" => $this->actor->render($request, $response, $acl, true),
 				"group" => !empty($this->group) ? $this->group->render($request, $response, $acl, true) : null,
+				"intent" => !empty($this->intent) ? $this->intent->render($request, $response, $acl, true) : null,
 				"project" => !empty($this->project) ? $this->project->render($request, $response, $acl, true) : null,
 				"user" => !empty($this->user) ? $this->user->render($request, $response, $acl, true) : null,
 				"year" => !empty($this->year) ? (string)$this->year : null,
@@ -483,12 +507,13 @@ class Model_Notification extends Model
 		{
 			/** @var _Database_State $result */
 			$result = Database::prepare(
-				"INSERT INTO `Notification` (`type`, `actor_id`, `group_id`, `project_id`, `user_id`, `year`)
-				 VALUES (?, ?, ?, ?, ?, ?)",
-				"siiiii"
+				"INSERT INTO `Notification` (`type`, `actor_id`, `group_id`, `intent_id`, `project_id`, `user_id`, `year`)
+				 VALUES (?, ?, ?, ?, ?, ?, ?)",
+				"siiiiii"
 			)->execute(
 				$this->type, $this->actor->getId(),
 				!empty($this->group) && is_object($this->group) ? $this->group->getId() : null,
+				!empty($this->intent) && is_object($this->intent) ? $this->intent->getId() : null,
 				!empty($this->project) && is_object($this->project) ? $this->project->getId() : null,
 				!empty($this->user) && is_object($this->user) ? $this->user->getId() : null,
 				!empty($this->year) && is_object($this->year) ? $this->year->getId() : null
@@ -506,6 +531,15 @@ class Model_Notification extends Model
 	public function setGroup(Model_Group $group)
 	{
 		$this->group = $group;
+	}
+
+	/**
+	 * @param Model_Intent $intent
+	 * @return void
+	 */
+	public function setIntent(Model_Intent $intent)
+	{
+		$this->intent = $intent;
 	}
 
 	/**

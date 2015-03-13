@@ -76,7 +76,11 @@ final class Intent_Access_Year extends Intent
 
 		Notification::queue(
 			"user_wants_to_access_a_year", $actor,
-			array("year" => (string)$currentYear), array("conveners")
+			array(
+				"intent_id" => $this->getId(),
+				"year" => (string)$currentYear
+			),
+			array("conveners")
 		);
 
 		$intent_creator_name = $actor->getName();

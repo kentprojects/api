@@ -190,6 +190,14 @@ abstract class Intent
 	}
 
 	/**
+	 * @return int
+	 */
+	public final function getId()
+	{
+		return $this->model->getId();
+	}
+
+	/**
 	 * @param array $data
 	 * @throws InvalidArgumentException
 	 * @return void

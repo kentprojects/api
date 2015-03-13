@@ -41,3 +41,21 @@ you'll be able to start generating new notification types straight away!
 Being designed this way, the notifications will take up very little space in the database (given the amount of them that
 there will be, that statement couldn't be more `false`) per notification, and per recipient, and with the caching of
 attributes & the strings we stand a fighting chance against the mass number of users expected to use this platform!
+
+----
+
+## Valid Types
+
+- `user_got_a_notification`
+- `user_wants_to_access_a_year`
+- `user_approved_access_to_year`
+- `user_rejected_access_to_year`
+- `user_wants_to_join_a_group`
+- `user_approved_another_to_join_a_group`
+- `user_rejected_another_to_join_a_group`
+- `user_joined_a_group`
+- `user_left_a_group`
+- `group_wants_to_undertake_a_project`
+- `group_undertaken_project_approved`
+- `group_undertaken_project_rejected`
+- `group_released_project`

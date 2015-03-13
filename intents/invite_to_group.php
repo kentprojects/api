@@ -4,10 +4,10 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  *
- * Class Intent_Join_A_Group
- * Represents someone wanting to join a group.
+ * Class Intent_Invite_To_Group
+ * Represents someone wanting someone else to join a group.
  */
-final class Intent_Join_A_Group extends Intent
+final class Intent_Invite_To_Group extends Intent
 {
 	/**
 	 * Can this particular user create an intent of this kind?
@@ -26,10 +26,18 @@ final class Intent_Join_A_Group extends Intent
 		}
 
 		/**
-		 * If you are in a group already, then fail.
+		 * If you don't have a group.
 		 */
-		$group = Model_Group::getByUser($user);
-		return empty($group);
+		$group = $user->getGroup();
+		if (empty($group))
+		{
+			return false;
+		}
+
+		/**
+		 * Are you the creator ID?
+		 */
+		return ($group->getCreator()->getId() == $user->getId());
 	}
 
 	/**
@@ -47,18 +55,19 @@ final class Intent_Join_A_Group extends Intent
 			return true;
 		}
 
-		if (empty($this->data->group_id))
+		/**
+		 * If you are not a student.
+		 */
+		if (!$user->isStudent())
 		{
-			throw new IntentException("Missing group_id.");
+			return false;
 		}
 
-		$group = Model_Group::getById($this->data->group_id);
-		if (empty($group))
-		{
-			throw new IntentException("Missing group.");
-		}
-
-		return $group->getCreator()->getId() == $user->getId();
+		/**
+		 * If you are in a group already, then fail.
+		 */
+		$group = Model_Group::getByUser($user);
+		return empty($group);
 	}
 
 	/**
@@ -73,69 +82,40 @@ final class Intent_Join_A_Group extends Intent
 	{
 		parent::create($data, $actor);
 
-		if (empty($data["group_id"]))
+		if (empty($data["user_id"]))
 		{
-			throw new HttpStatusException(400, "Missing parameter 'group_id' for this intent.");
+			throw new HttpStatusException(400, "Missing parameter 'user_id' for this intent.");
 		}
 
-		$group = Model_Group::getById($data["group_id"]);
-		if (empty($group))
+		$user = Model_Student::getById($data["user_id"]);
+		if (empty($user))
 		{
-			throw new HttpStatusException(404, "Group with `group_id` is not found.");
-		}
-		if ($group->hasProject())
-		{
-			throw new IntentException("This group already has a project and cannot be joined.");
+			throw new HttpStatusException(404, "Student with `user_id` is not found.");
 		}
 
-		$data = array_merge($data, array(
-			"group_id" => $group->getId()
-		));
+		$group = $actor->getGroup();
 
 		$this->deduplicate(array(
-			"group_id" => $group->getId()
+			"group_id" => $group->getId(),
+			"user_id" => $user->getId()
 		));
-		$this->mergeData($data);
+		$this->mergeData(array_merge($data, array(
+			"group_id" => $group->getId(),
+			"user_id" => $user->getId()
+		)));
 		$this->save();
 
 		Notification::queue(
 			"user_wants_to_join_a_group", $this->model->getUser(),
 			array(
 				"group_id" => $group->getId(),
-				"intent_id" => $this->getId()
+				"intent_id" => $this->getId(),
+				"user_id" => $user->getId()
 			),
-			array("group/" . $group->getId())
+			array(
+				"group/" . $group->getId()
+			)
 		);
-
-		$group_creator_name = $group->getCreator()->getFirstName();
-		$group_name = $group->getName();
-		$intent_creator_name = $this->model->getUser()->getName();
-
-		$path = sprintf("intents.php?action=view&id=%d", $this->model->getId());
-
-		$body = array(
-			"Hey {$group_creator_name},\n\n",
-			"{$intent_creator_name} wishes to join your group '{$group_name}'.\n\n",
-			"To accept, please click on the relevant link:\n\n",
-			"> http://localhost:5757/{$path}\n",
-			"> http://localhost:8080/{$path}\n",
-			"> http://dev.kentprojects.com/{$path}\n",
-			"> http://kentprojects.com/{$path}\n\n",
-			"Kind regards,\n",
-			"Your awesome API\n\n\n",
-			"For reference, here's the JSON export of the intent:\n",
-			json_encode($this, JSON_PRETTY_PRINT)
-		);
-
-		/**
-		 * This is where one would mail out, or at least add to a queue!
-		 */
-		$mail = new Postmark;
-		$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
-		$mail->setTo("matt.house@kentprojects.com", "Matt House");
-		$mail->setSubject("New Intent #" . $this->model->getId());
-		$mail->setBody($body);
-		$mail->send();
 	}
 
 	/**
@@ -153,15 +133,26 @@ final class Intent_Join_A_Group extends Intent
 		{
 			throw new HttpStatusException(500, "Failed to fetch group ID for this intent.");
 		}
-
 		$group = Model_Group::getById($groupId);
 		if (empty($group))
 		{
 			throw new HttpStatusException(500, "Failed to fetch group for this intent.");
 		}
 
+		$userId = $this->data->user_id;
+		if (empty($userId))
+		{
+			throw new HttpStatusException(500, "Failed to fetch student ID for this intent.");
+		}
+		$user = Model_Student::getById($userId);
+		if (empty($user))
+		{
+			throw new HttpStatusException(500, "Failed to fetch student for this intent.");
+		}
+
 		$rendered = parent::render($request, $response, $acl, $internal);
 		$rendered["group"] = $group->render($request, $response, $acl, true);
+		$rendered["user"] = $user->render($request, $response, $acl, true);
 		return $rendered;
 	}
 
@@ -179,14 +170,26 @@ final class Intent_Join_A_Group extends Intent
 			throw new IntentException("Missing group_id.");
 		}
 
-		$group = Model_Group::getById($this->data->group_id);
+		$groupId = $this->data->group_id;
+		if (empty($groupId))
+		{
+			throw new IntentException("Failed to fetch group ID for this intent.");
+		}
+		$group = Model_Group::getById($groupId);
 		if (empty($group))
 		{
-			throw new IntentException("Missing group.");
+			throw new IntentException("Failed to fetch group for this intent.");
 		}
-		if ($group->hasProject())
+
+		$userId = $this->data->user_id;
+		if (empty($userId))
 		{
-			throw new IntentException("This group already has a project and cannot be joined.");
+			throw new IntentException("Failed to fetch student ID for this intent.");
+		}
+		$user = Model_Student::getById($userId);
+		if (empty($user))
+		{
+			throw new IntentException("Failed to fetch student for this intent.");
 		}
 
 		$this->mergeData($data);
