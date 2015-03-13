@@ -51,7 +51,7 @@ final class Controller_Comment extends Controller
 			$this->validateUser(array(
 				"entity" => $params["root"],
 				"action" => ACL::READ,
-				"message" => "You do not have permission to read items related to {$root}."
+				"message" => "You do not have permission to read items related to {$params["root"]}."
 			));
 			$comment = new Model_Comment($params["root"], $this->auth->getUser(), $params["comment"]);
 			$comment->save();
