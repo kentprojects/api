@@ -89,6 +89,7 @@ class Model_Notification extends Model
 					`type`,
 					`actor_id` AS 'actor',
 					`group_id` AS 'group',
+					`intent_id` AS 'intent',
 					`project_id` AS 'project',
 					`user_id` AS 'user',
 					`year`,
