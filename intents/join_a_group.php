@@ -135,7 +135,7 @@ final class Intent_Join_A_Group extends Intent
 		$mail->setTo("matt.house@kentprojects.com", "Matt House");
 		$mail->setSubject("New Intent #" . $this->model->getId());
 		$mail->setBody($body);
-		$mail->send();
+		// $mail->send();
 	}
 
 	/**
@@ -241,7 +241,7 @@ final class Intent_Join_A_Group extends Intent
 					"Kind regards,\n",
 					"Your awesome API"
 				));
-				$mail->send();
+				// $mail->send();
 				break;
 			case static::STATE_REJECTED:
 				Notification::queue(
@@ -263,7 +263,7 @@ final class Intent_Join_A_Group extends Intent
 					"Kind regards,\n",
 					"Your awesome API"
 				));
-				$mail->send();
+				// $mail->send();
 				break;
 			default:
 				throw new IntentException("This state is not a valid Intent STATE constant.");
