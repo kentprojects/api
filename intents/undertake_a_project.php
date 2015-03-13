@@ -113,6 +113,7 @@ final class Intent_Undertake_A_Project extends Intent
 			"group_wants_to_undertake_a_project", $this->model->getUser(),
 			array(
 				"group_id" => $group->getId(),
+				"intent_id" => $this->getId(),
 				"project_id" => $project->getId()
 			),
 			array(
