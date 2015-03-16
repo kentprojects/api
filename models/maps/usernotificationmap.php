@@ -70,7 +70,7 @@ final class UserNotificationMap extends ModelMap
 			{
 				/** @var Model_Notification $notification */
 				$notification = $this->data[$id];
-				$notification->setRead(Date::format(Date::TIMESTAMP));
+				$notification->setRead(Date::format(Date::TIMESTAMP, time()));
 				$this->data[$id] = $notification;
 			}
 		}
