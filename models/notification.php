@@ -48,6 +48,11 @@ class Model_Notification extends Model
 			"default" => "ACTOR_NAME left GROUP_NAME.",
 			"group_member" => "ACTOR_NAME left your group."
 		),
+		"user_kicked_from_group" => array(
+			"default" => "ACTOR_NAME was removed from GROUP_NAME.",
+			"group_member" => "ACTOR_NAME was removed from your group.",
+			"user" => "You were removed from GROUP_NAME."
+		),
 		"group_wants_to_undertake_a_project" => array(
 			"default" => "GROUP_NAME would like to do PROJECT_NAME."
 		),
