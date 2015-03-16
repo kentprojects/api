@@ -93,6 +93,7 @@ final class Controller_Me extends Controller
 			}
 
 			$notifications->markAsReadByIds($ids);
+			$notifications->save();
 		}
 
 		if ($this->request->query("unread") !== null)
