@@ -184,11 +184,11 @@ final class UserYearMap implements Countable, IteratorAggregate
 	/**
 	 * Useful so the ModelMap can partake in a foreach loop.
 	 *
-	 * @return array
+	 * @return ArrayIterator
 	 */
 	public function getIterator()
 	{
-		return $this->data;
+		return new ArrayIterator(array_values($this->data));
 	}
 
 	/**
