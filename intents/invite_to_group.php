@@ -187,22 +187,15 @@ final class Intent_Invite_To_Group extends Intent
 		{
 			throw new IntentException("Failed to fetch student ID for this intent.");
 		}
-		$user = Model_Student::getById($userId);
-		if (empty($user))
+		if ($userId != $actor->getId())
 		{
-			throw new IntentException("Failed to fetch student for this intent.");
+			/**
+			 * This ain't the grammies, you can't accept awards on behalf of people.
+			 */
+			throw new IntentException("You are not allowed to accept this invite.");
 		}
 
 		$this->mergeData($data);
-
-		$group_creator_name = $group->getCreator()->getFirstName();
-		$group_name = $group->getName();
-		$intent_creator_name = $this->model->getUser()->getName();
-
-		$mail = new Postmark;
-		$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
-		$mail->setTo("matt.house@kentprojects.com", "Matt House");
-		$mail->setSubject("Update Intent #" . $this->model->getId());
 
 		switch ($this->state())
 		{
@@ -218,7 +211,7 @@ final class Intent_Invite_To_Group extends Intent
 
 				$acl = new ACL($this->model->getUser());
 				$acl->set("group", false, true, false, false);
-				$acl->set("group/" . $group->getId(), false, true, true, true);
+				$acl->set("group/" . $group->getId(), false, true, true, false);
 				$acl->save();
 
 				/**
@@ -236,15 +229,6 @@ final class Intent_Invite_To_Group extends Intent
 				);
 
 				$this->model->getUser()->clearCaches();
-
-				$mail->setBody(array(
-					"Hey {$intent_creator_name},\n\n",
-					"{$group_creator_name} was a total lad and allowed you to join '{$group_name}'.\n",
-					"Get going!\n\n",
-					"Kind regards,\n",
-					"Your awesome API"
-				));
-				// $mail->send();
 				break;
 			case static::STATE_REJECTED:
 				Notification::queue(
@@ -256,15 +240,6 @@ final class Intent_Invite_To_Group extends Intent
 						"group/" . $group->getId()
 					)
 				);
-
-				$mail->setBody(array(
-					"Hey {$intent_creator_name},\n\n",
-					"{$group_creator_name} was a total dick and has rejected your request to join '{$group_name}'.\n",
-					"Get going!\n\n",
-					"Kind regards,\n",
-					"Your awesome API"
-				));
-				// $mail->send();
 				break;
 			default:
 				throw new IntentException("This state is not a valid Intent STATE constant.");

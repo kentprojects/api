@@ -120,48 +120,6 @@ final class Intent_Undertake_A_Project extends Intent
 				"user/" . $project->getSupervisor()->getId()
 			)
 		);
-
-		$group_name = $group->getName();
-		$intent_creator_name = $this->model->getUser()->getName();
-		$project_supervisor_name = $project->getSupervisor()->getFirstName();
-		$project_name = $project->getName();
-
-		$path = sprintf("intents.php?action=view&id=%d", $this->model->getId());
-
-		$body = array(
-			"Hey {$project_supervisor_name},\n\n",
-			"{$intent_creator_name} and the group '{$group_name}' wishes to undertake your project '{$project_name}'.\n\n",
-			"To accept, please click on the relevant link:\n\n",
-			"> http://localhost:5757/{$path}\n",
-			"> http://localhost:8080/{$path}\n",
-			"> http://dev.kentprojects.com/{$path}\n",
-			"> http://kentprojects.com/{$path}\n\n",
-			"Kind regards,\n",
-			"Your awesome API\n\n\n",
-			"For reference, here's the JSON export of the intent:\n",
-			json_encode($this, JSON_PRETTY_PRINT)
-		);
-
-		/**
-		 * This is where one would mail out, or at least add to a queue!
-		 */
-		$mail = new Postmark;
-		$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
-		$mail->setTo("matt.house@kentprojects.com", "Matt House");
-		$mail->setSubject("New Intent #" . $this->model->getId());
-		$mail->setBody($body);
-		// $mail->send();
-	}
-
-	/**
-	 * @return array
-	 */
-	public function jsonSerialize()
-	{
-		$json = parent::jsonSerialize();
-		$json["group"] = $this->model->getUser()->getGroup();
-		$json["project"] = Model_Project::getById($this->data->project_id);
-		return $json;
 	}
 
 	/**
@@ -215,15 +173,6 @@ final class Intent_Undertake_A_Project extends Intent
 		$this->mergeData($data);
 		$group = $this->model->getUser()->getGroup();
 
-		$intent_creator_name = $this->model->getUser()->getName();
-		$project_supervisor_name = $project->getSupervisor()->getFirstName();
-		$project_name = $project->getName();
-
-		$mail = new Postmark;
-		$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
-		$mail->setTo("matt.house@kentprojects.com", "Matt House");
-		$mail->setSubject("Update Intent #" . $this->model->getId());
-
 		switch ($this->state())
 		{
 			case static::STATE_OPEN:
@@ -245,15 +194,6 @@ final class Intent_Undertake_A_Project extends Intent
 						"project/" . $project->getId()
 					)
 				);
-
-				$mail->setBody(array(
-					"Hey {$intent_creator_name},\n\n",
-					"{$project_supervisor_name} was lovely and allowed you to undertake '{$project_name}'.\n",
-					"Get going!\n\n",
-					"Kind regards,\n",
-					"Your awesome API"
-				));
-				// $mail->send();
 				break;
 			case static::STATE_REJECTED:
 				Notification::queue(
@@ -267,15 +207,6 @@ final class Intent_Undertake_A_Project extends Intent
 						"user/" . $project->getSupervisor()->getId()
 					)
 				);
-
-				$mail->setBody(array(
-					"Hey {$intent_creator_name},\n\n",
-					"{$project_supervisor_name} was incredibly rude and has rejected your request to join '{$project_name}'.\n",
-					"Get going!\n\n",
-					"Kind regards,\n",
-					"Your awesome API"
-				));
-				// $mail->send();
 				break;
 			default:
 				throw new IntentException("This state is not a valid Intent STATE constant.");

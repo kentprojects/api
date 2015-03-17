@@ -214,7 +214,7 @@ final class Intent_Join_A_Group extends Intent
 
 				$acl = new ACL($this->model->getUser());
 				$acl->set("group", false, true, false, false);
-				$acl->set("group/" . $group->getId(), false, true, true, true);
+				$acl->set("group/" . $group->getId(), false, true, true, false);
 				$acl->save();
 
 				/**

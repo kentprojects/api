@@ -82,33 +82,6 @@ final class Intent_Access_Year extends Intent
 			),
 			array("conveners")
 		);
-
-		$intent_creator_name = $actor->getName();
-		$path = sprintf("intents.php?action=view&id=%d", $this->model->getId());
-
-		$body = array(
-			"Hey there,\n\n",
-			"{$intent_creator_name} wishes to access the platform this year.\n\n",
-			"To accept, please click on the relevant link:\n\n",
-			"> http://localhost:5757/{$path}\n",
-			"> http://localhost:8080/{$path}\n",
-			"> http://dev.kentprojects.com/{$path}\n",
-			"> http://kentprojects.com/{$path}\n\n",
-			"Kind regards,\n",
-			"Your awesome API\n\n\n",
-			"For reference, here's the JSON export of the intent:\n",
-			json_encode($this, JSON_PRETTY_PRINT)
-		);
-
-		/**
-		 * This is where one would mail out, or at least add to a queue!
-		 */
-		$mail = new Postmark;
-		$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
-		$mail->setTo("matt.house@kentprojects.com", "Matt House");
-		$mail->setSubject("New Intent #" . $this->model->getId());
-		$mail->setBody($body);
-		// $mail->send();
 	}
 
 	/**
@@ -124,7 +97,6 @@ final class Intent_Access_Year extends Intent
 		$intentAuthor = $this->model->getUser();
 
 		$this->mergeData($data);
-		$intent_creator_name = $intentAuthor->getName();
 
 		$roles = array();
 		if ($intentAuthor->isStaff())
@@ -139,11 +111,6 @@ final class Intent_Access_Year extends Intent
 		}
 
 		$currentYear = Model_Year::getCurrentYear();
-
-		$mail = new Postmark;
-		$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
-		$mail->setTo("matt.house@kentprojects.com", "Matt House");
-		$mail->setSubject("Update Intent #" . $this->model->getId());
 
 		switch ($this->state())
 		{
@@ -166,15 +133,6 @@ final class Intent_Access_Year extends Intent
 						"user/" . $this->model->getUser()
 					)
 				);
-
-				$mail->setBody(array(
-					"Hey {$intent_creator_name},\n\n",
-					"You have been granted access to the year.\n",
-					"Get going!\n\n",
-					"Kind regards,\n",
-					"Your awesome API"
-				));
-				// $mail->send();
 				break;
 			case static::STATE_REJECTED:
 				Notification::queue(
@@ -188,15 +146,6 @@ final class Intent_Access_Year extends Intent
 						"user/" . $this->model->getUser()
 					)
 				);
-
-				$mail->setBody(array(
-					"Hey {$intent_creator_name},\n\n",
-					"You have been declined access to the year.\n",
-					"Sorry about that!\n\n",
-					"Kind regards,\n",
-					"Your awesome API"
-				));
-				// $mail->send();
 				break;
 			default:
 				throw new IntentException("This state is not a valid Intent STATE constant.");
