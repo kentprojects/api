@@ -221,8 +221,8 @@ INSERT INTO `ACL` (`user_id`, `entity`, `read`)
 INSERT INTO `ACL` (`user_id`, `entity`, `read`)
 	SELECT `user_id`, 'project', 1 FROM `User`;
 # Everyone can read user profiles.
-INSERT INTO `ACL` (`user_id`, `entity`, `read`, `update`)
-	SELECT `user_id`, 'user', 1, 1 FROM `User`;
+INSERT INTO `ACL` (`user_id`, `entity`, `read`)
+	SELECT `user_id`, 'user', 1 FROM `User`;
 
 # The convener can do everything.
 INSERT INTO `ACL` (`user_id`, `entity`, `create`, `read`, `update`, `delete`)
