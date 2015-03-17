@@ -213,7 +213,7 @@ final class Intent_Invite_To_Group extends Intent
 				return;
 			case static::STATE_ACCEPTED:
 				$students = new GroupStudentMap($group);
-				$students->add($this->model->getUser());
+				$students->add($actor);
 				$students->save();
 
 				$acl = new ACL($this->model->getUser());
