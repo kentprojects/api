@@ -131,28 +131,6 @@ class Model_Notification extends Model
 	}
 
 	/**
-	 * @param Model_User $user
-	 * @param array $ids
-	 * @return void
-	 */
-	public static function markAsRead(Model_User $user, array $ids)
-	{
-		if ($user->getId() === null)
-		{
-			return;
-		}
-
-		if (empty($ids))
-		{
-			return;
-		}
-
-		/**
-		 * TODO: FINISH THIS.
-		 */
-	}
-
-	/**
 	 * @param Model_Notification $notification
 	 * @param array $userIds
 	 * @throws InvalidArgumentException
@@ -182,7 +160,7 @@ class Model_Notification extends Model
 			$caches[] = Model_User::cacheName() . "." . $userId . ".notifications";
 		}
 
-		$statement = Database::prepare(implode(" ", $query), $types);
+		$statement = Database::prepare(implode(", ", $query), $types);
 		call_user_func_array(array($statement, "execute"), $values);
 
 		call_user_func_array(array("Cache", "delete"), $caches);
