@@ -439,33 +439,29 @@ class Model_Notification extends Model
 
 		if (!empty($user))
 		{
-			if (array_key_exists("actor", $strings))
+			if (array_key_exists("actor", $strings) && ($this->actor->getId() == $user->getId()))
 			{
-				if ($user->getId() == $this->actor->getId())
-				{
-					$string = $strings["actor"];
-				}
+				$string = $strings["actor"];
 			}
-			elseif (array_key_exists("supervisor", $strings) && !empty($this->project))
+			elseif (
+				array_key_exists("supervisor", $strings) && !empty($this->project) &&
+				($this->project->getSupervisor()->getId() == $user->getId())
+			)
 			{
-				if ($this->project->getSupervisor()->getId() == $user->getId())
-				{
-					$string = $strings["supervisor"];
-				}
+				$string = $strings["supervisor"];
 			}
-			elseif (array_key_exists("group_member", $strings) && !empty($this->group))
+			elseif (array_key_exists("group_member", $strings) && !empty($this->group) && false)
 			{
 				//if ($this->project->getSupervisor()->getId() == $user->getId())
 				{
 					//	$string = $strings["supervisor"];
 				}
 			}
-			elseif (array_key_exists("user", $strings) && !empty($this->user))
+			elseif (
+				array_key_exists("user", $strings) && !empty($this->user) && ($this->user->getId() == $user->getId())
+			)
 			{
-				if ($this->user->getId() == $user->getId())
-				{
-					$string = $strings["user"];
-				}
+				$string = $strings["user"];
 			}
 		}
 
