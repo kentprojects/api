@@ -226,10 +226,9 @@ final class Intent_Invite_To_Group extends Intent
 				 * for this notification.
 				 */
 				Notification::queue(
-					"user_approved_another_to_join_a_group", $group->getCreator(),
+					"user_accepted_invite_to_join_a_group", $actor,
 					array(
-						"group_id" => $group->getId(),
-						"user_id" => $this->model->getUser()->getId()
+						"group_id" => $group->getId()
 					),
 					array(
 						"group/" . $group->getId()
@@ -249,14 +248,12 @@ final class Intent_Invite_To_Group extends Intent
 				break;
 			case static::STATE_REJECTED:
 				Notification::queue(
-					"user_rejected_another_to_join_a_group", $group->getCreator(),
+					"user_declined_invite_to_join_a_group", $actor,
 					array(
-						"group_id" => $group->getId(),
-						"user_id" => $this->model->getUser()->getId()
+						"group_id" => $group->getId()
 					),
 					array(
-						"group/" . $group->getId(),
-						"user/" . $this->model->getUser()->getId()
+						"group/" . $group->getId()
 					)
 				);
 

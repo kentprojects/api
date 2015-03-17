@@ -34,6 +34,16 @@ class Model_Notification extends Model
 			"group_member" => "USER_NAME has been invited to join your group.",
 			"user" => "You have been invited by ACTOR_NAME to join GROUP_NAME."
 		),
+		"user_accepted_invite_to_join_a_group" => array(
+			"default" => "ACTOR_NAME has joined GROUP_NAME.",
+			"actor" => "You accepted the invite to join GROUP_NAME.",
+			"group_member" => "USER_NAME accepted the invite to join your group."
+		),
+		"user_declined_invite_to_join_a_group" => array(
+			"default" => "ACTOR_NAME has declined to join GROUP_NAME.",
+			"actor" => "You declined the invite to join GROUP_NAME.",
+			"group_member" => "USER_NAME declined the invite to join your group."
+		),
 		"user_approved_another_to_join_a_group" => array(
 			"default" => "ACTOR_NAME approved USER_NAME to join GROUP_NAME.",
 			"group_member" => "ACTOR_NAME approved USER_NAME to join your group."
