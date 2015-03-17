@@ -157,7 +157,7 @@ final class Model_Comment extends Model
 				"comment" => $this->comment,
 				"author" => $this->user->render($request, $response, $acl, true),
 				"permissions" => $acl->get($this->getEntityName()),
-				"created" => $this->created
+				"created" => Date::format(Date::RELATIVE, $this->created)
 			)
 		));
 	}
