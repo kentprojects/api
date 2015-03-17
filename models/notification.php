@@ -29,7 +29,8 @@ class Model_Notification extends Model
 			"user" => "ACTOR_NAME granted you access to YEAR."
 		),
 		"user_wants_another_to_join_a_group" => array(
-			"default" => "ACTOR_NAME would USER_NAME to join GROUP_NAME.",
+			"default" => "ACTOR_NAME would like USER_NAME to join GROUP_NAME.",
+			"actor" => "You invited USER_NAME to join GROUP_NAME.",
 			"group_member" => "USER_NAME has been invited to join your group.",
 			"user" => "You have been invited by ACTOR_NAME to join GROUP_NAME."
 		),
@@ -461,9 +462,9 @@ class Model_Notification extends Model
 			}
 			elseif (array_key_exists("group_member", $strings) && !empty($this->group))
 			{
-				if ($this->project->getSupervisor()->getId() == $user->getId())
+				//if ($this->project->getSupervisor()->getId() == $user->getId())
 				{
-					$string = $strings["supervisor"];
+					//	$string = $strings["supervisor"];
 				}
 			}
 			elseif (array_key_exists("user", $strings) && !empty($this->user))
