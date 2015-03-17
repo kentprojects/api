@@ -12,16 +12,8 @@ class Model_Group extends Model
 	 */
 	public static function delete(Model_Group $group)
 	{
-		$project = $group->getProject();
-		$students = $group->getStudents();
-
 		Database::prepare("DELETE FROM `Group` WHERE `group_id` = ?", "i")->execute($group->getId());
 		$group->clearCaches();
-		if (!empty($project))
-		{
-			$project->clearCaches();
-		}
-		$students->clearCaches();
 	}
 
 	/**
@@ -153,6 +145,7 @@ class Model_Group extends Model
 	 */
 	public function clearCacheStrings()
 	{
+		$this->getProject();
 		$this->getStudents();
 
 		return array_merge(
@@ -161,6 +154,7 @@ class Model_Group extends Model
 				$this->getCacheName("project"),
 				$this->getCacheName("students")
 			),
+			!empty($this->project) ? $this->project->clearCacheStrings() : array(),
 			!empty($this->students) ? $this->students->clearCacheStrings() : array()
 		);
 	}
