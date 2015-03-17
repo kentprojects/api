@@ -411,18 +411,11 @@ class Model_Notification extends Model
 		$this->getProject();
 		$this->getUser();
 
-		$string = Cache::get($this->getCacheName("string"));
-		if (empty($string))
-		{
-			$string = $this->renderNotificationString($acl->getUser());
-			!empty($string) && Cache::set($this->getCacheName("string"), $string, Cache::DAY);
-		}
-
 		return $this->validateFields(array_merge(
 			parent::render($request, $response, $acl, $internal),
 			array(
 				"type" => $this->type,
-				"text" => $string,
+				"text" => $this->renderNotificationString($acl->getUser()),
 				"actor" => $this->actor->render($request, $response, $acl, true),
 				"group" => !empty($this->group) ? $this->group->render($request, $response, $acl, true) : null,
 				"intent" => !empty($this->intent) ? $this->intent->render($request, $response, $acl, true) : null,
