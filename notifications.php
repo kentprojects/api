@@ -175,7 +175,37 @@ try
 }
 catch (Exception $e)
 {
-	Log::error($e->getMessage(), $parameters);
+	$error = array(
+		"error" => true,
+		"exception" => get_class($e),
+		"message" => $e->getMessage()
+	);
+	$status = 500;
+
+	switch (get_class($e))
+	{
+		case "DatabaseException":
+			/** @var DatabaseException $e */
+			if (config("environment") === "development")
+			{
+				$error["query"] = $e->getQuery();
+				$error["types"] = $e->getTypes();
+				$error["params"] = $e->getParams();
+			}
+			break;
+		case "HttpStatusException":
+			/** @var HttpStatusException $e */
+			$error["status"] = $status = $e->getCode();
+			break;
+	}
+	/** @var Exception $e */
+
+	if (true)
+	{
+		$error["trace"] = explode("\n", $e->getTraceAsString());
+	}
+
+	Log::error($error, $parameters);
 	Log::write();
 	exit(1);
 }
