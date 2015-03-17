@@ -443,7 +443,7 @@ class Model_Notification extends Model
 	{
 		$strings = static::$typeStrings[$this->type];
 
-		if (empty($user))
+		if (!empty($user))
 		{
 			if (array_key_exists("actor", $strings))
 			{
