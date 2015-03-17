@@ -28,9 +28,10 @@ class Model_Notification extends Model
 			"actor" => "You granted USER_NAME access to YEAR.",
 			"user" => "ACTOR_NAME granted you access to YEAR."
 		),
-		"user_wants_to_join_a_group" => array(
-			"default" => "ACTOR_NAME would like to join GROUP_NAME.",
-			"group_member" => "ACTOR_NAME would like to join your group."
+		"user_wants_another_to_join_a_group" => array(
+			"default" => "ACTOR_NAME would USER_NAME to join GROUP_NAME.",
+			"group_member" => "USER_NAME has been invited to join your group.",
+			"user" => "You have been invited by ACTOR_NAME to join GROUP_NAME."
 		),
 		"user_approved_another_to_join_a_group" => array(
 			"default" => "ACTOR_NAME approved USER_NAME to join GROUP_NAME.",
@@ -39,6 +40,10 @@ class Model_Notification extends Model
 		"user_rejected_another_to_join_a_group" => array(
 			"default" => "ACTOR_NAME rejected USER_NAME to join GROUP_NAME.",
 			"group_member" => "ACTOR_NAME rejected USER_NAME to join your group."
+		),
+		"user_wants_to_join_a_group" => array(
+			"default" => "ACTOR_NAME would like to join GROUP_NAME.",
+			"group_member" => "ACTOR_NAME would like to join your group."
 		),
 		"user_joined_a_group" => array(
 			"default" => "ACTOR_NAME joined GROUP_NAME.",

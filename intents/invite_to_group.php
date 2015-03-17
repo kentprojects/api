@@ -106,14 +106,15 @@ final class Intent_Invite_To_Group extends Intent
 		$this->save();
 
 		Notification::queue(
-			"user_wants_to_join_a_group", $this->model->getUser(),
+			"user_wants_another_to_join_a_group", $this->model->getUser(),
 			array(
 				"group_id" => $group->getId(),
 				"intent_id" => $this->getId(),
 				"user_id" => $user->getId()
 			),
 			array(
-				"group/" . $group->getId()
+				"group/" . $group->getId(),
+				"user/" . $user->getId()
 			)
 		);
 	}
@@ -225,7 +226,7 @@ final class Intent_Invite_To_Group extends Intent
 				 * for this notification.
 				 */
 				Notification::queue(
-					"user_approved_another_to_join_a_group", $group->getCreator(),
+					"user_wants_another_to_join_a_group", $group->getCreator(),
 					array(
 						"group_id" => $group->getId(),
 						"user_id" => $this->model->getUser()->getId()
