@@ -226,7 +226,7 @@ final class Intent_Invite_To_Group extends Intent
 				 * for this notification.
 				 */
 				Notification::queue(
-					"user_wants_another_to_join_a_group", $group->getCreator(),
+					"user_approved_another_to_join_a_group", $group->getCreator(),
 					array(
 						"group_id" => $group->getId(),
 						"user_id" => $this->model->getUser()->getId()
