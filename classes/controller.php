@@ -164,17 +164,16 @@ abstract class Controller
 			throw new InvalidArgumentException("Missing 'entity' and/or 'action' key for requirements.");
 		}
 
-		$user = $this->auth->getUser();
-
 		if (empty($requirements["message"]))
 		{
 			$requirements["message"] = "You aren't allowed to do this action.";
 		}
 
-		$requirements["missing-user-message"] = "No user found to authenticate this action against.";
-
 		if (!empty($requirements["role"]))
 		{
+			$user = $this->auth->getUser();
+			$requirements["missing-user-message"] = "No user found to authenticate this action against.";
+
 			if (empty($user))
 			{
 				throw new HttpStatusException(400, $requirements["missing-user-message"]);
