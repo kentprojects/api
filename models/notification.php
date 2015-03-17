@@ -148,7 +148,7 @@ class Model_Notification extends Model
 		}
 
 		$caches = array();
-		$query = array("INSERT INTO", "`User_Notification_Map`", "(`notification_id`, `user_id`)", "VALUES");
+		$query = array();
 		$types = "";
 		$values = array();
 
@@ -160,7 +160,10 @@ class Model_Notification extends Model
 			$caches[] = Model_User::cacheName() . "." . $userId . ".notifications";
 		}
 
-		$statement = Database::prepare(implode(", ", $query), $types);
+		$statement = Database::prepare(
+			implode(" ", array("INSERT INTO", "`User_Notification_Map`", "(`notification_id`, `user_id`)", "VALUES")) . " " .
+			implode(", ", $query), $types
+		);
 		call_user_func_array(array($statement, "execute"), $values);
 
 		call_user_func_array(array("Cache", "delete"), $caches);
