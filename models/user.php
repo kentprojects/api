@@ -303,7 +303,6 @@ final class Model_User extends Model
 			));
 		}
 
-		$this->getGroup();
 		if (!empty($this->group))
 		{
 			$data = array_merge($data, array(

@@ -33,6 +33,7 @@ final class Controller_User extends Controller
 		{
 			throw new HttpStatusException(404, "User not found.");
 		}
+		$user->getGroup();
 
 		$this->response->status(200);
 		$this->response->body($user);
