@@ -73,15 +73,20 @@ final class Controller_Comment extends Controller
 
 		if ($this->request->getMethod() === Request::DELETE)
 		{
-			$this->validateUser(array(
-				"entity" => "comment/" . $comment->getId(),
-				"action" => ACL::DELETE,
-				"message" => "You do not have permission to delete this comment."
-			));
-			Model_Comment::delete($comment);
-			$this->acl->delete("comment/" . $comment->getId());
-			$this->acl->save();
-			$this->response->status(204);
+			if (
+				$this->acl->validate("comment/" . $comment->getId(), ACL::DELETE) ||
+				$this->acl->validate($comment->getRoot(), ACL::UPDATE)
+			)
+			{
+				Model_Comment::delete($comment);
+				$this->acl->delete("comment/" . $comment->getId());
+				$this->acl->save();
+				$this->response->status(204);
+			}
+			else
+			{
+				throw new HttpStatusException(400, "You do not have permission to delete this comment.");
+			}
 			return;
 		}
 

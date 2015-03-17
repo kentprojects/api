@@ -53,7 +53,7 @@ final class Model_Comment extends Model
 	 */
 	public static function getByRoot($root)
 	{
-		$ids = Cache::get(static::cacheName() . ".root." . $root);
+		$ids = Cache::get(static::cacheName() . ".root." . str_replace("/", ".", $root));
 		if (empty($ids))
 		{
 			$ids = Database::prepare(
@@ -127,7 +127,7 @@ final class Model_Comment extends Model
 		return array_merge(
 			parent::clearCacheStrings(),
 			array(
-				static::getCacheName() . ".root." . $this->root
+				static::getCacheName() . ".root." . str_replace("/", ".", $this->root)
 			)
 		);
 	}
@@ -138,6 +138,14 @@ final class Model_Comment extends Model
 	public function getId()
 	{
 		return $this->id;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getRoot()
+	{
+		return $this->root;
 	}
 
 	/**
