@@ -103,6 +103,7 @@ abstract class ModelMap implements Countable, IteratorAggregate
 			/** @var Model $model */
 			$strings = array_merge($strings, $model->clearCacheStrings());
 		}
+		Log::debug($strings);
 		return $strings;
 	}
 

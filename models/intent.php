@@ -17,6 +17,7 @@ final class Model_Intent extends Model
 		$notifications = Model_Notification::getByIntent($intent);
 		if (!empty($notifications))
 		{
+			/** @var Model_Notification[] $notifications */
 			foreach ($notifications as $k => $notification)
 			{
 				$notifications[$k] = new NotificationUserMap($notification);
@@ -27,6 +28,7 @@ final class Model_Intent extends Model
 
 		if (!empty($notifications))
 		{
+			/** @var NotificationUserMap[] $notifications */
 			foreach ($notifications as $notificationUserMap)
 			{
 				$notificationUserMap->clearCaches();
