@@ -7,6 +7,20 @@
 final class Model_Intent extends Model
 {
 	/**
+	 * Delete a particular intent.
+	 *
+	 * @param Model_Intent $intent
+	 * @return void
+	 */
+	public static function delete(Model_Intent $intent)
+	{
+		Database::prepare("DELETE FROM `Intent` WHERE `intent_id` = ?", "i")->execute($intent->getId());
+		Database::prepare("DELETE FROM `Notification` WHERE `intent_id` = ?", "i")->execute($intent->getId());
+		$intent->user->clearCaches();
+		$intent->clearCaches();
+	}
+
+	/**
 	 * Delete any conflicting Intents with that hash.
 	 *
 	 * @param string $handler

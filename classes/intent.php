@@ -111,6 +111,11 @@ abstract class Intent
 		return true;
 	}
 
+	public function canDelete(Model_User $user)
+	{
+		return false;
+	}
+
 	/**
 	 * Can this particular user read this intent?
 	 *
@@ -182,11 +187,11 @@ abstract class Intent
 	/**
 	 * @param array $data
 	 * @param Model_User $actor
-	 * @throws Exception
+	 * @return void
 	 */
 	public function delete(array $data, Model_User $actor)
 	{
-		throw new Exception("Why are you calling a delete method of an Intent?");
+		Model_Intent::delete($this->model);
 	}
 
 	/**

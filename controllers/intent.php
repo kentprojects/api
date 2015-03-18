@@ -20,7 +20,7 @@ final class Controller_Intent extends Controller
 	 */
 	public function action_index()
 	{
-		$this->validateMethods(Request::GET, Request::POST, Request::PUT);
+		$this->validateMethods(Request::GET, Request::POST, Request::PUT, Request::DELETE);
 
 		if ($this->request->getMethod() === Request::POST)
 		{
@@ -69,6 +69,23 @@ final class Controller_Intent extends Controller
 			throw new HttpStatusException(404, "Intent not found.");
 		}
 
+		if ($this->request->getMethod() === Request::DELETE)
+		{
+			/**
+			 * DELETE /intent/:id
+			 */
+			if (!$intent->canDelete($this->auth->getUser()))
+			{
+				throw new HttpStatusException(403, "You do not have permission to delete this intent.");
+			}
+
+			$intent->delete($this->request->post("data", array()), $this->auth->getUser());
+
+			$this->response->status(200);
+			$this->response->body("Deleted!");
+			return;
+		}
+
 		if (!$intent->canRead($this->auth->getUser()))
 		{
 			throw new HttpStatusException(403, "You do not have permission to read this intent.");
@@ -96,8 +113,6 @@ final class Controller_Intent extends Controller
 			}
 			$intent->update($this->request->post("data", array()), $this->auth->getUser());
 		}
-
-		Log::debug($intent);
 
 		/**
 		 * GET /intent/:id
