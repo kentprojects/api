@@ -130,7 +130,7 @@ final class Intent_Access_Year extends Intent
 					),
 					array(
 						"conveners",
-						"user/" . $this->model->getUser()
+						"user/" . $this->model->getUser()->getId()
 					)
 				);
 				break;
