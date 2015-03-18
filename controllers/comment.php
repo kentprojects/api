@@ -6,6 +6,9 @@
  */
 final class Controller_Comment extends Controller
 {
+	use Entity;
+	protected $allowedEntities = array("group", "project", "user");
+
 	/**
 	 * /comment
 	 * /comment/:id
@@ -151,33 +154,5 @@ final class Controller_Comment extends Controller
 
 		$this->response->status(200);
 		$this->response->body(Model_Comment::getByRoot($root));
-	}
-
-	/**
-	 * @param $root
-	 * @throws InvalidArgumentException
-	 * @return string
-	 */
-	protected function validateRoot($root)
-	{
-		$split = explode("/", $root);
-		if (count($split) !== 2)
-		{
-			throw new InvalidArgumentException("Invalid root format.");
-		}
-
-		$allowedEntities = array("group", "project", "user");
-		list($entity, $id) = $split;
-
-		if (empty($entity) || !in_array($entity, $allowedEntities))
-		{
-			throw new InvalidArgumentException("Invalid root entity.");
-		}
-		elseif (!is_numeric($id))
-		{
-			throw new InvalidArgumentException("Invalid root entity ID.");
-		}
-
-		return "{$entity}/{$id}";
 	}
 }

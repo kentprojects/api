@@ -69,6 +69,7 @@ spl_autoload_register(
 		{
 			$folders = array(
 				APPLICATION_PATH . "/classes",
+				APPLICATION_PATH . "/classes/traits",
 				APPLICATION_PATH . "/system",
 				APPLICATION_PATH . "/vendor"
 			);
