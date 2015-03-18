@@ -137,7 +137,7 @@ final class Model_Notification extends Model
 				->execute($intent->getId())->singlevals();
 			!empty($ids) && Cache::set($intent->getCacheName("notification"), $ids, Cache::HOUR);
 		}
-		return call_user_func_array(array("Model_Notification", "getById"), $ids);
+		return call_user_func_array(array(get_called_class(), "getById"), $ids);
 	}
 
 	/**
