@@ -125,6 +125,22 @@ class Model_Notification extends Model
 	}
 
 	/**
+	 * @param Model_Intent $intent
+	 * @return Model_Notification[]
+	 */
+	public static function getByIntent(Model_Intent $intent)
+	{
+		$ids = Cache::get($intent->getCacheName("notification"));
+		if (empty($ids))
+		{
+			$ids = Database::prepare("SELECT `notification_id` FROM `Notification` WHERE `intent_id` = ?", "i")
+				->execute($intent->getId())->singlevals();
+			!empty($ids) && Cache::set($intent->getCacheName("notification"), $ids, Cache::HOUR);
+		}
+		return call_user_func_array(array(get_called_class(), "getById"), $ids);
+	}
+
+	/**
 	 * @return array
 	 */
 	public static function getNotificationStrings()
@@ -139,45 +155,6 @@ class Model_Notification extends Model
 	public static function isValidType($type)
 	{
 		return array_key_exists($type, static::$typeStrings);
-	}
-
-	/**
-	 * @param Model_Notification $notification
-	 * @param array $userIds
-	 * @throws InvalidArgumentException
-	 * @return void
-	 */
-	public static function addTargets(Model_Notification $notification, array $userIds)
-	{
-		if ($notification->getId() === null)
-		{
-			throw new InvalidArgumentException("Missing notification ID.");
-		}
-		if (empty($userIds))
-		{
-			throw new InvalidArgumentException("Missing user IDs.");
-		}
-
-		$caches = array();
-		$query = array();
-		$types = "";
-		$values = array();
-
-		foreach ($userIds as $userId)
-		{
-			$query[] = "(?, ?)";
-			$types .= "ii";
-			array_push($values, $notification->getId(), $userId);
-			$caches[] = Model_User::cacheName() . "." . $userId . ".notifications";
-		}
-
-		$statement = Database::prepare(
-			implode(" ", array("INSERT INTO", "`User_Notification_Map`", "(`notification_id`, `user_id`)", "VALUES")) . " " .
-			implode(", ", $query), $types
-		);
-		call_user_func_array(array($statement, "execute"), $values);
-
-		call_user_func_array(array("Cache", "delete"), $caches);
 	}
 
 	/**
@@ -247,19 +224,6 @@ class Model_Notification extends Model
 			$this->actor = $actor;
 		}
 		parent::__construct();
-	}
-
-	/**
-	 * @return array
-	 */
-	public function clearCacheStrings()
-	{
-		return array_merge(
-			parent::clearCacheStrings(),
-			array(
-				$this->getCacheName("string")
-			)
-		);
 	}
 
 	/**

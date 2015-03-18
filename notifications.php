@@ -114,7 +114,8 @@ try
 		$notification->setYear($year);
 	}
 
-	$targetIds = array();
+	/** @var Model_User[] $targets */
+	$targets = array();
 	foreach ($parameters["targets"] as $target)
 	{
 		if ($target === "conveners")
@@ -122,48 +123,73 @@ try
 			$year = Model_Year::getCurrentYear();
 			foreach ($year->getConveners() as $convener)
 			{
-				$targetIds[] = $convener->getId();
+				$targets[] = $convener;
 			}
 			continue;
 		}
 
-		$splitTarget = explode("/", $target);
+		$target = explode("/", $target);
 
-		switch ($splitTarget[0])
+		switch ($target[0])
 		{
 			case "group":
-				$group = Model_Group::getById($splitTarget[1]);
+				$group = Model_Group::getById($target[1]);
 				foreach ($group->getStudents() as $student)
 				{
 					/** @var Model_User $student */
-					$targetIds[] = $student->getId();
+					$targets[] = $student;
 				}
 				break;
 			case "project":
-				$project = Model_Project::getById($splitTarget[1]);
-				$targetIds[] = $project->getSupervisor()->getId();
+				$project = Model_Project::getById($target[1]);
+				$targets[] = $project->getSupervisor();
 				foreach ($project->getGroup()->getStudents() as $student)
 				{
 					/** @var Model_User $student */
-					$targetIds[] = $student->getId();
+					$targets[] = $student;
 				}
 				break;
 			case "user":
-				$user = Model_User::getById($splitTarget[1]);
-				$targetIds[] = $user->getId();
+				$user = Model_User::getById($target[1]);
+				$targets[] = $user;
 				break;
 			default:
 				throw new InvalidArgumentException(
-					"Invalid target '{$target}' passed to notification script switch. Aborting."
+					"Invalid target '{$target[0]}' passed to notification script switch. Aborting."
 				);
 		}
 	}
 
-	$targetIds = array_unique($targetIds, SORT_NUMERIC);
+	$uniqueIds = array();
+	foreach ($targets as $key => $user)
+	{
+		if (in_array($user->getId(), $uniqueIds))
+		{
+			unset($targets[$key]);
+		}
+		else
+		{
+			$uniqueIds[] = $user->getId();
+		}
+	}
+	unset($uniqueIds);
 
 	$notification->save();
-	Log::debug($notification, $targetIds);
-	Model_Notification::addTargets($notification, $targetIds);
+	Log::debug($notification, array_map(
+		function ($user)
+		{
+			/** @var Model_User $user */
+			return $user->getId();
+		},
+		$targets
+	));
+
+	$notificationUserMap = new NotificationUserMap($notification);
+	foreach ($targets as $user)
+	{
+		$notificationUserMap->add($user);
+	}
+	$notificationUserMap->save();
 
 	Timing::stop("notifications");
 	if (config("environment") === "development")

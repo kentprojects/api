@@ -14,8 +14,13 @@ final class Model_Intent extends Model
 	 */
 	public static function delete(Model_Intent $intent)
 	{
+		$notifications = Model_Notification::getByIntent($intent);
 		Database::prepare("DELETE FROM `Intent` WHERE `intent_id` = ?", "i")->execute($intent->getId());
-		Database::prepare("DELETE FROM `Notification` WHERE `intent_id` = ?", "i")->execute($intent->getId());
+		foreach ($notifications as $notification)
+		{
+			$notificationUserMap = new NotificationUserMap($notification);
+			$notificationUserMap->clearCaches();
+		}
 		$intent->user->clearCaches();
 		$intent->clearCaches();
 	}
