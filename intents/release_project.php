@@ -92,7 +92,10 @@ final class Intent_Release_Project extends Intent
 
 		Notification::queue(
 			"group_released_project", $this->model->getUser(),
-			array("group_id" => $group->getId()),
+			array(
+				"group_id" => $group->getId(),
+				"project_id" => $project->getId()
+			),
 			array(
 				"group/" . $group->getId(),
 				"user/" . $project->getSupervisor()->getId()
