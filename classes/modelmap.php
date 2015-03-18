@@ -89,7 +89,10 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	 */
 	public function clearCaches()
 	{
-		call_user_func_array(array("Cache", "delete"), $this->clearCacheStrings());
+		if (!empty($this->data))
+		{
+			call_user_func_array(array("Cache", "delete"), $this->clearCacheStrings());
+		}
 	}
 
 	/**
