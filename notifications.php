@@ -189,8 +189,8 @@ try
 	{
 		$notificationUserMap->add($user);
 	}
-	$notificationUserMap->save();
 	$notificationUserMap->clearCaches();
+	$notificationUserMap->save();
 
 	Timing::stop("notifications");
 	if (config("environment") === "development")
