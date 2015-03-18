@@ -18,7 +18,6 @@ final class Model_Intent extends Model
 		Database::prepare("DELETE FROM `Intent` WHERE `intent_id` = ?", "i")->execute($intent->getId());
 		if (!empty($notifications))
 		{
-			Log::debug($notifications);
 			foreach ($notifications as $notification)
 			{
 				$notificationUserMap = new NotificationUserMap($notification);
