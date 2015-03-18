@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-class Model_Notification extends Model
+final class Model_Notification extends Model
 {
 	/**
 	 * If you add any new types, please update the docs!
@@ -137,7 +137,7 @@ class Model_Notification extends Model
 				->execute($intent->getId())->singlevals();
 			!empty($ids) && Cache::set($intent->getCacheName("notification"), $ids, Cache::HOUR);
 		}
-		return call_user_func_array(array(get_called_class(), "getById"), $ids);
+		return call_user_func_array(array("Model_Notification", "getById"), $ids);
 	}
 
 	/**

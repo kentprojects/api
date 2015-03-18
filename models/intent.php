@@ -16,10 +16,13 @@ final class Model_Intent extends Model
 	{
 		$notifications = Model_Notification::getByIntent($intent);
 		Database::prepare("DELETE FROM `Intent` WHERE `intent_id` = ?", "i")->execute($intent->getId());
-		foreach ($notifications as $notification)
+		if (!empty($notifications))
 		{
-			$notificationUserMap = new NotificationUserMap($notification);
-			$notificationUserMap->clearCaches();
+			foreach ($notifications as $notification)
+			{
+				$notificationUserMap = new NotificationUserMap($notification);
+				$notificationUserMap->clearCaches();
+			}
 		}
 		$intent->user->clearCaches();
 		$intent->clearCaches();
