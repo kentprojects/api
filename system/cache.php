@@ -119,7 +119,7 @@ final class Cache
 		{
 			if (static::$memcached->delete($key) === true)
 			{
-				return true;
+				continue;
 			}
 
 			$exception = new CacheException(static::$memcached->getResultMessage(), static::$memcached->getResultCode());
@@ -128,7 +128,7 @@ final class Cache
 				/**
 				 * If the actual error was a calm 'NOT FOUND', then relax.
 				 */
-				return false;
+				continue;
 			}
 			else
 			{
