@@ -125,7 +125,7 @@ final class Intent_Access_Year extends Intent
 				Notification::queue(
 					"user_approved_access_to_year", $actor,
 					array(
-						"user_id" => $this->model->getUser(),
+						"user_id" => $this->model->getUser()->getId(),
 						"year" => (string)$currentYear
 					),
 					array(
@@ -138,12 +138,12 @@ final class Intent_Access_Year extends Intent
 				Notification::queue(
 					"user_rejected_access_to_year", $actor,
 					array(
-						"user_id" => $this->model->getUser(),
+						"user_id" => $this->model->getUser()->getId(),
 						"year" => (string)$currentYear
 					),
 					array(
 						"conveners",
-						"user/" . $this->model->getUser()
+						"user/" . $this->model->getUser()->getId()
 					)
 				);
 				break;
