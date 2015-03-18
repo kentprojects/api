@@ -18,4 +18,18 @@ final class NotificationUserMap extends ModelMap
 			"INSERT INTO `User_Notification_Map` (`notification_id`, `user_id`) VALUES (?,?)"
 		);
 	}
+
+	/**
+	 * @return array
+	 */
+	public function clearCacheStrings()
+	{
+		$strings = array();
+		foreach ($this->data as $modelId => $model)
+		{
+			$strings[] = Cache::key("model") . sprintf("user.%d.notifications", $modelId);
+		}
+		Log::debug($strings);
+		return $strings;
+	}
 }
