@@ -29,6 +29,27 @@ final class Intent_Access_Year extends Intent
 	}
 
 	/**
+	 * Can this particular user create an intent of this kind?
+	 * In particular, is this user "enrolled" on the current year?
+	 *
+	 * @param Model_User $user
+	 * @return bool
+	 */
+	public function canDelete(Model_User $user)
+	{
+		if (parent::canDelete($user) === true)
+		{
+			return true;
+		}
+		elseif ($this->canUpdate($user) === true)
+		{
+			return true;
+		}
+
+		return $user->getId() == $this->model->getUser()->getId();
+	}
+
+	/**
 	 * Can this particular user update this intent?
 	 * In particular, is this user a convener?
 	 *
