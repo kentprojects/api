@@ -24,7 +24,6 @@ abstract class Intent
 
 		/** @var Intent $class */
 		$class = static::getHandlerClassName($model->getHandler());
-
 		return new $class($model);
 	}
 
@@ -50,6 +49,19 @@ abstract class Intent
 		}
 
 		return $className;
+	}
+
+	public static function getOpenByUser(Model_User $user)
+	{
+		$ids = Cache::get($user->getCacheName("intents"));
+		if (empty($ids))
+		{
+			$ids = Database::prepare(
+				"SELECT `intent_id` FROM `Intent` WHERE `state` = 'open' AND `user_id` = ?", "i"
+			)->execute($user->getId())->singlevals();
+			!empty($ids) && Cache::get($user->getCacheName("intents"), 2 * Cache::HOUR);
+		}
+		return array_filter(array_map(array(get_called_class(), "getById"), $ids));
 	}
 
 	/**

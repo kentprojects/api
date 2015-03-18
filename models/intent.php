@@ -226,7 +226,9 @@ final class Model_Intent extends Model
 			Database::prepare("UPDATE `Intent` SET `state` = ? WHERE `intent_id` = ?", "si")
 				->execute($this->state, $this->id);
 		}
+
 		Cache::delete($this->getCacheName());
+		$this->user->clearCaches();
 	}
 
 	/**
