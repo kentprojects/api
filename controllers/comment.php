@@ -59,6 +59,27 @@ final class Controller_Comment extends Controller
 			$this->acl->set("comment/" . $comment->getId(), false, true, true, true);
 			$this->acl->save();
 
+			if (strpos($params["root"], "group/") === 0)
+			{
+				$group = Model_Group::getById(str_replace("group/", "", $params["root"]));
+				$tempAcl = new ACL($group->getCreator());
+				$tempAcl->set("comment/" . $comment->getId(), false, true, false, true);
+				$tempAcl->save();
+			}
+			elseif (strpos($params["root"], "project/") === 0)
+			{
+				$project = Model_Project::getById(str_replace("project/", "", $params["root"]));
+				$tempAcl = new ACL($project->getSupervisor());
+				$tempAcl->set("comment/" . $comment->getId(), false, true, false, true);
+				$tempAcl->save();
+			}
+			elseif (strpos($params["root"], "user/") === 0)
+			{
+				$tempAcl = new ACL(Model_User::getById(str_replace("user/", "", $params["root"])));
+				$tempAcl->set("comment/" . $comment->getId(), false, true, false, true);
+				$tempAcl->save();
+			}
+
 			$this->response->status(201);
 			$this->response->body($comment);
 			return;
@@ -73,10 +94,7 @@ final class Controller_Comment extends Controller
 
 		if ($this->request->getMethod() === Request::DELETE)
 		{
-			if (
-				$this->acl->validate("comment/" . $comment->getId(), ACL::DELETE) ||
-				$this->acl->validate($comment->getRoot(), ACL::UPDATE)
-			)
+			if ($this->acl->validate("comment/" . $comment->getId(), ACL::DELETE))
 			{
 				Model_Comment::delete($comment);
 				$this->acl->delete("comment/" . $comment->getId());
