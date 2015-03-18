@@ -89,10 +89,7 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	 */
 	public function clearCaches()
 	{
-		if (!empty($this->data))
-		{
-			call_user_func_array(array("Cache", "delete"), $this->clearCacheStrings());
-		}
+		call_user_func_array(array("Cache", "delete"), $this->clearCacheStrings());
 	}
 
 	/**
@@ -101,7 +98,7 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	public function clearCacheStrings()
 	{
 		$strings = array();
-		foreach ($this->data as $modelId => $model)
+		foreach ($this->data as $model)
 		{
 			/** @var Model $model */
 			$strings = array_merge($strings, $model->clearCacheStrings());
