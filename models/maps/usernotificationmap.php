@@ -13,7 +13,8 @@ final class UserNotificationMap extends ModelMap
 	{
 		parent::__construct(
 			$user, "Model_Notification", "notifications",
-			"SELECT `notification_id`, `read` FROM `User_Notification_Map` WHERE `user_id` = ?",
+			"SELECT `notification_id`, `read` FROM `User_Notification_Map`
+			 WHERE `user_id` = ? ORDER BY `notification_id` DESC",
 			"DELETE FROM `User_Notification_Map` WHERE `user_id` = ?",
 			"INSERT INTO `User_Notification_Map` (`user_id`, `notification_id`, `read`) VALUES (?,?,?)"
 		);
