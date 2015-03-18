@@ -51,6 +51,10 @@ abstract class Intent
 		return $className;
 	}
 
+	/**
+	 * @param Model_User $user
+	 * @return array
+	 */
 	public static function getOpenByUser(Model_User $user)
 	{
 		$ids = Cache::get($user->getCacheName("intents"));
