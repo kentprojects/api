@@ -149,10 +149,9 @@ class Model_Project extends Model
 			}
 			else
 			{
-				$groupCaches = $this->group->clearCacheStrings();
+				$groupCaches[] = $this->group->clearCacheStrings();
 			}
 		}
-		/** @noinspection PhpToStringImplementationInspection */
 		return array_merge(
 			parent::clearCacheStrings(),
 			$groupCaches// , $this->getCacheName("project")
