@@ -96,6 +96,10 @@ final class Query
 			);
 		}
 
+		/**
+		 * This returns the information back to the QueryTest.
+		 * Don't ever remove this again. #badman.
+		 */
 		if ($returnResults === true)
 		{
 			return new _QueryStub($query, $types, $values);
