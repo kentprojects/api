@@ -86,7 +86,6 @@ abstract class Model_Like extends Model
 			{
 				$user = Model_User::getById($userId);
 				$user->getGroup();
-				$user->getProject();
 				return $user;
 			},
 			$who
