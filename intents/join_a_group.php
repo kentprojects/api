@@ -63,6 +63,14 @@ final class Intent_Join_A_Group extends Intent
 			throw new IntentException("Missing group.");
 		}
 
+		/**
+		 * If the group got a project before this was answered.
+		 */
+		if ($group->hasProject())
+		{
+			return false;
+		}
+
 		return $group->getCreator()->getId() == $user->getId();
 	}
 
