@@ -102,7 +102,7 @@ final class Intent_Undertake_A_Project extends Intent
 		));
 
 		$this->deduplicate(array(
-			"project_id" => $project->getId()
+			"project" => "project"
 		));
 		$this->mergeData($data);
 		$this->save();

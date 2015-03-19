@@ -93,7 +93,7 @@ final class Intent_Join_A_Group extends Intent
 		));
 
 		$this->deduplicate(array(
-			"group_id" => $group->getId()
+			"join_group" => "join_group"
 		));
 		$this->mergeData($data);
 		$this->save();
