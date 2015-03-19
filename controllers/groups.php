@@ -45,6 +45,25 @@ final class Controller_Groups extends Controller
 			));
 		}
 
+		if ($this->request->query("supervisor") !== null)
+		{
+			/**
+			 * JOIN `Project` USING (`group_id`)
+			 * WHERE `Project`.`supervisor_id` = ?
+			 */
+			$query->join(array(
+				"table" => "Project",
+				"how" => Query::USING,
+				"field" => "group_id"
+			));
+			$query->where(array(
+				"table" => "Project",
+				"field" => "supervisor_id",
+				"type" => "i",
+				"value" => $this->request->query("supervisor")
+			));
+		}
+
 		$groups = $query->execute()->singlevals();
 		foreach ($groups as $k => $group_id)
 		{
