@@ -26,6 +26,11 @@ final class Controller_Students extends Controller
 		 * Get students by a criteria.
 		 */
 
+		if ($this->request->query("fields") !== null)
+		{
+			Model_User::returnFields(explode(",", $this->request->query("fields")));
+		}
+
 		/**
 		 * SELECT `user_id` FROM `User`
 		 * WHERE `role` = 'student' AND `status` = 1

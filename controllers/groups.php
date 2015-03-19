@@ -26,6 +26,11 @@ final class Controller_Groups extends Controller
 		 * Get groups by a criteria.
 		 */
 
+		if ($this->request->query("fields") !== null)
+		{
+			Model_Group::returnFields(explode(",", $this->request->query("fields")));
+		}
+
 		/**
 		 * SELECT `group_id` FROM `Group`
 		 * WHERE `status` = 1

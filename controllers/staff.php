@@ -86,20 +86,16 @@ final class Controller_Staff extends Controller
 		/**
 		 * /staff
 		 */
-		$this->validateMethods(Request::GET, Request::POST);
-
-		if ($this->request->getMethod() === Request::POST)
-		{
-			/**
-			 * POST /staff
-			 * Used to create staff!
-			 */
-			throw new HttpStatusException(501, "Creating a staff member is coming soon.");
-		}
+		$this->validateMethods(Request::GET);
 
 		/**
 		 * GET /staff
 		 */
+
+		if ($this->request->query("fields") !== null)
+		{
+			Model_Project::returnFields(explode(",", $this->request->query("fields")));
+		}
 
 		/**
 		 * SELECT `user_id` FROM `User`
