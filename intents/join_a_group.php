@@ -32,6 +32,11 @@ final class Intent_Join_A_Group extends Intent
 		return empty($group);
 	}
 
+	public function canDelete(Model_User $user)
+	{
+		return $this->model->getUser()->getId() == $user->getId();
+	}
+
 	/**
 	 * Can this particular user update this intent?
 	 * In particular, is this user the creator of the group?
