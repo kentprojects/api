@@ -60,6 +60,18 @@ final class Controller_Projects extends Controller
 			));
 		}
 
+		if ($this->request->query("supervisor") !== null)
+		{
+			/**
+			 * WHERE `Project`.`supervisor_id` = ?
+			 */
+			$query->where(array(
+				"field" => "supervisor_id",
+				"type" => "i",
+				"value" => $this->request->query("supervisor")
+			));
+		}
+
 		$projects = $query->execute()->singlevals();
 		foreach ($projects as $k => $project_id)
 		{
