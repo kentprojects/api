@@ -107,9 +107,7 @@ final class Query
 
 		if (config("environment") === "development")
 		{
-			addStaticHeader("X-Query", $query);
-			addStaticHeader("X-Types", $types);
-			addStaticHeader("X-Values", print_r($values, true));
+			Log::debug($query, $types, $values);
 		}
 
 		$statement = Database::prepare($query, $types);
