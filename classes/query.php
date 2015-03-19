@@ -109,7 +109,7 @@ final class Query
 		{
 			addStaticHeader("X-Query", $query);
 			addStaticHeader("X-Types", $types);
-			addStaticHeader("X-Values", $values);
+			addStaticHeader("X-Values", print_r($values, true));
 		}
 
 		$statement = Database::prepare($query, $types);
