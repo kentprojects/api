@@ -53,6 +53,31 @@ final class Controller_Students extends Controller
 			));
 		}
 
+		if ($this->request->query("supervisor") !== null)
+		{
+			/**
+			 * JOIN `Group_Student_Map` USING (`user_id`)
+			 * JOIN `Project` USING (`group_id`)
+			 * WHERE `Project`.`supervisor_id` = ?
+			 */
+			$query->join(array(
+				"table" => "Group_Student_Map",
+				"how" => Query::USING,
+				"field" => "user_id"
+			));
+			$query->join(array(
+				"table" => "Project",
+				"how" => Query::USING,
+				"field" => "group_id"
+			));
+			$query->where(array(
+				"table" => "Project",
+				"field" => "supervisor_id",
+				"type" => "i",
+				"value" => $this->request->query("year")
+			));
+		}
+
 		$users = $query->execute()->singlevals();
 		foreach ($users as $k => $user_id)
 		{
