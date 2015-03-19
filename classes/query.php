@@ -41,10 +41,9 @@ final class Query
 	}
 
 	/**
-	 * @param bool $returnResults
-	 * @return _Database_Result|_Database_State|_QueryStub
+	 * @return _Database_Result|_Database_State
 	 */
-	public function execute($returnResults = false)
+	public function execute()
 	{
 		$query = "SELECT ";
 		$query .= implode(
@@ -97,11 +96,10 @@ final class Query
 			);
 		}
 
-		if ($returnResults === true)
+		if (config("environment") === "development")
 		{
-			return new _QueryStub($query, $types, $values);
+			addStaticHeader("X-Query", $query);
 		}
-
 		$statement = Database::prepare($query, $types);
 		return call_user_func_array(array($statement, "execute"), $values);
 	}
