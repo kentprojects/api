@@ -81,15 +81,6 @@ abstract class Model_Like extends Model
 			!empty($who) && Cache::set($cacheKeys["who"], $who, Cache::HOUR);
 		}
 
-		$users = array_filter(array_map(array("Model_User", "getById"), $who));
-		$who = array();
-
-		/** @var Model_User $user */
-		foreach ($users as $user)
-		{
-			$who[$user->getId()] = $user->getName();
-		}
-
-		return $who;
+		return array_filter(array_map(array("Model_User", "getById"), $who));
 	}
 }
