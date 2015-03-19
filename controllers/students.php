@@ -74,7 +74,7 @@ final class Controller_Students extends Controller
 				"table" => "Project",
 				"field" => "supervisor_id",
 				"type" => "i",
-				"value" => $this->request->query("year")
+				"value" => $this->request->query("supervisor")
 			));
 		}
 

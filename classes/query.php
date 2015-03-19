@@ -105,10 +105,7 @@ final class Query
 			return new _QueryStub($query, $types, $values);
 		}
 
-		if (config("environment") === "development")
-		{
-			Log::debug($query, $types, $values);
-		}
+		// Log::debug($query, $types, $values);
 
 		$statement = Database::prepare($query, $types);
 		return call_user_func_array(array($statement, "execute"), $values);
