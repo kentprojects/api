@@ -74,7 +74,7 @@ final class Controller_Like extends Controller
 			$this->response->body(array(
 				"entity" => $entity,
 				"count" => Model_Like::count($entity),
-				"liked" => false,
+				"liked" => Model_Like::has($entity, $this->auth->getUser()) == "liked",
 				"who" => Model_Like::who($entity)
 			));
 		}
