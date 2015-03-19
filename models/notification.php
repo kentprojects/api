@@ -85,7 +85,26 @@ final class Model_Notification extends Model
 		"group_released_project" => array(
 			"default" => "GROUP_NAME is no longer doing PROJECT_NAME.",
 			"group_member" => "Your group is no longer doing PROJECT_NAME."
-		)
+		),
+		"new_comment_for_group" => array(
+			"default" => "ACTOR_NAME commented on GROUP_NAME's profile.",
+			"group_member" => "ACTOR_NAME commented on your group's profile."
+		),
+		"new_comment_for_project" => array(
+			"default" => "ACTOR_NAME commented on PROJECT_NAME's profile.",
+			"group_member" => "ACTOR_NAME commented on your project's profile."
+		),
+		"new_comment_for_user" => array(
+			"default" => "ACTOR_NAME commented on USER_NAME's profile.",
+			"user" => "ACTOR_NAME commented on your profile."
+		),
+		"new_like_for_comment" => array(
+			"default" => "Have fun working out these."
+		),
+		"new_like_for_project" => array(
+			"default" => "ACTOR_NAME likes PROJECT_NAME.",
+			"group_member" => "ACTOR_NAME commented on your project."
+		),
 	);
 
 	/**

@@ -39,22 +39,22 @@ final class Controller_Students extends Controller
 		$query->where(array("field" => "role", "value" => "student"));
 		$query->where(array("field" => "status", "value" => 1));
 
-		if ($this->request->query("year") !== null)
+		if ($this->request->query("group") !== null)
 		{
 			/**
-			 * JOIN `User_Year_Map` USING (`user_id`)
-			 * WHERE `User_Year_Map`.`year` = ?
+			 * JOIN `Group_Student_Map` USING (`user_id`)
+			 * WHERE `Group_Student_Map`.`group_id` = ?
 			 */
 			$query->join(array(
-				"table" => "User_Year_Map",
+				"table" => "Group_Student_Map",
 				"how" => Query::USING,
 				"field" => "user_id"
 			));
 			$query->where(array(
-				"table" => "User_Year_Map",
-				"field" => "year",
+				"table" => "Group_Student_Map",
+				"field" => "group_id",
 				"type" => "i",
-				"value" => $this->request->query("year")
+				"value" => $this->request->query("group")
 			));
 		}
 
@@ -80,6 +80,25 @@ final class Controller_Students extends Controller
 				"field" => "supervisor_id",
 				"type" => "i",
 				"value" => $this->request->query("supervisor")
+			));
+		}
+
+		if ($this->request->query("year") !== null)
+		{
+			/**
+			 * JOIN `User_Year_Map` USING (`user_id`)
+			 * WHERE `User_Year_Map`.`year` = ?
+			 */
+			$query->join(array(
+				"table" => "User_Year_Map",
+				"how" => Query::USING,
+				"field" => "user_id"
+			));
+			$query->where(array(
+				"table" => "User_Year_Map",
+				"field" => "year",
+				"type" => "i",
+				"value" => $this->request->query("year")
 			));
 		}
 
