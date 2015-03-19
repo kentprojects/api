@@ -215,7 +215,7 @@ final class UserYearMap implements Countable, IteratorAggregate
 	 */
 	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
-		return array_values($this->data);
+		return $this->data;
 	}
 
 	/**
