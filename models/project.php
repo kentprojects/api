@@ -145,11 +145,11 @@ class Model_Project extends Model
 			if (is_numeric($this->group))
 			{
 				/** @noinspection PhpToStringImplementationInspection */
-				$groupCaches[] = Model_Group::cacheName() . "." . $this->group;
+				$groupCaches = array(Model_Group::cacheName() . "." . $this->group);
 			}
 			else
 			{
-				$groupCaches[] = $this->group->clearCacheStrings();
+				$groupCaches = $this->group->clearCacheStrings();
 			}
 		}
 		return array_merge(
