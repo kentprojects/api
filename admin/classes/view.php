@@ -9,6 +9,11 @@ abstract class View
 	private $children = array();
 	private $pageTitle;
 
+	public function __construct()
+	{
+		$this->pageTitle = "KentProjects";
+	}
+
 	/**
 	 * @throws Exception
 	 * @return string

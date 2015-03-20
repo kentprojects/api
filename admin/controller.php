@@ -62,6 +62,7 @@ abstract class Admin_Controller
 	 */
 	public function after()
 	{
+		$this->response->status(200);
 		Timing::stop("controller");
 	}
 }

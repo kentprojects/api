@@ -8,10 +8,12 @@ class Form extends HtmlElement
 {
 	/**
 	 * @param string $action
-	 * @param array $method
+	 * @param string $method
+	 * @param array $attributes
+	 * @param array $elements
 	 * @throws InvalidArgumentException
 	 */
-	public function __construct($action, $method = null)
+	public function __construct($action, $method = null, array $attributes = array(), array $elements = array())
 	{
 		if (empty($method))
 		{
@@ -21,6 +23,15 @@ class Form extends HtmlElement
 		{
 			throw new InvalidArgumentException("A form's method should be GET or POST.");
 		}
-		parent::__construct("form");
+
+		parent::__construct("form", $attributes);
+
+		if (!empty($elements))
+		{
+			foreach ($elements as $element)
+			{
+				$this->addElement($element);
+			}
+		}
 	}
 }
