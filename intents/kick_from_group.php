@@ -75,6 +75,11 @@ final class Intent_Kick_From_Group extends Intent
 		$students->remove($user);
 		$students->save();
 
+		$acl = new ACL($user);
+		$acl->delete("group/" . $group->getId());
+		$acl->set("group", true, true, false, false);
+		$acl->save();
+
 		Notification::queue(
 			"user_kicked_from_group", $actor,
 			array(
