@@ -129,43 +129,6 @@ final class Controller_Auth extends Controller
 
 		throw $this->generateAuthUrl($url, $user);
 	}
-	
-	/**
-	 * GET /auth/logout
-	 *
-	 * @throws HttpRedirectException
-	 */
-	public function action_logout()
-	{
-		if (config("environment") === "development")
-		{
-			throw new HttpRedirectException(302, "https://api.kentprojects.com/auth/logout?return=dev");
-		}
-		else
-		{
-			switch ($this->request->query("return"))
-			{
-				case "dev":
-					$redirect = "http://dev.kentprojects.com";
-					break;
-				default:
-					$redirect = "http://www.kentprojects.com";
-			}
-
-			/**
-			 * @require The external SimpleSAML2 library.
-			 */
-			/** @noinspection PhpIncludeInspection */
-			/** @noinspection SpellCheckingInspection */
-			require_once "/var/www/simplesaml/lib/_autoload.php";
-
-			/** @noinspection PhpUndefinedClassInspection */
-			$provider = new SimpleSAML_Auth_Simple("default-sp");
-			/** @noinspection PhpUndefinedMethodInspection */
-			$provider->logout($redirect);
-		}
-		throw new HttpStatusException(724, "This line should be unreachable.");
-	}
 
 	/**
 	 * GET /auth/logout
