@@ -7,12 +7,12 @@
  */
 DELIMITER //
 DROP PROCEDURE IF EXISTS usp_ClearEverything//
-CREATE PROCEDURE usp_ClearEverything()
+CREATE PROCEDURE usp_ClearEverything(IN p_database VARCHAR(100))
 	BEGIN
 		DECLARE kptable VARCHAR(150) DEFAULT NULL;
 		DECLARE no_more_tables BOOLEAN DEFAULT FALSE;
 		DECLARE kptables CURSOR FOR SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
-		WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = 'kentprojects-dev';
+		WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = p_database;
 		DECLARE CONTINUE HANDLER FOR NOT FOUND SET no_more_tables = TRUE;
 
 		SET foreign_key_checks = 0;
@@ -34,5 +34,5 @@ CREATE PROCEDURE usp_ClearEverything()
 
 		SET foreign_key_checks = 1;
 	END//
-CALL usp_ClearEverything//
+CALL usp_ClearEverything('kentprojects-dev')//
 DROP PROCEDURE IF EXISTS usp_ClearEverything//
