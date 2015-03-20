@@ -214,7 +214,7 @@ final class Intent_Invite_To_Group extends Intent
 				$students->add($actor);
 				$students->save();
 
-				$acl = new ACL($this->model->getUser());
+				$acl = new ACL($actor);
 				$acl->set("group", false, true, false, false);
 				$acl->set("group/" . $group->getId(), false, true, true, false);
 				$acl->save();
