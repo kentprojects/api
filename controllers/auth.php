@@ -141,17 +141,24 @@ final class Controller_Auth extends Controller
 	{
 		if (config("environment") === "development")
 		{
-			throw new HttpRedirectException(302, "https://api.kentprojects.com/auth/logout?return=dev");
+			/** @noinspection SpellCheckingInspection */
+			throw new HttpRedirectException(
+				302, "https://api.kentprojects.com/auth/logout?return=dev&url=" . $this->request->query("url")
+			);
 		}
 		else
 		{
-			switch ($this->request->query("return"))
+			$redirect = $this->request->query("url");
+			if (empty($redirect))
 			{
-				case "dev":
-					$redirect = "http://dev.kentprojects.com";
-					break;
-				default:
-					$redirect = "http://www.kentprojects.com";
+				switch ($this->request->query("return"))
+				{
+					case "dev":
+						$redirect = "http://dev.kentprojects.com";
+						break;
+					default:
+						$redirect = "http://www.kentprojects.com";
+				}
 			}
 
 			/**
