@@ -99,7 +99,10 @@ final class Model_Notification extends Model
 			"user" => "ACTOR_NAME commented on your profile."
 		),
 		"new_like_for_comment" => array(
-			"default" => "Have fun working out these."
+			"default" => "ACTOR_NAME commented on something.",
+			"group_member" => "ACTOR_NAME commented on your group profile.",
+			"supervisor" => "ACTOR_NAME commented on your project profile.",
+			"user" => "ACTOR_NAME commented on your profile."
 		),
 		"new_like_for_project" => array(
 			"default" => "ACTOR_NAME likes PROJECT_NAME.",

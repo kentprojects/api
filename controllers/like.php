@@ -47,6 +47,17 @@ final class Controller_Like extends Controller
 
 			Model_Like::create($entity, $this->auth->getUser());
 
+			list($type, $id) = explode("/", $entity);
+			switch ($type)
+			{
+				case "project":
+					Notification::queue(
+						"new_like_for_project", $this->auth->getUser(),
+						array("project_id" => $id), array($entity)
+					);
+					break;
+			}
+
 			$this->response->status(201);
 			$this->response->body(array(
 				"entity" => $entity,
