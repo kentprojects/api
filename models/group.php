@@ -12,7 +12,16 @@ class Model_Group extends Model
 	 */
 	public static function delete(Model_Group $group)
 	{
+		$students = $group->getStudents();
 		Database::prepare("DELETE FROM `Group` WHERE `group_id` = ?", "i")->execute($group->getId());
+		foreach ($students as $student)
+		{
+			/** @var Model_User $student */
+			$acl = new ACL($student);
+			$acl->delete("group/" . $group->getId());
+			$acl->set("group", true, true, false, false);
+			$acl->save();
+		}
 		$group->clearCaches();
 	}
 
