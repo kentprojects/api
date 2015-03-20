@@ -24,9 +24,9 @@ final class Model_Notification extends Model
 			"user" => "ACTOR_NAME granted you access to YEAR."
 		),
 		"user_rejected_access_to_year" => array(
-			"default" => "USER_NAME was granted access to YEAR.",
-			"actor" => "You granted USER_NAME access to YEAR.",
-			"user" => "ACTOR_NAME granted you access to YEAR."
+			"default" => "USER_NAME was denied access to YEAR.",
+			"actor" => "You denied USER_NAME access to YEAR.",
+			"user" => "ACTOR_NAME denied you access to YEAR."
 		),
 		"user_wants_another_to_join_a_group" => array(
 			"default" => "ACTOR_NAME would like USER_NAME to join GROUP_NAME.",
