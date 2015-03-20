@@ -46,11 +46,15 @@ final class Model_Notification extends Model
 		),
 		"user_approved_another_to_join_a_group" => array(
 			"default" => "ACTOR_NAME approved USER_NAME to join GROUP_NAME.",
-			"group_member" => "ACTOR_NAME approved USER_NAME to join your group."
+			"actor" => "You approved USER_NAME to join your group.",
+			"group_member" => "ACTOR_NAME approved USER_NAME to join your group.",
+			"user" => "ACTOR_NAME allowed you to join GROUP_NAME."
 		),
 		"user_rejected_another_to_join_a_group" => array(
 			"default" => "ACTOR_NAME rejected USER_NAME to join GROUP_NAME.",
-			"group_member" => "ACTOR_NAME rejected USER_NAME to join your group."
+			"actor" => "You rejected USER_NAME to join your group.",
+			"group_member" => "ACTOR_NAME rejected USER_NAME to join your group.",
+			"user" => "ACTOR_NAME rejected your request to join GROUP_NAME."
 		),
 		"user_wants_to_join_a_group" => array(
 			"default" => "ACTOR_NAME would like to join GROUP_NAME.",
