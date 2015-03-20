@@ -4,58 +4,29 @@
 # @license: Copyright KentProjects
 # @link: http://kentprojects.com
 #
-
-CURRENT_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-BASE_PATH=$(dirname $CURRENT_PATH)
-OUT_CODE=0
-
-FAIL=" \033[0;31;49m[==]\033[0m "
-GOOD=" \033[0;32;49m[==]\033[0m "
-WARN=" \033[0;33;49m[==]\033[0m "
-TASK=" \033[0;34;49m[==]\033[0m "
-USER=" \033[1;1;49m[==]\033[0m "
-
-pushd "$CURRENT_PATH"
-
+PHPUNIT_PHAR_URL="https://github.com/kentprojects/scripts/raw/master/phpunit/phpunit.phar"
 #
-# A simple function to run the PhpUnit tests.
-#
-# @param string folder
-# @return int
-#
-function runPhpUnit
-{
-	php phpunit.phar --bootstrap functions.php --color --verbose $1
-	return $?
-}
-
-OUTPUT=$(php functions.php)
-if [ $? -gt 0 ]; then
-	printf "$FAIL $OUTPUT\n"
-	exit 1;
+which mysql > /dev/null
+if [ $? -ne 0 ]; then
+    echo "No mysql package detected."
+    echo "This would suggest this is being run on a development machine rather than your development environment."
+    echo "Maybe you should SSH into your development environment and run this again?"
+    exit 1
 fi
-
-if [ -n "$1" ]; then
-	runPhpUnit $1
-	OUT_CODE=$?
-else
-	for DIR in `find . -mindepth 1 -type d`; do
-		[ "$DIR" == "./base" ] && continue
-		[ "$DIR" == "./data" ] && continue
-
-		printf "$GOOD Running tests for %s\n" ${DIR:2}
-		OUTPUT=$(runPhpUnit $DIR)
-		CODE=$?
-
-		if [ $CODE -eq 0 ]; then
-			printf "$GOOD $OUTPUT\n"
-		else
-			printf "$FAIL $OUTPUT\n"
-		fi
-
-		OUT_CODE=$(($OUT_CODE + $CODE))
-	done
+#
+if [ ! -f "phpunit.phar" ]; then
+    echo "Missing phpunit.phar"
+    which wget > /dev/null
+    if [ $? -eq 0 ]; then
+        echo "Downloading from the KentProjects Scripts repository:"
+        wget "$PHPUNIT_PHAR_URL"
+    else
+        echo "No wget package detected."
+        echo "If you wish to do this yourself, download the PHPUnit phar either from http://phpunit.de"
+        echo "Or from our Script repository: $PHPUNIT_PHAR_URL"
+        exit 1
+    fi
 fi
-
-popd
-exit $OUT_CODE
+#
+php phpunit.phar --bootstrap functions.php --color --verbose ./
+exit $?

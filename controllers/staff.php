@@ -28,13 +28,29 @@ final class Controller_Staff extends Controller
 				throw new HttpStatusException(404, "Staff member not found.");
 			}
 
+			$isSelf = ($this->auth->getUser() !== null) ? ($this->auth->getUser()->getId() == $user->getId()) : false;
+
 			if ($this->request->getMethod() === Request::PUT)
 			{
 				/**
 				 * PUT /staff/:id
 				 * Used to update staff!
 				 */
-				throw new HttpStatusException(501, "Updating a staff member is coming soon.");
+
+				/**
+				 * Validate that the user can update this staff profile.
+				 */
+				if (!$isSelf)
+				{
+					$this->validateUser(array(
+						"entity" => "user/" . $user->getId(),
+						"action" => ACL::UPDATE,
+						"message" => "You do not have permission to update this user profile."
+					));
+				}
+
+				$user->update($this->request->getPostData());
+				$user->save();
 			}
 			elseif ($this->request->getMethod() === Request::DELETE)
 			{
@@ -42,6 +58,19 @@ final class Controller_Staff extends Controller
 				 * DELETE /staff/:id
 				 * Used to delete staff!
 				 */
+
+				/**
+				 * Validate that the user can delete this staff profile.
+				 */
+				if (!$isSelf)
+				{
+					$this->validateUser(array(
+						"entity" => "user/" . $user->getId(),
+						"action" => ACL::DELETE,
+						"message" => "You do not have permission to delete this user profile."
+					));
+				}
+
 				throw new HttpStatusException(501, "Deleting a staff member is coming soon.");
 			}
 
@@ -57,20 +86,16 @@ final class Controller_Staff extends Controller
 		/**
 		 * /staff
 		 */
-		$this->validateMethods(Request::GET, Request::POST);
-
-		if ($this->request->getMethod() === Request::POST)
-		{
-			/**
-			 * POST /staff
-			 * Used to create staff!
-			 */
-			throw new HttpStatusException(501, "Creating a staff member is coming soon.");
-		}
+		$this->validateMethods(Request::GET);
 
 		/**
 		 * GET /staff
 		 */
+
+		if ($this->request->query("fields") !== null)
+		{
+			Model_Project::returnFields(explode(",", $this->request->query("fields")));
+		}
 
 		/**
 		 * SELECT `user_id` FROM `User`
@@ -88,7 +113,7 @@ final class Controller_Staff extends Controller
 			 */
 			$query->join(array(
 				"table" => "User_Year_Map",
-				"how" => "USING",
+				"how" => Query::USING,
 				"field" => "user_id"
 			));
 			$query->where(array(
@@ -96,6 +121,27 @@ final class Controller_Staff extends Controller
 				"field" => "year",
 				"type" => "i",
 				"value" => $this->request->query("year")
+			));
+		}
+
+		if ($this->request->query("supervisor") !== null)
+		{
+			/**
+			 * JOIN `User_Year_Map` USING (`user_id`)
+			 * WHERE `User_Year_Map`.`role_supervisor` = TRUE
+			 */
+			if ($this->request->query("year") === null)
+			{
+				$query->join(array(
+					"table" => "User_Year_Map",
+					"how" => Query::USING,
+					"field" => "user_id"
+				));
+			}
+			$query->where(array(
+				"table" => "User_Year_Map",
+				"field" => "role_supervisor",
+				"value" => 1
 			));
 		}
 

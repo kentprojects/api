@@ -26,17 +26,17 @@ final class Controller_Projects extends Controller
 		 * Get projects by a criteria.
 		 */
 
+		if ($this->request->query("fields") !== null)
+		{
+			Model_Project::returnFields(explode(",", $this->request->query("fields")));
+		}
+
 		/**
 		 * SELECT `project_id` FROM `Project`
 		 * WHERE `status` = 1
 		 */
 		$query = new Query("project_id", "Project");
 		$query->where(array("field" => "status", "value" => 1));
-
-		if ($this->request->query("fields") !== null)
-		{
-			Model_Project::returnFields(explode(",", $this->request->query("fields")));
-		}
 
 		if ($this->request->query("ids") !== null)
 		{
@@ -57,6 +57,18 @@ final class Controller_Projects extends Controller
 				"field" => "year",
 				"type" => "i",
 				"value" => $this->request->query("year")
+			));
+		}
+
+		if ($this->request->query("supervisor") !== null)
+		{
+			/**
+			 * WHERE `Project`.`supervisor_id` = ?
+			 */
+			$query->where(array(
+				"field" => "supervisor_id",
+				"type" => "i",
+				"value" => $this->request->query("supervisor")
 			));
 		}
 

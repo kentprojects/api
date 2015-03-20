@@ -11,11 +11,7 @@ final class Auth
 	const USER = "auth:user";
 
 	/**
-	 * @var array
-	 */
-	protected $applications = array();
-	/**
-	 * @var stdClass
+	 * @var Model_Application
 	 */
 	protected $application;
 	/**
@@ -31,9 +27,9 @@ final class Auth
 	 */
 	protected $response;
 	/**
-	 * @var Model_User
+	 * @var Model_Token
 	 */
-	protected $user;
+	protected $token;
 
 	/**
 	 * @param Request_Internal $request
@@ -43,21 +39,6 @@ final class Auth
 	 */
 	public function __construct(Request_Internal &$request, Response &$response, $level)
 	{
-		$applications = parse_ini_file(APPLICATION_PATH . "/applications.ini", true);
-		foreach ($applications as $name => $details)
-		{
-			if (empty($details["key"]) || empty($details["secret"]))
-			{
-				error_log("The application {$name} doesn't have a KEY & a SECRET.");
-				continue;
-			}
-			$this->applications[$details["key"]] = (object)array(
-				"name" => $name,
-				"key" => $details["key"],
-				"secret" => $details["secret"]
-			);
-		}
-
 		$this->level = $level;
 		$this->request = $request;
 		$this->response = $response;
@@ -84,17 +65,16 @@ final class Auth
 				throw new HttpStatusException(400, "Expired request.");
 			}
 
-			if (empty($this->applications[$this->request->query("key")]))
-			{
-				throw new HttpStatusException(400, "Invalid application.");
-			}
-
 			if (($this->level === self::USER) && ($this->request->query("user", null) === null))
 			{
 				throw new HttpStatusException(400, "Missing user token.");
 			}
 
-			$this->application = $this->applications[$this->request->query("key")];
+			$this->application = Model_Application::getByKey($this->request->query("key"));
+			if (empty($this->application))
+			{
+				throw new HttpStatusException(400, "Invalid application.");
+			}
 
 			$query = $this->request->getQueryData();
 			{
@@ -108,35 +88,48 @@ final class Auth
 					}
 				);
 			}
-			$local = md5(config("checksum", "salt") . $this->application->secret . json_encode($query));
-
+			$local = md5(config("checksum", "salt") . $this->application->getSecret() . json_encode($query));
 			if ($local !== $this->request->query("signature"))
 			{
-				/*
-				error_log(json_encode(array(
-					"INVALID" => "SIGNATURE",
-					"local" => $local,
-					"remote" => $this->request->query("signature"),
-					"get" => $this->request->getQueryData(),
-					"app" => $this->application,
-					"sum" => config("checksum", "salt") . $this->application->secret . json_encode($query)
-				)));
-				*/
+				if (false)
+				{
+					error_log(json_encode(array(
+						"INVALID" => "SIGNATURE",
+						"local" => $local,
+						"remote" => $this->request->query("signature"),
+						"get" => $this->request->getQueryData(),
+						"app" => $this->application,
+						"sum" => config("checksum", "salt") . $this->application->getSecret() . json_encode($query)
+					)));
+				}
 				throw new HttpStatusException(400, "Invalid signature.");
 			}
 
-			if ($this->level === self::USER)
+			$this->token = Model_Token::getByToken($this->request->query("user", null));
+			/**
+			 * If we require user authentication, and we don't have a user, then throw an exception!
+			 */
+			if (($this->level === self::USER) && empty($this->token))
 			{
-				/**
-				 * Authenticate the user.
-				 * Using the token, find the user!
-				 */
+				throw new HttpStatusException(400, "Invalid user.");
+			}
+		}
+		else
+		{
+			if ($this->request->query("key", null) !== null)
+			{
+				$this->application = Model_Application::getByKey($this->request->query("key"));
+				if (empty($this->application))
+				{
+					throw new HttpStatusException(400, "Invalid application.");
+				}
+				$this->token = Model_Token::getByToken($this->request->query("user", null));
 			}
 		}
 	}
 
 	/**
-	 * @return stdClass
+	 * @return Model_Application
 	 */
 	public function getApplication()
 	{
@@ -144,10 +137,27 @@ final class Auth
 	}
 
 	/**
+	 * @return Model_Token
+	 */
+	public function getToken()
+	{
+		return $this->token;
+	}
+
+	/**
 	 * @return Model_User
 	 */
 	public function getUser()
 	{
-		return $this->user;
+		return empty($this->token) ? null : $this->token->getUser();
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasUser()
+	{
+		$user = $this->getUser();
+		return !empty($user) && ($user instanceof Model_User);
 	}
 }

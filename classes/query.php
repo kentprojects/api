@@ -41,7 +41,6 @@ final class Query
 	}
 
 	/**
-	 * @param bool $returnResults
 	 * @return _Database_Result|_Database_State|_QueryStub
 	 */
 	public function execute($returnResults = false)
@@ -97,10 +96,16 @@ final class Query
 			);
 		}
 
+		/**
+		 * This returns the information back to the QueryTest.
+		 * Don't ever remove this again. #badman.
+		 */
 		if ($returnResults === true)
 		{
 			return new _QueryStub($query, $types, $values);
 		}
+
+		// Log::debug($query, $types, $values);
 
 		$statement = Database::prepare($query, $types);
 		return call_user_func_array(array($statement, "execute"), $values);

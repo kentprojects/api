@@ -7,13 +7,21 @@
 abstract class Controller
 {
 	/**
+	 * @var ACL
+	 */
+	protected $acl;
+	/**
 	 * @var Auth
 	 */
 	protected $auth;
 	/**
 	 * @var string
 	 */
-	protected $authentication = Auth::APP;
+	protected $authentication = Auth::USER;
+	/**
+	 * @var bool
+	 */
+	private $isHeadRequest = false;
 	/**
 	 * @var Request_Internal
 	 */
@@ -33,7 +41,14 @@ abstract class Controller
 		$this->request = $request;
 		$this->response = $response;
 
+		if ($this->request->getMethod() === Request::HEAD)
+		{
+			$this->isHeadRequest = true;
+			$this->request->setMethod(Request::GET);
+		}
+
 		$this->auth = new Auth($request, $response, $this->authentication);
+		$this->acl = new ACL($this->auth->getUser());
 	}
 
 	/**
@@ -41,7 +56,7 @@ abstract class Controller
 	 */
 	public function before()
 	{
-
+		Timing::start("controller");
 	}
 
 	/**
@@ -50,12 +65,48 @@ abstract class Controller
 	public function after()
 	{
 		$this->response->header("Content-Type", "application/json");
-		$this->response->body(
-			json_encode(
-				$this->response->body(),
-				JSON_PRETTY_PRINT
+		$this->response->body(json_encode($this->render($this->response->body()), JSON_PRETTY_PRINT));
+
+		$this->response->header("Content-Length", strlen($this->response->body()));
+
+		if ($this->isHeadRequest)
+		{
+			$this->response->body("");
+		}
+		Timing::stop("controller");
+	}
+
+	/**
+	 * @param mixed $body
+	 * @return mixed
+	 */
+	private function render($body)
+	{
+		if (is_object($body))
+		{
+			if ($body instanceof Intent || $body instanceof Model || $body instanceof ModelMap ||
+				$body instanceof UserYearMap
 			)
-		);
+			{
+				return $body->render($this->request, $this->response, $this->acl);
+			}
+			else
+			{
+				return json_decode(json_encode($body));
+			}
+		}
+		elseif (is_array($body))
+		{
+			foreach ($body as $i => $b)
+			{
+				$body[$i] = $this->render($b);
+			}
+			return $body;
+		}
+		else
+		{
+			return json_decode(json_encode($body));
+		}
 	}
 
 	/**
@@ -91,9 +142,53 @@ abstract class Controller
 		{
 			if ($value === false)
 			{
-				throw new HttpStatusException(400, "Missing parameter {$key} for this request.");
+				throw new HttpStatusException(400, "Missing parameter '{$key}' for this request.");
 			}
 		}
 		return $data;
+	}
+
+	/**
+	 * This is a clever function to handle all the user permissions.
+	 * Uses an array to set various requirements for an action.
+	 *
+	 * @param array $requirements An array of requirements to check against.
+	 * @throws HttpStatusException
+	 * @throws InvalidArgumentException
+	 * @return bool
+	 */
+	protected function validateUser(array $requirements)
+	{
+		if (empty($requirements["entity"]) || empty($requirements["action"]))
+		{
+			throw new InvalidArgumentException("Missing 'entity' and/or 'action' key for requirements.");
+		}
+
+		if (empty($requirements["message"]))
+		{
+			$requirements["message"] = "You aren't allowed to do this action.";
+		}
+
+		if (!empty($requirements["role"]))
+		{
+			$user = $this->auth->getUser();
+			$requirements["missing-user-message"] = "No user found to authenticate this action against.";
+
+			if (empty($user))
+			{
+				throw new HttpStatusException(400, $requirements["missing-user-message"]);
+			}
+			if ($user->getRole() !== $requirements["role"])
+			{
+				throw new HttpStatusException(
+					400, "You must be the role of '{$requirements["role"]}' to do this action."
+				);
+			}
+		}
+
+		if (!$this->acl->validate($requirements["entity"], $requirements["action"]))
+		{
+			throw new HttpStatusException(400, $requirements["message"]);
+		}
 	}
 }

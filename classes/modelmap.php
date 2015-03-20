@@ -7,8 +7,9 @@
  * Class ModelMap
  * This class is designed to bring two objects together by way of a map table.
  */
-abstract class ModelMap implements IteratorAggregate, JsonSerializable
+abstract class ModelMap implements Countable, IteratorAggregate
 {
+	protected $cacheName;
 	protected $data = array();
 	protected $foreignClass;
 	protected $source;
@@ -20,14 +21,17 @@ abstract class ModelMap implements IteratorAggregate, JsonSerializable
 	/**
 	 * @param Model $sourceObject
 	 * @param string $foreignClass
+	 * @param string $cacheName
 	 * @param string $getSQL
 	 * @param string $clearSQL
 	 * @param string $saveSQL
 	 */
-	public function __construct(Model $sourceObject, $foreignClass, $getSQL = null, $clearSQL = null, $saveSQL = null)
+	public function __construct(Model $sourceObject, $foreignClass, $cacheName, $getSQL = null, $clearSQL = null, $saveSQL = null)
 	{
-		$this->source = $sourceObject;
 		$this->foreignClass = $foreignClass;
+		$this->source = $sourceObject;
+
+		$this->cacheName = $this->source->getCacheName($cacheName);
 
 		if (!empty($getSQL))
 		{
@@ -80,6 +84,37 @@ abstract class ModelMap implements IteratorAggregate, JsonSerializable
 	}
 
 	/**
+	 * @throws CacheException
+	 * @return void
+	 */
+	public function clearCaches()
+	{
+		call_user_func_array(array("Cache", "delete"), $this->clearCacheStrings());
+	}
+
+	/**
+	 * @return array
+	 */
+	public function clearCacheStrings()
+	{
+		$strings = array();
+		foreach ($this->data as $model)
+		{
+			/** @var Model $model */
+			$strings = array_merge($strings, $model->clearCacheStrings());
+		}
+		return $strings;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function count()
+	{
+		return count($this->data);
+	}
+
+	/**
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */
@@ -90,40 +125,52 @@ abstract class ModelMap implements IteratorAggregate, JsonSerializable
 			throw new InvalidArgumentException("Missing getSQL for " . get_called_class());
 		}
 
-		$statement = Database::prepare($this->getSQL, "i");
-		$results = $statement->execute($this->source->getId());
-		if (count($results) == 0)
+		$foreignIds = Cache::get($this->cacheName);
+		if (empty($foreignIds))
 		{
-			return;
+			$results = Database::prepare($this->getSQL, "i")->execute($this->source->getId());
+			if (count($results) == 0)
+			{
+				return;
+			}
+			$foreignIds = $results->singlevals();
+			Cache::set($this->cacheName, $foreignIds, Cache::HOUR);
 		}
 
 		/** @var Model $class */
 		$class = $this->foreignClass;
 		$this->data = array();
-		foreach ($results->singlevals() as $foreignId)
+		foreach ($foreignIds as $foreignId)
 		{
 			$this->data[$foreignId] = $class::getById($foreignId);
 		}
 	}
 
 	/**
-	 * Useful so the ModelMap can partake in a foreach loop.
-	 *
-	 * @return array
+	 * @param int $modelId
+	 * @return Model
 	 */
-	public function getIterator()
+	public function get($modelId)
 	{
-		return $this->data;
+		return array_key_exists($modelId, $this->data) ? $this->data[$modelId] : null;
 	}
 
 	/**
-	 * Useful so the ModelMap can partake in json_encode.
-	 *
 	 * @return array
 	 */
-	public function jsonSerialize()
+	public function getIds()
 	{
-		return $this->data;
+		return array_keys($this->data);
+	}
+
+	/**
+	 * Useful so the ModelMap can partake in a foreach loop.
+	 *
+	 * @return ArrayIterator
+	 */
+	public function getIterator()
+	{
+		return new ArrayIterator(array_values($this->data));
 	}
 
 	/**
@@ -136,6 +183,28 @@ abstract class ModelMap implements IteratorAggregate, JsonSerializable
 		{
 			unset($this->data[$model->getId()]);
 		}
+	}
+
+	/**
+	 * Render the model map.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
+	 * @return array
+	 */
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
+	{
+		return array_values(
+			array_map(
+				function (Model $model) use ($request, &$response, $acl, $internal)
+				{
+					return $model->render($request, $response, $acl, $internal);
+				},
+				$this->data
+			)
+		);
 	}
 
 	/**
@@ -153,6 +222,7 @@ abstract class ModelMap implements IteratorAggregate, JsonSerializable
 		}
 
 		Database::prepare($this->clearSQL, "i")->execute($this->source->getId());
+		Cache::delete($this->cacheName);
 
 		if (empty($this->data))
 		{
@@ -169,7 +239,7 @@ abstract class ModelMap implements IteratorAggregate, JsonSerializable
 			{
 				$query[] = "(?,?)";
 				$types .= "ii";
-				$values[] = $id;
+				array_push($values, $this->source->getId(), $id);
 			}
 
 			$this->clear();

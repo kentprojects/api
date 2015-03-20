@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
 BASE_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-pushd "$BASE_PATH"
+pushd "$BASE_PATH" > /dev/null
 
 FAIL=" \033[0;31;49m[==]\033[0m "
 GOOD=" \033[0;32;49m[==]\033[0m "
@@ -33,6 +33,35 @@ function Question()
 		"Y") return 0 ;;
 		*) printf "$FAIL $2\n"; exit 1 ;;
 	esac
+}
+
+#
+# Internal function to deploy the develop branch.
+#
+# @return void
+#
+function circleCiDeployDevelop()
+{
+    ssh kentprojects@kentprojects.com <<'ENDSSH'
+cd /var/www/kentprojects-api-dev && sudo -u www-data git pull && \
+php database/update.php && \
+sudo service apache2 restart && \
+sudo service memcached restart
+ENDSSH
+}
+#
+# Internal function to deploy the master branch.
+#
+# @return void
+#
+function circleCiDeployMaster()
+{
+    ssh kentprojects@kentprojects.com <<'ENDSSH'
+cd /var/www/kentprojects-api && sudo -u www-data git pull && \
+php database/update.php && \
+sudo service apache2 restart && \
+sudo service memcached restart
+ENDSSH
 }
 
 #
@@ -75,7 +104,7 @@ function deploy()
 
 	git pull &&
 	git checkout $DESTINATION_BRANCH &&
-	git merge --no-ff $SOURCE_BRANCH -m "Merging develop branch with master branch." &&
+	git merge --no-ff $SOURCE_BRANCH -m "Merging develop into master for deployment." &&
 	git push origin $DESTINATION_BRANCH &&
 	git checkout $SOURCE_BRANCH
 
@@ -138,16 +167,64 @@ function hotfix()
 	fi
 }
 
+#
+# Internal function for (re)building the database.
+#
+# @return void
+#
+function reloadDatabase()
+{
+#   Build the development database.
+    mysql -u root -ppassword <<'ENDSQL'
+DROP DATABASE IF EXISTS `kentprojects`;
+CREATE DATABASE `kentprojects` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+GRANT ALL PRIVILEGES ON `kentprojects`.* TO 'kentprojects'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION;
+ENDSQL
+#   And it's structure.
+    php /vagrant/database/update.php
+#   And then import some sample data.
+    mysql -u root -ppassword kentprojects < /vagrant/tests/sample.sql
+}
+
+#
+# Internal function for (re)building the database.
+#
+# @return void
+#
+function reloadLive()
+{
+    ssh kentprojects@kentprojects.com <<'ENDSSH'
+sudo service apache2 restart && sudo service memcached restart
+ENDSSH
+}
+
 case "$1" in
+    "circleci")
+        case "$2" in
+            "deployDevelop") circleCiDeployDevelop ;;
+            "deployMaster") circleCiDeployMaster ;;
+            *)
+                printf "$FAIL Unknown CircleCi action"
+                exit 6
+                ;;
+        esac
+        ;;
 	"deploy") deploy ;;
 	"hotfix") hotfix ;;
-	"test") sh tests/run.sh ;;
+	"reloadDatabase") reloadDatabase ;;
+	"reloadLive") reloadLive ;;
+	"test")
+	    shift
+	    cd tests/
+	    ./run.sh $@
+	    cd ..
+	    ;;
 	*)
 		printf "A simple utility to help you work with the KentProjects codebase!\n\n"
 		printf "Usage: ./kentprojects.sh ACTION\n"
-		printf "deploy: Deploy this branch.\n"
+		printf "deploy: Push item from 'develop' to 'master'.\n"
 		printf "hotfix: Working on a quick fix for the 'master' branch?.\n"
 		printf "test: Run the KentProjects tests.\n"
 		;;
 esac
-popd
+popd > /dev/null

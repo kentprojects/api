@@ -31,6 +31,12 @@ final class Cache
 	 * @var int
 	 */
 	const DAY = 86400;
+	/**
+	 * Represents the number of seconds in a week.
+	 *
+	 * @var int
+	 */
+	const WEEK = 604800;
 
 	/**
 	 * @var Memcached
@@ -57,11 +63,19 @@ final class Cache
 			return false;
 		}
 
+		$key = (string)$key;
+		$value = serialize($value);
+		if (empty($expires))
+		{
+			$expires = static::WEEK;
+		}
+
 		if (static::$memcached->add($key, $value, $expires) === true)
 		{
 			/**
 			 * If adding it was successful, then yay!
 			 */
+			addStaticHeader("X-Cache-Set", "++");
 			return true;
 		}
 
@@ -87,6 +101,7 @@ final class Cache
 	 * If that item never existed in the cache, don't panic. You'll get a `false` back.
 	 *
 	 * @param string $key
+	 * [ @param string $key More keys ]
 	 * @throws CacheException
 	 * @return bool
 	 */
@@ -100,25 +115,28 @@ final class Cache
 			return false;
 		}
 
-		if (static::$memcached->delete($key) === true)
+		foreach (func_get_args() as $key)
 		{
-			return true;
-		}
+			if (static::$memcached->delete($key) === true)
+			{
+				continue;
+			}
 
-		$exception = new CacheException(static::$memcached->getResultMessage(), static::$memcached->getResultCode());
-		if ($exception->getCode() === Memcached::RES_NOTFOUND)
-		{
-			/**
-			 * If the actual error was a calm 'NOT FOUND', then relax.
-			 */
-			return false;
-		}
-		else
-		{
-			/**
-			 * Otherwise panic. Something big went down.
-			 */
-			throw $exception;
+			$exception = new CacheException(static::$memcached->getResultMessage(), static::$memcached->getResultCode());
+			if ($exception->getCode() === Memcached::RES_NOTFOUND)
+			{
+				/**
+				 * If the actual error was a calm 'NOT FOUND', then relax.
+				 */
+				continue;
+			}
+			else
+			{
+				/**
+				 * Otherwise panic. Something big went down.
+				 */
+				throw $exception;
+			}
 		}
 	}
 
@@ -137,6 +155,7 @@ final class Cache
 		 */
 		if (empty(static::$memcached))
 		{
+			addStaticHeader("X-Cache-Ignored", "++");
 			return $default;
 		}
 
@@ -146,7 +165,8 @@ final class Cache
 			/**
 			 * If that operation was okay, then return the value.
 			 */
-			return $value;
+			addStaticHeader("X-Cache-Hit", "++");
+			return unserialize($value);
 		}
 
 		$exception = new CacheException(static::$memcached->getResultMessage(), static::$memcached->getResultCode());
@@ -156,13 +176,9 @@ final class Cache
 			 * If the item didn't actually exist.
 			 */
 			case Memcached::RES_NOTSTORED:
+			case Memcached::RES_NOTFOUND:
+				addStaticHeader("X-Cache-Miss", "++");
 				return $default;
-				break;
-			/**
-			 * If the item's value actually was `false`. Because that could totally happen.
-			 */
-			case Memcached::RES_SUCCESS:
-				return false;
 				break;
 			/**
 			 * Otherwise panic. Something big went down.
@@ -198,12 +214,9 @@ final class Cache
 
 		if ($memcached->addServer(config("cache", "host"), config("cache", "port")) === false)
 		{
-			error_log(
-				(string)new CacheException(
-					static::$memcached->getResultMessage(), static::$memcached->getResultCode()
-				)
-			);
-			return;
+			$exception = new CacheException(static::$memcached->getResultMessage(), static::$memcached->getResultCode());
+			error_log((string)$exception);
+			throw $exception;
 		}
 
 		if ($memcached->setOption(Memcached::OPT_BINARY_PROTOCOL, true) === false)
@@ -212,6 +225,15 @@ final class Cache
 		}
 
 		static::$memcached = $memcached;
+	}
+
+	/**
+	 * @param string $key
+	 * @return string
+	 */
+	public static function key($key)
+	{
+		return Cache::PREFIX . (config("environment") === "development" ? "dev." : "") . $key . ".";
 	}
 
 	/**
@@ -231,11 +253,20 @@ final class Cache
 		 */
 		if (empty(static::$memcached))
 		{
+			addStaticHeader("X-Cache-Ignored", "++");
 			return false;
+		}
+
+		$key = (string)$key;
+		$value = serialize($value);
+		if (empty($expires))
+		{
+			$expires = static::WEEK;
 		}
 
 		if (static::$memcached->set($key, $value, $expires) === true)
 		{
+			addStaticHeader("X-Cache-Set", "++");
 			return true;
 		}
 		/**
@@ -243,14 +274,43 @@ final class Cache
 		 */
 		throw new CacheException(static::$memcached->getResultMessage(), static::$memcached->getResultCode());
 	}
+
+	/**
+	 * @param Model $model
+	 * @throws CacheException
+	 * @return void
+	 */
+	public static function store($model)
+	{
+		if (empty($model))
+		{
+			return;
+		}
+
+		if (!is_object($model))
+		{
+			throw new CacheException("Unknown variable passed to Cache::store: " . gettype($model));
+		}
+		if (!($model instanceof Model))
+		{
+			throw new CacheException("Unknown object passed to Cache::store: " . get_class($model));
+		}
+
+		static::set($model->getCacheName(), $model, 4 * static::HOUR);
+	}
 }
 
-$exit = 1;
-$output = array();
-exec("which memcached", $output, $exit);
-if ($exit > 0)
+if (config("cache", "use") == true)
 {
-	error_log("Memcached is not installed on this server.");
-	throw new CacheException("Memcached is not installed on this server.", 1);
+	$exit = 1;
+	$output = array();
+	exec("which memcached", $output, $exit);
+	if ($exit > 0)
+	{
+		throw new CacheException("Memcached is not installed on this server.", 1);
+	}
+	else
+	{
+		Cache::init();
+	}
 }
-Cache::init();

@@ -2,6 +2,5 @@
 .idea/
 .vagrant/
 config.production.ini
-docs/_site/
 logs/
 !logs/README.md

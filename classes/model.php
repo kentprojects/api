@@ -4,7 +4,7 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-abstract class Model implements JsonSerializable
+abstract class Model
 {
 	/**
 	 * An array of the allowed fields.
@@ -54,34 +54,36 @@ abstract class Model implements JsonSerializable
 		}
 
 		$object->__construct();
+
 		return $object;
 	}
 
 	/**
 	 * @return string
 	 */
-	private static function cachename()
+	protected static function cacheName()
 	{
-		return Cache::PREFIX . ".model." . (config("environment") === "development" ? "dev." : "") .
-		strtolower(str_replace("/", ".", static::classname()));
+		return Cache::key("model") . strtolower(str_replace("Model_", "", get_called_class()));
 	}
-	
+
 	/**
 	 * @return string
 	 */
-	private static function classname()
+	protected static function className()
 	{
 		return str_replace("_", "/", get_called_class());
 	}
-	
+
 	/**
 	 * Get the relevant Model by it's ID.
 	 *
+	 * @param mixed $id
+	 * @throws CacheException
 	 * @return mixed|null
 	 */
 	public static function getById($id)
 	{
-		return Cache::get(static::cachename().".".$id);
+		return Cache::get(static::cacheName() . "." . $id);
 	}
 
 	/**
@@ -92,12 +94,12 @@ abstract class Model implements JsonSerializable
 	{
 		self::$limitFields[get_called_class()] = array_merge(array("id"), $fields);
 	}
-	
+
 	/**
 	 * @var Metadata
 	 */
 	protected $metadata;
-	
+
 	/**
 	 * Build a new Model
 	 */
@@ -105,34 +107,68 @@ abstract class Model implements JsonSerializable
 	{
 		$this->metadata = new Metadata(($this->getId() !== null) ? $this->getClassName() : null);
 	}
-	
+
 	/**
+	 * @throws CacheException
+	 * @return void
+	 */
+	public final function clearCaches()
+	{
+		call_user_func_array(array("Cache", "delete"), $this->clearCacheStrings());
+	}
+
+	/**
+	 * @return array
+	 */
+	public function clearCacheStrings()
+	{
+		return array(
+			$this->getCacheName()
+		);
+	}
+
+	/**
+	 * @param string $append
 	 * @return string
 	 */
-	public function getCacheName()
+	public function getCacheName($append = null)
 	{
-		return static::cachename().".".$this->getId();
+		return static::cacheName() . "." . $this->getId() . (!empty($append) ? "." . $append : "");
 	}
-	
+
 	/**
 	 * @return string
 	 */
 	public function getClassName()
 	{
-		return static::classname()."/".$this->getId();
+		return static::className() . "/" . $this->getId();
 	}
-	
+
+	/**
+	 * @return string
+	 */
+	public function getEntityName()
+	{
+		return strtolower(str_replace("Model_", "", get_called_class()) . "/" . $this->getId());
+	}
+
 	/**
 	 * Get the ID of a Model.
 	 *
 	 * @return int|string
 	 */
 	public abstract function getId();
-	
+
 	/**
+	 * Render the model.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
 	 * @return array
 	 */
-	public function jsonSerialize()
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
 		return array(
 			"id" => $this->getId()
@@ -157,9 +193,10 @@ abstract class Model implements JsonSerializable
 				}
 			}
 		}
+
 		return $jsonSerialized;
 	}
-	
+
 	/**
 	 * Save the Model.
 	 *
@@ -169,5 +206,18 @@ abstract class Model implements JsonSerializable
 	public function save()
 	{
 		$this->metadata->save(($this->getId() !== null) ? $this->getClassName() : null);
+		$this->clearCaches();
+	}
+
+	/**
+	 * This will be a really cheeky function to update models.
+	 * Please remember to save after using this function!
+	 *
+	 * @param array $data
+	 * @throws InvalidArgumentException
+	 * @return void
+	 */
+	public function update(array $data)
+	{
 	}
 }

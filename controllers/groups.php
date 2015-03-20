@@ -26,6 +26,11 @@ final class Controller_Groups extends Controller
 		 * Get groups by a criteria.
 		 */
 
+		if ($this->request->query("fields") !== null)
+		{
+			Model_Group::returnFields(explode(",", $this->request->query("fields")));
+		}
+
 		/**
 		 * SELECT `group_id` FROM `Group`
 		 * WHERE `status` = 1
@@ -45,10 +50,31 @@ final class Controller_Groups extends Controller
 			));
 		}
 
+		if ($this->request->query("supervisor") !== null)
+		{
+			/**
+			 * JOIN `Project` USING (`group_id`)
+			 * WHERE `Project`.`supervisor_id` = ?
+			 */
+			$query->join(array(
+				"table" => "Project",
+				"how" => Query::USING,
+				"field" => "group_id"
+			));
+			$query->where(array(
+				"table" => "Project",
+				"field" => "supervisor_id",
+				"type" => "i",
+				"value" => $this->request->query("supervisor")
+			));
+		}
+
 		$groups = $query->execute()->singlevals();
 		foreach ($groups as $k => $group_id)
 		{
-			$groups[$k] = Model_Group::getById($group_id);
+			$group = Model_Group::getById($group_id);
+			$group->getProject();
+			$groups[$k] = $group;
 		}
 
 		$this->response->status(200);

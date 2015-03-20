@@ -7,6 +7,25 @@
 class Model_Group extends Model
 {
 	/**
+	 * @param Model_Group $group
+	 * @return void
+	 */
+	public static function delete(Model_Group $group)
+	{
+		$students = $group->getStudents();
+		Database::prepare("DELETE FROM `Group` WHERE `group_id` = ?", "i")->execute($group->getId());
+		foreach ($students as $student)
+		{
+			/** @var Model_User $student */
+			$acl = new ACL($student);
+			$acl->delete("group/" . $group->getId());
+			$acl->set("group", true, true, false, false);
+			$acl->save();
+		}
+		$group->clearCaches();
+	}
+
+	/**
 	 * Get the relevant Group by it's ID.
 	 *
 	 * @param int $id
@@ -14,20 +33,52 @@ class Model_Group extends Model
 	 */
 	public static function getById($id)
 	{
-		$statement = Database::prepare(
-			"SELECT
-				`group_id` AS 'id',
-				`year`,
-				`name`,
-				`creator_id` AS 'creator',
-				`created`,
-				`updated`,
-				`status`
-			 FROM `Group`
-			 WHERE `group_id` = ?",
-			"i", __CLASS__
-		);
-		return $statement->execute($id)->singleton();
+		if (empty($id))
+		{
+			return null;
+		}
+		/** @var Model_Group $group */
+		$group = parent::getById($id);
+		if (empty($group))
+		{
+			$group = Database::prepare(
+				"SELECT
+					`group_id` AS 'id',
+					`year`,
+					`name`,
+					`creator_id` AS 'creator',
+					`created`,
+					`updated`,
+					`status`
+				 FROM `Group`
+				 WHERE `group_id` = ?",
+				"i", __CLASS__
+			)->execute($id)->singleton();
+			Cache::store($group);
+		}
+		return $group;
+	}
+
+	/**
+	 * Get the relevant Group by a user.
+	 *
+	 * @param Model_User $user
+	 * @return Model_Group
+	 */
+	public static function getByUser(Model_User $user)
+	{
+		if (empty($user))
+		{
+			return null;
+		}
+		$id = Cache::get($user->getCacheName("group"));
+		if (empty($id))
+		{
+			$id = Database::prepare("SELECT `group_id` FROM `Group_Student_Map` WHERE `user_id` = ?", "i")
+				->execute($user->getId())->singleval();
+			!empty($id) && Cache::set($user->getCacheName("group"), $id, Cache::HOUR);
+		}
+		return !empty($id) ? static::getById($id) : null;
 	}
 
 	/**
@@ -60,29 +111,22 @@ class Model_Group extends Model
 	protected $status;
 
 	/**
+	 * @var Model_Project
+	 */
+	protected $project;
+	/**
 	 * @var GroupStudentMap
 	 */
-	private $students;
+	protected $students;
 
 	/**
-	 * The reason for the @noinspection lines is because when the Database builds the model, the other 'Model' values
-	 * are actually ids, and the models need fetching.
-	 *
 	 * @param Model_Year $year
 	 * @param string $name
 	 * @param Model_User $creator
 	 */
 	public function __construct(Model_Year $year = null, $name = null, Model_User $creator = null)
 	{
-		if ($this->getId() !== null)
-		{
-			/** @noinspection PhpParamsInspection */
-			$this->year = Model_Year::getById($this->year);
-			/** @noinspection PhpParamsInspection */
-			$this->creator = Model_User::getById($this->creator);
-			return;
-		}
-		else
+		if ($this->getId() === null)
 		{
 			if (empty($year))
 			{
@@ -102,8 +146,26 @@ class Model_Group extends Model
 			}
 			$this->creator = $creator;
 		}
+		parent::__construct();
+	}
 
-		$this->students = new GroupStudentMap($this);
+	/**
+	 * @return array
+	 */
+	public function clearCacheStrings()
+	{
+		$this->getProject();
+		$this->getStudents();
+
+		return array_merge(
+			parent::clearCacheStrings(),
+			array(
+				$this->getCacheName("project"),
+				$this->getCacheName("students")
+			),
+			!empty($this->project) ? $this->project->clearCacheStrings() : array(),
+			!empty($this->students) ? $this->students->clearCacheStrings() : array()
+		);
 	}
 
 	/**
@@ -115,11 +177,24 @@ class Model_Group extends Model
 	}
 
 	/**
-	 * @return Model_User|null
+	 * @return Model_User
 	 */
 	public function getCreator()
 	{
+		if (is_numeric($this->creator))
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->creator = Model_User::getById($this->creator);
+		}
 		return $this->creator;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDescription()
+	{
+		return $this->metadata->description;
 	}
 
 	/**
@@ -136,6 +211,16 @@ class Model_Group extends Model
 	public function getName()
 	{
 		return $this->name;
+	}
+
+	public function getProject()
+	{
+		if (empty($this->project))
+		{
+			$this->project = Model_Project::getByGroup($this);
+		}
+
+		return $this->project;
 	}
 
 	/**
@@ -159,25 +244,77 @@ class Model_Group extends Model
 	 */
 	public function getYear()
 	{
+		if (is_numeric($this->year))
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->year = Model_Year::getById($this->year);
+		}
 		return $this->year;
 	}
 
+	public function hasProject()
+	{
+		$this->getProject();
+		return !empty($this->project);
+	}
+
+	public function getStudents()
+	{
+		if (empty($this->students))
+		{
+			$this->students = new GroupStudentMap($this);
+		}
+		return $this->students;
+	}
+
 	/**
+	 * Render the group.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
 	 * @return array
 	 */
-	public function jsonSerialize()
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
-		return $this->validateFields(array_merge(
-			parent::jsonSerialize(),
+		$this->getCreator();
+		$this->getProject();
+		$this->getYear();
+
+		$data = array_merge(
+			parent::render($request, $response, $acl, $internal),
 			array(
 				"year" => (string)$this->year,
-				"name" => $this->name,
-				"students" => $this->students,
-				"creator" => $this->creator,
-				"created" => $this->created,
-				"updated" => $this->updated
+				"name" => $this->name
 			)
+		);
+
+		if ($internal !== "project")
+		{
+			$data = array_merge($data, array(
+				"project" => !empty($this->project) ? $this->project->render($request, $response, $acl, true) : null
+			));
+		}
+
+		if ($internal !== true)
+		{
+			$this->getStudents();
+			$data = array_merge($data, array(
+				"students" => (count($this->students) > 0)
+					? $this->students->render($request, $response, $acl, true)
+					: array(),
+			));
+		}
+
+		$data = array_merge($data, array(
+			"creator" => $this->creator->render($request, $response, $acl, true),
+			"permissions" => $acl->get($this->getEntityName()),
+			"created" => $this->created,
+			"updated" => $this->updated
 		));
+
+		return $this->validateFields($data);
 	}
 
 	/**
@@ -188,19 +325,6 @@ class Model_Group extends Model
 	{
 		if (empty($this->id))
 		{
-			if (empty($this->year))
-			{
-				throw new InvalidArgumentException("No year has been set for the group.");
-			}
-			if (empty($this->name))
-			{
-				throw new InvalidArgumentException("No name has been set for the group.");
-			}
-			if (empty($this->creator))
-			{
-				throw new InvalidArgumentException("No creator has been set for the group.");
-			}
-
 			/** @var _Database_State $result */
 			$result = Database::prepare(
 				"INSERT INTO `Group` (`year`, `name`, `creator_id`, `created`)
@@ -226,24 +350,28 @@ class Model_Group extends Model
 			$this->updated = Date::format(Date::TIMESTAMP, time());
 		}
 		parent::save();
+		Cache::delete($this->getCacheName("project"));
 	}
 
 	/**
-	 * @param Model_User $user
+	 * @param string $description
 	 * @return void
 	 */
-	public function setCreator(Model_User $user)
+	public function setDescription($description)
 	{
-		$this->creator = $user;
+		$this->metadata->description = strip_tags($description);
 	}
 
-	public function setName($name)
+	/**
+	 * @param array $data
+	 * @throws InvalidArgumentException
+	 * @return void
+	 */
+	public function update(array $data)
 	{
-		$this->name = $name;
-	}
-
-	public function setYear(Model_Year $year)
-	{
-		$this->year = $year;
+		if (!empty($data["description"]))
+		{
+			$this->setDescription($data["description"]);
+		}
 	}
 }

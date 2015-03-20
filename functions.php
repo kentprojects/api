@@ -4,7 +4,6 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-
 define("APPLICATION_PATH", __DIR__);
 date_default_timezone_set("Etc/UTC");
 setlocale(LC_ALL, "en_GB.UTF8");
@@ -41,12 +40,27 @@ spl_autoload_register(
 			$filename = APPLICATION_PATH . "/models/" . str_replace("model/", "", $file);
 		}
 		/**
+		 * If the word "Intent_" exists at the beginning of this class, handle it.
+		 */
+		elseif (strpos($class, "Intent_") === 0)
+		{
+			$filename = APPLICATION_PATH . "/intents/" . str_replace("intent_", "", strtolower($class)) . ".php";
+		}
+		/**
 		 * If the word "_Map" exists in this class, handle it.
 		 * Checking to see if "Map" exists in general will make this function quicker for other classes!
 		 */
-		elseif ((strpos($class, "Map") !== false) && (strpos($class, "Map") === (strlen($class) - 3)))
+		elseif (($class != "ModelMap") && (strpos($class, "Map") !== false) && (strpos($class, "Map") === (strlen($class) - 3)))
 		{
-			$filename = APPLICATION_PATH . "/models/maps/" . str_replace("_", "", strtolower($class)) . ".php";
+			$filename = APPLICATION_PATH . "/models/maps/" . $file;
+		}
+		/**
+		 * If the word "Permissions" exists in this class, handle it.
+		 * Checking to see if "Permissions" exists in general will make this function quicker for other classes!
+		 */
+		elseif ((strpos($class, "Permissions") !== false) && (strpos($class, "Permissions") === (strlen($class) - 11)))
+		{
+			$filename = APPLICATION_PATH . "/models/permissions/" . $file;
 		}
 		/**
 		 * Else this is a generic class in a folder, so go find it!
@@ -55,6 +69,7 @@ spl_autoload_register(
 		{
 			$folders = array(
 				APPLICATION_PATH . "/classes",
+				APPLICATION_PATH . "/classes/traits",
 				APPLICATION_PATH . "/system",
 				APPLICATION_PATH . "/vendor"
 			);
@@ -76,6 +91,7 @@ spl_autoload_register(
 
 		/** @noinspection PhpIncludeInspection */
 		require_once $filename;
+
 		return class_exists($class, false);
 	}
 );
@@ -87,9 +103,20 @@ spl_autoload_register(
 set_error_handler(
 	function ($error_no, $error_string, $error_file, $error_line, $error_context)
 	{
+		Log::log_error($error_no, "{$error_string} in {$error_file}:{$error_line}");
 		throw new PHPException($error_no, $error_string, $error_file, $error_line, $error_context);
 	}
 );
+
+/**
+ * @param string $key
+ * @param string $value
+ * @return void
+ */
+function addStaticHeader($key, $value)
+{
+	class_exists("Response") && call_user_func_array(array("Response", "addStaticHeader"), func_get_args());
+}
 
 /**
  * Returns the first non-empty argument or NULL.
@@ -108,6 +135,7 @@ function coalesce($a, $b)
 			return $a;
 		}
 	}
+
 	return null;
 }
 
@@ -132,6 +160,7 @@ function config($section = null, $key = null)
 		else
 		{
 			trigger_error("No config file found.", E_USER_ERROR);
+
 			return null;
 		}
 		$GLOBALS["config.ini"] = parse_ini_file($configFile, true);
@@ -251,6 +280,7 @@ function getHttpStatusForCode($code)
 		748 => "Confounded by ponies",
 		749 => "Reserved for Chuck Norris"
 	);
+
 	return (isset($codes[$code])) ? $codes[$code] : "";
 }
 

@@ -13,5 +13,5 @@ A collection of PHP-Unit tests for the KentProjects API.
 ## Running the tests
 
 ```bash
-$ ./run.sh [FOLDER]
+$ ./run.sh
 ```

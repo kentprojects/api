@@ -7,21 +7,21 @@
 class EyeRequest
 {
 	/**
+	 * @var Model_Application
+	 */
+	public static $application;
+	/**
 	 * @var int
 	 */
 	public static $expires = 600;
 	/**
 	 * @var string
 	 */
-	public static $key;
-	/**
-	 * @var string
-	 */
 	public static $salt;
 	/**
-	 * @var string
+	 * @var Model_Token
 	 */
-	public static $secret;
+	public static $userToken;
 
 	/**
 	 * @param array $params
@@ -31,11 +31,28 @@ class EyeRequest
 	{
 		unset($params["signature"]);
 		ksort($params);
-		array_walk($params, function (&$v)
+		array_walk(
+			$params,
+			function (&$v)
+			{
+				$v = (string)$v;
+			}
+		);
+
+		$local = md5(config("checksum", "salt") . static::$application->getSecret() . json_encode($params));
+
+		if (false)
 		{
-			$v = (string)$v;
-		});
-		$params["signature"] = md5(static::$salt . static::$secret . json_encode($params));
+			error_log(json_encode(array(
+				"INVALIDATED" => "SIGNATURE",
+				"local" => $local,
+				"get" => $params,
+				"app" => static::$application,
+				"sum" => config("checksum", "salt") . static::$application->getSecret() . json_encode($params)
+			)));
+		}
+
+		$params["signature"] = $local;
 	}
 
 	/**
@@ -76,12 +93,25 @@ class EyeRequest
 	}
 }
 
+require_once __DIR__ . "/../functions.php";
+
 /**
- * @var array
+ * @var Model_Application[] $applications
  */
-$config = (file_exists(__DIR__ . "/config.production.ini"))
-	? parse_ini_file(__DIR__ . "/config.production.ini", true)
-	: parse_ini_file(__DIR__ . "/config.ini", true);
+$applications = array(
+	Model_Application::getById(1),
+	Model_Application::getById(2)
+);
+
+/**
+ * @var Model_User[] $users
+ */
+$users = array(
+	Model_User::getByEmail("J.C.Hernandez-Castro@kent.ac.uk"),
+	Model_User::getByEmail("jsd24@kent.ac.uk"),
+	Model_User::getByEmail("mh471@kent.ac.uk"),
+	Model_User::getByEmail("supervisor2@kent.ac.uk")
+);
 
 /**
  * @var EyeRequest
@@ -106,10 +136,6 @@ if (!empty($_POST["url"]))
 	$request->url = $_POST["url"];
 }
 
-EyeRequest::$salt = (stripos($request->url, "api.dev") === false)
-	? $config["live-api"]["salt"]
-	: $config["dev-api"]["salt"];
-
 if (!empty($_POST["params-keys"]))
 {
 	for ($i = 0; $i < count($_POST["params-keys"]); $i++)
@@ -123,11 +149,16 @@ if (!empty($_POST["params-keys"]))
 
 if (!empty($_POST["key"]))
 {
-	/**
-	 * Grab the correct keys from the application.ini file.
-	 */
-	$applications = parse_ini_file(__DIR__ . "/../applications.ini", true);
-	if (empty($applications[$_POST["key"]]))
+	$application = null;
+	foreach ($applications as $app)
+	{
+		if ($app->getKey() === $_POST["key"])
+		{
+			$application = $app;
+		}
+	}
+
+	if (empty($application))
 	{
 		echo '<div class="alert alert-danger">',
 		'<strong>There was an error with your API key</strong><br/>',
@@ -136,8 +167,31 @@ if (!empty($_POST["key"]))
 	}
 	else
 	{
-		$request::$key = $applications[$_POST["key"]]["key"];
-		$request::$secret = $applications[$_POST["key"]]["secret"];
+		$request::$application = $application;
+	}
+}
+
+if (!empty($_POST["user"]))
+{
+	$user = null;
+	foreach ($users as $u)
+	{
+		if ($u->getId() == $_POST["user"])
+		{
+			$user = $u;
+		}
+	}
+
+	if (empty($user))
+	{
+		echo '<div class="alert alert-danger">',
+		'<strong>There was an error with your User ID</strong><br/>',
+		'The User ID was not found in the list of users.',
+		'</div>';
+	}
+	else
+	{
+		$request::$userToken = Model_Token::generate($application, $user);
 	}
 }
 
@@ -161,7 +215,7 @@ if (strpos($request->url, "?") > 1)
 
 $urlParams = array_merge($urlParams, $request->params);
 
-if (!empty($request->body))
+if (!empty($request->body) && ($request->method != "GET"))
 {
 	$request->body = json_encode($request->body);
 	$request->headers["Content-Length"] = strlen($request->body);
@@ -174,9 +228,15 @@ else
 if ($signRequest)
 {
 	$urlParams = array_merge($urlParams, array(
-		"key" => EyeRequest::$key,
-		"expires" => time() + EyeRequest::$expires
+		"key" => $request::$application->getKey(),
+		"expires" => time() + $request::$expires
 	));
+	if (!empty($request::$userToken))
+	{
+		$urlParams = array_merge($urlParams, array(
+			"user" => $request::$userToken->getToken()
+		));
+	}
 	EyeRequest::checksum($urlParams);
 }
 
@@ -215,45 +275,78 @@ switch ($request->method)
 		break;
 }
 
+curl_setopt($ch, CURLOPT_HEADER, 1);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $request->getHeaders());
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 curl_setopt($ch, CURLOPT_URL, $request->url);
+
+$response = curl_exec($ch);
+if (true)
+{
+	// error_log($response);
+	echo <<<EOT
+	<hr/>
+	<p><pre><a href="{$request->url}" target="_blank">{$request->url}</a></pre></p>
+	<pre><code>{$response}</code></pre>
+EOT;
+	exit();
+}
+
+try
+{
+	$splitResponse = explode("\r\n\r\n", $response, 2);
+	$response = array_pop($splitResponse);
+	$headers = explode("\n", array_pop($splitResponse));
+	$httpHeader = array_shift($headers);
+	sort($headers);
+	array_unshift($headers, $httpHeader);
+	error_log(print_r($headers, true));
+	$headers = implode("\n", $headers);
+	unset($splitResponse, $httpHeader);
+}
+catch (Exception $e)
+{
+	$headers = "Failed to build a response from the CURL request.";
+	$response = json_encode("Maybe the CURL request received no data?");
+}
 
 /**
  * Run the CURL request.
  *
  * @var array
  */
-$response = array(
-	"body" => curl_exec($ch),
+$output = array(
+	"body" => $response,
+	"headers" => $headers,
 	"info" => curl_getinfo($ch),
 	"json" => null
 );
 
-if ($request->method == "PUT")
+if (!empty($fh))
 {
 	fclose($fh);
 }
 
-$response["info"] = print_r($response["info"], true);
-$response["json"] = json_decode($response["body"]);
-if (!empty($response["json"]))
+$output["info"] = print_r($output["info"], true);
+$output["json"] = json_decode($output["body"]);
+if (!empty($output["json"]))
 {
 	/**
 	 * @var array|stdClass|null
 	 */
-	$response["body"] = json_encode($response["json"], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+	$output["body"] = json_encode($output["json"], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 }
 else
 {
-	$response["body"] = $response["json"];
+	$output["body"] = $output["json"];
 }
 
 echo <<<EOT
 	<hr/>
 
 	<p><pre><a href="{$request->url}" target="_blank">{$request->url}</a></pre></p>
-	<pre><code>{$response["body"]}</code></pre>
-	<pre>{$response["info"]}</pre>
+	<pre><code>{$output["headers"]}</code></pre>
+	<pre><code>{$output["body"]}</code></pre>
+	<pre>{$output["info"]}</pre>
 EOT;

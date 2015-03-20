@@ -14,6 +14,10 @@ final class Controller_Auth extends Controller
 	 * @var string
 	 */
 	protected $prefixCacheKey = "auth.confirm.";
+	/**
+	 * @var string
+	 */
+	protected $suffixEmailDomain = "kent.ac.uk";
 
 	/**
 	 * GET /auth/confirm
@@ -23,6 +27,13 @@ final class Controller_Auth extends Controller
 	public function action_confirm()
 	{
 		$this->validateMethods(Request::POST);
+
+		if ($this->auth->getApplication() === null)
+		{
+			throw new HttpStatusException(
+				400, "Missing application. You must authorise as an application to confirm authentication."
+			);
+		}
 
 		if ($this->request->post("code") === null)
 		{
@@ -35,12 +46,9 @@ final class Controller_Auth extends Controller
 			throw new HttpStatusException(400, "Invalid authentication token.");
 		}
 
-		$output = array(
-			"token" => $this->createApiToken($user),
-			"user" => $user
-		);
+		$token = Model_Token::generate($this->auth->getApplication(), $user);
 		$this->response->status(200);
-		$this->response->body(json_encode($output));
+		$this->response->body($token);
 	}
 
 	/**
@@ -48,7 +56,7 @@ final class Controller_Auth extends Controller
 	 */
 	public function action_index()
 	{
-		$this->action_internal();
+		$this->action_sso();
 	}
 
 	/**
@@ -68,31 +76,35 @@ final class Controller_Auth extends Controller
 		$fakeCodes = array(
 			"f4dfeada0e91e1791a80da1bb26a7d96" => array(
 				"role" => "staff",
+				"uid" => "jch27",
 				"username" => "J.C.Hernandez-Castro"
 			),
 			"1e9a755d73865da9068f079d81402ce7" => array(
 				"role" => "staff",
+				"uid" => "jsc",
 				"username" => "J.S.Crawford"
 			),
 			"6f2653c2a1c64220e3d2a713cc52b438" => array(
 				"role" => "staff",
+				"uid" => "sup2",
 				"username" => "supervisor2"
 			),
 			"1f18ed87771daf095e090916cb9423e4" => array(
 				"role" => "student",
+				"uid" => "mh471",
 				"username" => "mh471"
 			),
 			"1460357d62390ab9b3b33fa1a0618a8f" => array(
 				"role" => "student",
+				"uid" => "jsd24",
 				"username" => "jsd24"
 			),
 			"930144ea545ce754789b15074106bc36" => array(
 				"role" => "student",
+				"uid" => "mjw59",
 				"username" => "mjw59"
 			),
 		);
-		/** @noinspection SpellCheckingInspection */
-		$url = parse_url($_SERVER["HTTP_REFERER"]);
 
 		if (!array_key_exists($this->request->query("auth"), $fakeCodes))
 		{
@@ -101,16 +113,60 @@ final class Controller_Auth extends Controller
 
 		$authUser = $fakeCodes[$this->request->query("auth")];
 
-		$user = Model_User::getByEmail($authUser["username"] . "@kent.ac.uk");
+		$user = Model_User::getByUid($authUser["uid"]);
 		if (empty($user))
 		{
-			$user = new Model_User;
-			$user->setEmail($authUser["username"] . "@kent.ac.uk");
-			$user->setRole($authUser["role"]);
+			$user = new Model_User(
+				$authUser["uid"], $authUser["username"] . "@" . $this->suffixEmailDomain, $authUser["role"]
+			);
 			$user->save();
+			$this->setNewUserValues($user);
 		}
 
+		/** @noinspection SpellCheckingInspection */
+		$url = parse_url(!empty($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"]
+			: "http://" . (config("environment") === "development" ? "dev." : "") . "kentprojects.com");
+
 		throw $this->generateAuthUrl($url, $user);
+	}
+
+	/**
+	 * GET /auth/logout
+	 *
+	 * @throws HttpRedirectException
+	 * @throws HttpStatusException
+	 * @return void
+	 */
+	public function action_logout()
+	{
+		if (config("environment") === "development")
+		{
+			throw new HttpRedirectException(302, "https://api.kentprojects.com/auth/logout?return=dev");
+		}
+		else
+		{
+			switch ($this->request->query("return"))
+			{
+				case "dev":
+					$redirect = "http://dev.kentprojects.com";
+					break;
+				default:
+					$redirect = "http://www.kentprojects.com";
+			}
+
+			/**
+			 * @require The external SimpleSAML2 library.
+			 */
+			/** @noinspection PhpIncludeInspection */
+			/** @noinspection SpellCheckingInspection */
+			require_once "/var/www/simplesaml/lib/_autoload.php";
+
+			/** @noinspection PhpUndefinedClassInspection */
+			$provider = new SimpleSAML_Auth_Simple("default-sp");
+			/** @noinspection PhpUndefinedMethodInspection */
+			$provider->logout($redirect);
+		}
+		throw new HttpStatusException(724, "This line should be unreachable.");
 	}
 
 	/**
@@ -136,10 +192,11 @@ final class Controller_Auth extends Controller
 		{
 			if ($this->request->query("data") === null)
 			{
-				throw new HttpRedirectException(302, "http://api.kentprojects.com/auth/sso?return=dev");
+				throw new HttpRedirectException(302, "https://api.kentprojects.com/auth/sso?return=dev");
 			}
 			else
 			{
+				Log::debug($prefixDevCacheKey . $this->request->query("data"));
 				$attributes = Cache::getOnce($prefixDevCacheKey . $this->request->query("data"));
 				if (empty($attributes))
 				{
@@ -179,12 +236,7 @@ final class Controller_Auth extends Controller
 			if ($this->request->query("return") === "dev")
 			{
 				$key = md5(uniqid());
-				if (Cache::set($prefixDevCacheKey . $key, $attributes, 10 * Cache::MINUTE) === false)
-				{
-					trigger_error(
-						"Unable to save {$prefixDevCacheKey}{$key} => " . json_encode($attributes), E_USER_ERROR
-					);
-				}
+				Cache::set($prefixDevCacheKey . $key, $attributes, 10 * Cache::MINUTE);
 				throw new HttpRedirectException(302, "http://api.dev.kentprojects.com/auth/sso?data=" . $key);
 			}
 		}
@@ -232,13 +284,12 @@ final class Controller_Auth extends Controller
 			exit(1);
 		}
 
-		$user = Model_User::getByEmail($email);
+		$user = Model_User::getByUid($uid);
 		if (empty($user))
 		{
-			$user = new Model_User;
-			$user->setEmail($email);
-			$user->setRole($role);
+			$user = new Model_User($uid, $email, $role);
 			$user->save();
+			$this->setNewUserValues($user);
 		}
 
 		$url = parse_url(!empty($_SESSION["incoming-url"]) ? $_SESSION["incoming-url"] : $backupUrl);
@@ -257,14 +308,13 @@ final class Controller_Auth extends Controller
 	protected function createApiToken(Model_User $user)
 	{
 		$break = false;
-		$token = null;
-		$statement = Database::prepare("INSERT INTO `Token` (`user_id`, `token`) VALUES (?,?)", "is");
+		$statement = Database::prepare("CALL usp_GetApplicationUserToken", "ii");
+		$token = new stdClass;
 		while (!$break)
 		{
-			$token = md5(uniqid());
 			try
 			{
-				$statement->execute($user->getId(), $token);
+				$token = $statement->execute($this->auth->getApplication()->getId(), $user->getId())->singleton();
 				$break = true;
 			}
 			catch (DatabaseException $e)
@@ -276,23 +326,38 @@ final class Controller_Auth extends Controller
 				}
 			}
 		}
-		return $token;
+		if (empty($token) || empty($token->token))
+		{
+			throw new LogicException("Failed to create token.");
+		}
+
+		return $token->token;
 	}
 
 	/**
 	 * @param array $url
 	 * @param Model_User $user
+	 * @throws HttpStatusException
 	 * @return HttpRedirectException
 	 */
 	protected function generateAuthUrl(array $url, Model_User $user)
 	{
-		$break = false;
+		$runtime = 0;
+		$success = false;
 		$token = null;
 
-		while (!$break)
+		while (!$success && ($runtime < 5))
 		{
 			$token = md5(uniqid());
-			$break = Cache::add(Cache::PREFIX . $this->prefixCacheKey . $token, $user->getId(), 10 * Cache::MINUTE);
+			$success = Cache::add(Cache::PREFIX . $this->prefixCacheKey . $token, $user->getId(), 10 * Cache::MINUTE);
+			$runtime++;
+		}
+		if (!$success)
+		{
+			/**
+			 * HTTP/1.1 724 This line should be unreachable.
+			 */
+			throw new HttpStatusException(500, "Failed to generate authentication url.");
 		}
 
 		$url = $url["scheme"] . "://" . $url["host"] . (!empty($url["port"]) ? ":" . $url["port"] : "") .
@@ -302,12 +367,51 @@ final class Controller_Auth extends Controller
 	}
 
 	/**
+	 * Sets the ACL and other items for new users.
+	 *
+	 * @param Model_User $user
+	 * @return void
+	 */
+	private function setNewUserValues(Model_User $user)
+	{
+		/**
+		 * This is the point where a NEW USER has been created.
+		 * They require initiations. Or something cult-like.
+		 */
+		$this->acl = new ACL($user);
+		/**
+		 * Provide the ability to update themselves.
+		 */
+		$this->acl->set("user/" . $user->getId(), false, true, true, false);
+		/**
+		 * Provide the ability to create and read comments.
+		 */
+		$this->acl->set("comment", true, true, false, false);
+		/**
+		 * Provide the ability to create and read group profiles.
+		 * As a new user, they can create groups. Once they are part of a group the create permission is removed.
+		 */
+		$this->acl->set("group", true, true, false, false);
+		/**
+		 * Provide the ability to read project profiles.
+		 */
+		$this->acl->set("project", false, true, false, false);
+		/**
+		 * Provide the ability to read user profiles.
+		 */
+		$this->acl->set("user", false, true, false, false);
+		/**
+		 * And finally save.
+		 */
+		$this->acl->save();
+	}
+
+	/**
 	 * @param string $token
 	 * @return Model_User
 	 */
 	private function validateCode($token)
 	{
-		$user_id = Cache::getOnce(Cache::PREFIX . $this->prefixCacheKey . $token, null);
-		return (empty($user_id)) ? null : Model_User::getById($user_id);
+		return Model_User::getById(Cache::getOnce(Cache::PREFIX . $this->prefixCacheKey . $token, null));
 	}
 }

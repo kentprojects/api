@@ -4,12 +4,6 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-
-if (!defined("USE_DATABASE_STUB"))
-{
-	define("USE_DATABASE_STUB", false);
-}
-
 abstract class Database
 {
 	/**
@@ -30,7 +24,7 @@ abstract class Database
 	 * @param string $types The types of any variables
 	 * @param string $format The format of the results
 	 * @throws DatabaseException
-	 * @return DatabaseStub|_Database_Query
+	 * @return _Database_Query
 	 */
 	public static function prepare($query, $types = "", $format = null)
 	{
@@ -43,7 +37,7 @@ abstract class Database
 				config("database", "database")
 			);
 
-			if (static::$mysqli->connect_error)
+			if (static::$mysqli->connect_error > 0)
 			{
 				throw new DatabaseException(
 					static::$mysqli->connect_error, static::$mysqli->connect_errno,
@@ -57,10 +51,13 @@ abstract class Database
 		if (!empty($types))
 		{
 			$allowed = str_split(static::$types);
-			$allowedcheck = str_replace($allowed, "", $types);
-			if (strlen($allowedcheck) > 0)
+			$allowedCheck = str_replace($allowed, "", $types);
+			if (strlen($allowedCheck) > 0)
 			{
-				throw new DatabaseException("Unable to create prepared statement: There is an invalid type supplied: $allowedcheck", 0, $query, $types, $format);
+				throw new DatabaseException(
+					"Unable to create prepared statement: There is an invalid type supplied: $allowedCheck", 0,
+					$query, $types, $format
+				);
 			}
 		}
 
@@ -68,7 +65,10 @@ abstract class Database
 
 		if ($statement === false)
 		{
-			throw new DatabaseException("Unable to create prepared statement: ".self::$mysqli->error, self::$mysqli->errno, $query, $types, $format);
+			throw new DatabaseException(
+				"Unable to create prepared statement: " . self::$mysqli->error, self::$mysqli->errno,
+				$query, $types, $format
+			);
 		}
 
 		return new _Database_Query($query, $statement, $types, $format);
@@ -116,7 +116,7 @@ class _Database_Query
 		$this->format = $format;
 		$this->query = $sql;
 		$this->statement = $statement;
-		$this->types = empty($types) ? "" : (string) $types;
+		$this->types = empty($types) ? "" : (string)$types;
 	}
 
 	/**
@@ -130,7 +130,9 @@ class _Database_Query
 	{
 		$values = func_get_args();
 		if (strlen($this->types) !== count($values))
-			throw new Exception('Invalid parameter count: expected '.strlen($this->types).', got '.count($values));
+		{
+			throw new Exception('Invalid parameter count: expected ' . strlen($this->types) . ', got ' . count($values));
+		}
 
 		if (!empty($values))
 		{
@@ -142,7 +144,11 @@ class _Database_Query
 
 		$success = $this->statement->execute();
 		if ($success === false)
-			throw new DatabaseException($this->statement->error, $this->statement->errno, $this->query, $this->types, $values);
+		{
+			throw new DatabaseException(
+				$this->statement->error, $this->statement->errno, $this->query, $this->types, func_get_args()
+			);
+		}
 
 		$result = $this->statement->get_result();
 
@@ -150,7 +156,9 @@ class _Database_Query
 			? new _Database_State($this->statement)
 			: new _Database_Result($result, $this->format);
 
-		while ($this->statement->more_results() && $this->statement->next_result());
+		while ($this->statement->more_results() && $this->statement->next_result())
+		{
+		}
 		$this->statement->close();
 
 		return $return;
@@ -163,8 +171,10 @@ class _Database_Query
 	private static function makeParams(array $args)
 	{
 		$refs = array();
-		foreach($args as $key => $value)
+		foreach ($args as $key => $value)
+		{
 			$refs[$key] = &$args[$key];
+		}
 		return $refs;
 	}
 }
@@ -194,7 +204,9 @@ class _Database_Result implements Countable
 		$this->results = $results;
 
 		if (!empty($format))
+		{
 			$this->type = $format;
+		}
 	}
 
 	/**
@@ -240,18 +252,25 @@ class _Database_Result implements Countable
 	public function all()
 	{
 		$results = array();
-		switch($this->type) {
+		switch ($this->type)
+		{
 			case "assoc":
 				while ($row = $this->results->fetch_assoc())
+				{
 					$results[] = $row;
-			break;
+				}
+				break;
 			case "object":
 				while ($row = $this->results->fetch_object())
+				{
 					$results[] = $row;
-			break;
+				}
+				break;
 			default:
 				while ($row = $this->results->fetch_object($this->type))
+				{
 					$results[] = $row;
+				}
 		}
 		return $results;
 	}
@@ -297,6 +316,11 @@ class _Database_Result implements Countable
 	 */
 	public function singlevals()
 	{
+		if ($this->count() == 0)
+		{
+			return array();
+		}
+
 		$results = $this->as_assoc()->all();
 		if (!empty($results))
 		{

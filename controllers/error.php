@@ -28,6 +28,15 @@ final class Controller_Error extends Controller
 
 		switch (get_class($e))
 		{
+			case "DatabaseException":
+				/** @var DatabaseException $e */
+				if (config("environment") === "development")
+				{
+					$error["query"] = $e->getQuery();
+					$error["types"] = $e->getTypes();
+					$error["params"] = $e->getParams();
+				}
+				break;
 			case "HttpStatusException":
 				/** @var HttpStatusException $e */
 				$error["status"] = $status = $e->getCode();

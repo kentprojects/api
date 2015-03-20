@@ -1,0 +1,4 @@
+admin/assets/fonts linguist-vendored
+admin/assets/less/flat-ui linguist-vendored
+admin/assets/* linguist-documentation
+eye/* linguist-documentation

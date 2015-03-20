@@ -29,33 +29,72 @@ final class Controller_Project extends Controller
 				throw new HttpStatusException(400, "You cannot create a project using an existing project ID.");
 			}
 
-			$params = $this->validateParams(array(
-				"year" => $this->request->post("year", false),
-				"name" => $this->request->post("name", false),
-				"creator" => $this->request->post("creator", false)
+			/**
+			 * Validate that the user can create a project.
+			 */
+			$this->validateUser(array(
+				"entity" => "project",
+				"action" => ACL::CREATE,
+				"message" => "You do not have permission to create a project."
 			));
 
-			$year = Model_Year::getById($params["year"]);
-			if (empty($year))
+			if ($this->request->query("rollover") !== null)
 			{
-				throw new HttpStatusException(400, "Invalid year entered.");
+				$existingProject = Model_Project::getById($this->request->query("rollover"));
+				if (empty($existingProject))
+				{
+					throw new HttpStatusException(404, "Rollover project not found.");
+				}
+
+				// TODO: Is user convener? That should be easy to calculate given how much we're calculating.
+				$this->validateUser(array(
+					"entity" => "project/" . $existingProject->getId(),
+					"action" => ACL::READ,
+					"message" => "You do not have permission to rollover this project.",
+					"role" => "staff"
+				));
+
+				$params = array(
+					"name" => $existingProject->getName()
+				);
+
+				$creator = $this->auth->getUser();
+				$supervisor = $existingProject->getSupervisor();
+				if (empty($supervisor))
+				{
+					$supervisor = $this->auth->getUser();
+					// TODO: Notify convener that the supervisor has been deleted and he should take action.
+				}
+			}
+			else
+			{
+				/**
+				 * Validate parameters.
+				 */
+				$params = $this->validateParams(array(
+					"name" => $this->request->post("name", false)
+				));
+
+				$creator = $supervisor = $this->auth->getUser();
 			}
 
-			$creator = Model_User::getById($params["creator"]);
-			if (empty($creator))
+			$project = new Model_Project(Model_Year::getCurrentYear(), $params["name"], $creator);
+			$project->setSupervisor($supervisor);
+			if (!empty($existingProject))
 			{
-				throw new HttpStatusException(400, "Invalid user id entered for the project's creator.");
+				$project->setDescription($existingProject->getDescription());
 			}
-
-			$slug = slugify($params["name"]);
-
-			if (!Model_Project::validate($year, $slug))
-			{
-				throw new HttpStatusException(400, "This year already has a project with that name '" . $params["name"] . "'.");
-			}
-
-			$project = new Model_Project($year, $params["name"], $slug, $creator);
 			$project->save();
+
+			$this->acl->set("project/" . $project->getId(), true, true, true, true);
+			$this->acl->save();
+
+			if (!empty($existingProject) && ($supervisor->getId() !== $this->auth->getUser()->getId()))
+			{
+				$supervisorACL = new ACL($supervisor);
+				$supervisorACL->set("project/" . $project->getId(), true, true, true, true);
+				$supervisorACL->save();
+			}
 
 			$this->response->status(201);
 			$this->response->body($project);
@@ -79,7 +118,18 @@ final class Controller_Project extends Controller
 			 * PUT /project/:id
 			 * Used to update a project!
 			 */
-			throw new HttpStatusException(501, "Updating a project is coming soon.");
+
+			/**
+			 * Validate that the user can update this project.
+			 */
+			$this->validateUser(array(
+				"entity" => "project/" . $project->getId(),
+				"action" => ACL::UPDATE,
+				"message" => "You do not have permission to update this project."
+			));
+
+			$project->update($this->request->getPostData());
+			$project->save();
 		}
 		elseif ($this->request->getMethod() === Request::DELETE)
 		{
@@ -87,7 +137,27 @@ final class Controller_Project extends Controller
 			 * DELETE /project/:id
 			 * Used to delete a project.
 			 */
-			throw new HttpStatusException(501, "Deleting a project is coming soon.");
+
+			/**
+			 * Validate that the user can delete this project.
+			 */
+			$this->validateUser(array(
+				"entity" => "project/" . $project->getId(),
+				"action" => ACL::DELETE,
+				"message" => "You do not have permission to delete this project."
+			));
+
+			Model_Project::delete($project);
+
+			$this->acl->delete("project/" . $project->getId());
+			$this->acl->save();
+
+			$this->response->status(204);
+			return;
+		}
+		else
+		{
+			$project->getGroup();
 		}
 
 		/**
@@ -97,63 +167,5 @@ final class Controller_Project extends Controller
 
 		$this->response->status(200);
 		$this->response->body($project);
-	}
-
-	/**
-	 * /project/group
-	 * /project/:id/group
-	 *
-	 * @throws HttpStatusException
-	 * @return void
-	 */
-	public function action_group()
-	{
-		$this->validateMethods(Request::POST);
-
-		/**
-		 * POST /project/:id/group
-		 */
-
-		if ($this->request->param("id") === null)
-		{
-			throw new HttpStatusException(400, "No project id provided.");
-		}
-
-		$project = Model_Project::getById($this->request->param("id"));
-		if (empty($project))
-		{
-			throw new HttpStatusException(404, "Project not found.");
-		}
-
-		throw new HttpStatusException(501, "Adding a group to a project is coming soon.");
-	}
-
-	/**
-	 * /project/rollover
-	 * /project/:id/rollover
-	 *
-	 * @throws HttpStatusException
-	 * @return void
-	 */
-	public function action_rollover()
-	{
-		$this->validateMethods(Request::POST);
-
-		/**
-		 * POST /project/:id/rollover
-		 */
-
-		if ($this->request->param("id") === null)
-		{
-			throw new HttpStatusException(400, "No project id provided.");
-		}
-
-		$project = Model_Project::getById($this->request->param("id"));
-		if (empty($project))
-		{
-			throw new HttpStatusException(404, "Project not found.");
-		}
-
-		throw new HttpStatusException(501, "Rolling over a project is coming soon.");
 	}
 }

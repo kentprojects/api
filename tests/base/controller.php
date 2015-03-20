@@ -6,55 +6,80 @@
  */
 abstract class KentProjects_Controller_TestBase extends KentProjects_TestBase
 {
+	protected static $applicationKey = "ad7921ce757a74d8676c9140ec498003";
+	protected static $applicationSecret = "be0855399d72ad351807f3eeecec5ade";
+	protected static $tokenModels = array();
+	protected static $userTokens = array(
+		"convener" => "daa4ed4e5994c355197cc17bb52bf0d9",
+		"supervisor" => "e529609067c6dd7fcb1e744f3f634adf",
+		"student" => "3865caf68614ce90f15c5f77cdbbb8b9",
+	);
+
 	/**
 	 * @param string $method
-	 * @param array $getData
-	 * @param array $postData
-	 * @param array $paramData
+	 * @param array $data
 	 * @return Request_Internal
 	 */
-	protected function createBadSignedRequest($method, array $getData = array(), array $postData = array(), array $paramData = array())
+	protected function createBadSignedRequest($method, array $data = array())
 	{
 		$request = Request::factory($method, "/test");
-		$getData = $this->signRequest($getData);
+		$getData = $this->signRequest(!empty($data["get"]) ? $data["get"] : array());
 		$getData[uniqid()] = uniqid();
 
 		$request->setQueryData($getData);
-		$request->setPostData($postData);
-		$request->setParamData($paramData);
+		$request->setPostData(!empty($data["post"]) ? $data["post"] : array());
+		$request->setParamData(!empty($data["param"]) ? $data["param"] : array());
 		return $request;
 	}
 
 	/**
 	 * @param string $method
-	 * @param array $getData
-	 * @param array $postData
-	 * @param array $paramData
+	 * @param array $data
+	 * @param string $user
 	 * @return Request_Internal
 	 */
-	protected function createSignedRequest($method, array $getData = array(), array $postData = array(), array $paramData = array())
+	protected function createSignedRequest($method, array $data = array(), $user = null)
 	{
 		$request = Request::factory($method, "/test");
-		$request->setQueryData($this->signRequest($getData));
-		$request->setPostData($postData);
-		$request->setParamData($paramData);
+		$request->setQueryData($this->signRequest(!empty($data["get"]) ? $data["get"] : array(), $user));
+		$request->setPostData(!empty($data["post"]) ? $data["post"] : array());
+		$request->setParamData(!empty($data["param"]) ? $data["param"] : array());
 		return $request;
 	}
 
 	/**
 	 * @param string $method
-	 * @param array $getData
-	 * @param array $postData
-	 * @param array $paramData
+	 * @param array $data
 	 * @return Request_Internal
 	 */
-	protected function createUnsignedRequest($method, array $getData = array(), array $postData = array(), array $paramData = array())
+	protected function createUnsignedRequest($method, array $data = array())
 	{
 		$request = Request::factory($method, "/test");
-		$request->setQueryData($getData);
-		$request->setPostData($postData);
-		$request->setParamData($paramData);
+		$request->setQueryData(!empty($data["get"]) ? $data["get"] : array());
+		$request->setPostData(!empty($data["post"]) ? $data["post"] : array());
+		$request->setParamData(!empty($data["param"]) ? $data["param"] : array());
 		return $request;
+	}
+
+	/**
+	 * @param string $token
+	 * @return Model_Token
+	 */
+	protected function getUserForToken($token)
+	{
+		if (empty(static::$tokenModels[$token]))
+		{
+			if (empty(static::$userTokens[$token]))
+			{
+				throw new InvalidArgumentException("Invalid token '$token'.");
+			}
+			static::$tokenModels[$token] = Model_Token::getByToken(static::$userTokens[$token]);
+			if (empty(static::$tokenModels[$token]))
+			{
+				throw new InvalidArgumentException("Invalid token '$token'.");
+			}
+		}
+		return static::$tokenModels[$token];
 	}
 
 	/**
@@ -78,26 +103,37 @@ abstract class KentProjects_Controller_TestBase extends KentProjects_TestBase
 
 	/**
 	 * @param array $getData
+	 * @param string $token
 	 * @return array
 	 */
-	private function signRequest(array $getData)
+	private function signRequest(array $getData, $token = null)
 	{
-		$applications = parse_ini_file(APPLICATION_PATH . "/applications.ini", true);
-		$getData = array_merge(
-			array(
-				"key" => $applications["phpunit"]["key"],
-				"expires" => time() + 600,
-			),
-			$getData
+		$forcedGetData = array(
+			"key" => static::$applicationKey,
+			"expires" => time() + 600
 		);
+		if (!empty($token))
+		{
+			if (empty(static::$userTokens[$token]))
+			{
+				throw new InvalidArgumentException("Invalid token '$token'.");
+			}
+			$forcedGetData["user"] = static::$userTokens[$token];
+		}
+
+		$getData = array_merge($forcedGetData, $getData);
+
 		unset($getData["signature"]);
 		ksort($getData);
-		array_walk($getData, function (&$v)
-		{
-			$v = (string)$v;
-		});
+		array_walk(
+			$getData,
+			function (&$v)
+			{
+				$v = (string)$v;
+			}
+		);
 		$getData["signature"] = md5(
-			config("checksum", "salt") . $applications["phpunit"]["secret"] . json_encode($getData)
+			config("checksum", "salt") . static::$applicationSecret . json_encode($getData)
 		);
 
 		return $getData;

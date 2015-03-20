@@ -1,7 +1,4 @@
----
-layout: page
-title: Requests
----
+# KentProjects > Making Requests
 
 The API communicates over a simple HTTP REST interface, taking query strings and JSON-encoded POST data as requests and 
 returning JSON-encoded responses.

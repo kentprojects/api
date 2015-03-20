@@ -7,6 +7,40 @@
 class Model_Project extends Model
 {
 	/**
+	 * @param Model_Project $project
+	 * @return void
+	 */
+	public static function delete(Model_Project $project)
+	{
+		$project->getGroup();
+		Database::prepare("DELETE FROM `Project` WHERE `project_id` = ?", "i")->execute($project->getId());
+		$project->clearCaches();
+	}
+
+	/**
+	 * Get the relevant Project by it's group.
+	 *
+	 * @param Model_Group $group
+	 * @return Model_Project
+	 */
+	public static function getByGroup(Model_Group $group)
+	{
+		if ($group->getId() === null)
+		{
+			return null;
+		}
+
+		$id = Cache::get($group->getCacheName("project"));
+		if (empty($id))
+		{
+			$id = Database::prepare("SELECT `project_id` FROM `Project` WHERE `group_id` = ? AND `status` = 1", "i")
+				->execute($group->getId())->singleval();
+			!empty($id) && Cache::set($group->getCacheName("project"), $id, Cache::HOUR);
+		}
+		return !empty($id) ? static::getById($id) : null;
+	}
+
+	/**
 	 * Get the relevant Project by it's ID.
 	 *
 	 * @param int $id
@@ -14,43 +48,28 @@ class Model_Project extends Model
 	 */
 	public static function getById($id)
 	{
+		/** @var Model_Project $project */
 		$project = parent::getById($id);
 		if (empty($project))
 		{
-			$statement = Database::prepare(
+			$project = Database::prepare(
 				"SELECT
 					`project_id` AS 'id',
 					`year`,
 					`group_id` AS 'group',
 					`name`,
-					`slug`,
 					`creator_id` AS 'creator',
+					`supervisor_id` AS 'supervisor',
 					`created`,
 					`updated`,
 					`status`
 				 FROM `Project`
 			 	 WHERE `project_id` = ?",
 				"i", __CLASS__
-			);
-			$project = $statement->execute($id)->singleton();
-			if (!empty($project))
-			{
-				Cache::set($project);
-			}
+			)->execute($id)->singleton();
+			Cache::store($project);
 		}
 		return $project;
-	}
-
-	/**
-	 * @param Model_Year $year
-	 * @param string $slug
-	 * @return boolean
-	 */
-	public static function validate(Model_Year $year, $slug)
-	{
-		$statement = Database::prepare("SELECT `project_id` FROM `Project` WHERE `year` = ? AND `slug` = ?", "is");
-		$project_id = $statement->execute($year->getId(), $slug)->singleval();
-		return $project_id === null;
 	}
 
 	/**
@@ -70,13 +89,13 @@ class Model_Project extends Model
 	 */
 	protected $name;
 	/**
-	 * @var string
-	 */
-	protected $slug;
-	/**
 	 * @var Model_User
 	 */
 	protected $creator;
+	/**
+	 * @var Model_User
+	 */
+	protected $supervisor;
 	/**
 	 * @var string
 	 */
@@ -90,17 +109,53 @@ class Model_Project extends Model
 	 */
 	protected $status;
 
-	public function __construct(Model_Year $year = null, $name = null, $slug = null, Model_User $creator = null)
+	public function __construct(Model_Year $year = null, $name = null, Model_User $creator = null)
 	{
-		if ($this->getId() !== null)
+		if ($this->getId() === null)
 		{
-			return;
-		}
+			if (empty($year))
+			{
+				trigger_error("Missing YEAR passed to the PROJECT constructor", E_USER_ERROR);
+			}
+			$this->year = $year;
 
-		$this->year = $year;
-		$this->name = $name;
-		$this->slug = $slug;
-		$this->creator = $creator;
+			if (empty($name))
+			{
+				trigger_error("Missing NAME passed to the PROJECT constructor", E_USER_ERROR);
+			}
+			$this->name = $name;
+
+			if (empty($creator))
+			{
+				trigger_error("Missing CREATOR passed to the PROJECT constructor", E_USER_ERROR);
+			}
+			$this->creator = $creator;
+		}
+		parent::__construct();
+	}
+
+	/**
+	 * @return array
+	 */
+	public function clearCacheStrings()
+	{
+		$groupCaches = array();
+		if (!empty($this->group))
+		{
+			if (is_numeric($this->group))
+			{
+				/** @noinspection PhpToStringImplementationInspection */
+				$groupCaches = array(Model_Group::cacheName() . "." . $this->group);
+			}
+			else
+			{
+				$groupCaches = $this->group->clearCacheStrings();
+			}
+		}
+		return array_merge(
+			parent::clearCacheStrings(),
+			$groupCaches// , $this->getCacheName("project")
+		);
 	}
 
 	/**
@@ -116,7 +171,30 @@ class Model_Project extends Model
 	 */
 	public function getCreator()
 	{
+		if (!empty($this->creator) && is_numeric($this->creator))
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->creator = Model_User::getById($this->creator);
+		}
 		return $this->creator;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDescription()
+	{
+		return $this->metadata->description;
+	}
+
+	public function getGroup()
+	{
+		if (!empty($this->group) && is_numeric($this->group))
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->group = Model_Group::getById($this->group);
+		}
+		return $this->group;
 	}
 
 	/**
@@ -136,19 +214,24 @@ class Model_Project extends Model
 	}
 
 	/**
-	 * @return string
-	 */
-	public function getSlug()
-	{
-		return $this->slug;
-	}
-
-	/**
 	 * @return int
 	 */
 	public function getStatus()
 	{
 		return $this->status;
+	}
+
+	/**
+	 * @return Model_User
+	 */
+	public function getSupervisor()
+	{
+		if (!empty($this->supervisor) && is_numeric($this->supervisor))
+		{
+			/** @noinspection PhpParamsInspection */
+			$this->supervisor = Model_User::getById($this->supervisor);
+		}
+		return $this->supervisor;
 	}
 
 	/**
@@ -168,18 +251,46 @@ class Model_Project extends Model
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function hasGroup()
+	{
+		return !empty($this->group);
+	}
+
+	/**
+	 * Remove the group from the project.
+	 * @return void
+	 */
+	public function removeGroup()
+	{
+		$this->group = null;
+	}
+
+	/**
+	 * Render the project.
+	 *
+	 * @param Request_Internal $request
+	 * @param Response $response
+	 * @param ACL $acl
+	 * @param boolean $internal
 	 * @return array
 	 */
-	public function jsonSerialize()
+	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
+		$this->getCreator();
+		$this->getSupervisor();
+
 		return $this->validateFields(array_merge(
-			parent::jsonSerialize(),
+			parent::render($request, $response, $acl, $internal),
 			array(
 				"year" => (string)$this->year,
-				"group" => $this->group,
+				"group" => is_object($this->group) ? $this->group->render($request, $response, $acl, "project") : $this->group,
 				"name" => $this->name,
-				"slug" => $this->slug,
-				"creator" => $this->creator,
+				"description" => $this->getDescription(),
+				"creator" => $this->creator->render($request, $response, $acl, true),
+				"supervisor" => $this->supervisor->render($request, $response, $acl, true),
+				"permissions" => $acl->get($this->getEntityName()),
 				"created" => $this->created,
 				"updated" => $this->updated
 			)
@@ -190,45 +301,31 @@ class Model_Project extends Model
 	{
 		if (empty($this->id))
 		{
-			if (empty($this->year))
-			{
-				throw new InvalidArgumentException("No year has been set for the project.");
-			}
-			if (empty($this->name))
-			{
-				throw new InvalidArgumentException("No name has been set for the project.");
-			}
-			if (empty($this->slug))
-			{
-				throw new InvalidArgumentException("No slug has been set for the project.");
-			}
-			if (empty($this->creator))
-			{
-				throw new InvalidArgumentException("No creator has been set for the project.");
-			}
-
 			/** @var _Database_State $result */
 			$result = Database::prepare(
-				"INSERT INTO `Project` (`year`, `group_id`, `name`, `slug`, `creator_id`, `created`)
+				"INSERT INTO `Project` (`year`, `group_id`, `name`, `creator_id`, `supervisor_id`, `created`)
 				 VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
-				"iissi"
+				"iisii"
 			)->execute(
 				(string)$this->year, (!empty($this->group) ? $this->group->getId() : null), $this->name,
-				$this->slug, $this->creator->getId()
+				$this->creator->getId(), $this->supervisor->getId()
 			);
 			$this->id = $result->insert_id;
 			$this->created = $this->updated = Date::format(Date::TIMESTAMP, time());
 		}
 		else
 		{
+			$this->getGroup();
+			$this->getSupervisor();
+
 			Database::prepare(
 				"UPDATE `Project`
-				 SET `year` = ?, `group_id` = ?, `name` = ?, `slug` = ?, `creator_id` = ?
+				 SET `year` = ?, `group_id` = ?, `name` = ?, `supervisor_id` = ?
 				 WHERE `project_id` = ?",
-				"iissi"
+				"iisii"
 			)->execute(
-				(string)$this->year, (!empty($this->group) ? $this->group->getId() : null), $this->name,
-				$this->slug, $this->creator->getId(), $this->id
+				(string)$this->year, !empty($this->group) ? $this->group->getId() : null, $this->name,
+				$this->supervisor->getId(), $this->id
 			);
 			$this->updated = Date::format(Date::TIMESTAMP, time());
 		}
@@ -236,27 +333,41 @@ class Model_Project extends Model
 	}
 
 	/**
-	 * @param Model_User $creator
+	 * @param string $description
+	 * @return void
 	 */
-	public function setCreator(Model_User $creator)
+	public function setDescription($description)
 	{
-		$this->creator = $creator;
+		$this->metadata->description = strip_tags($description);
 	}
 
 	/**
-	 * @param string $name
+	 * @param Model_Group $group
+	 * @return void
 	 */
-	public function setName($name)
+	public function setGroup(Model_Group $group)
 	{
-		$this->name = $name;
-		$this->slug = slugify($name);
+		$this->group = $group;
+	}
+
+	public function setSupervisor(Model_User $supervisor)
+	{
+		/**
+		 * TODO: Validate this user is a registered supervisor of this year.
+		 */
+		$this->supervisor = $supervisor;
 	}
 
 	/**
-	 * @param Model_Year $year
+	 * @param array $data
+	 * @throws InvalidArgumentException
+	 * @return void
 	 */
-	public function setYear(Model_Year $year)
+	public function update(array $data)
 	{
-		$this->year = $year;
+		if (!empty($data["description"]))
+		{
+			$this->setDescription($data["description"]);
+		}
 	}
 }

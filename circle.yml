@@ -1,0 +1,44 @@
+#
+# @author: James Dryden <james.dryden@kentprojects.com>
+# @license: Copyright KentProjects
+# @link: http://kentprojects.com
+#
+general:
+  branches:
+    only:
+      - master
+      - develop
+machine:
+# Machine specifics.
+  php:
+    version: 5.5.8
+  timezone:
+      Europe/London
+#
+checkout:
+# Operations to occur after the CI server has checked out our code.
+  post:
+    - cp config.ci.ini config.ini
+#
+database:
+# To setup our database.
+  override:
+    - php database/update.php
+    - mysql -u ubuntu circle_test < tests/sample.sql
+#
+test:
+# Tests to run.
+  override:
+    - phpunit --bootstrap tests/functions.php --color --verbose tests
+#
+deployment:
+# Deploy the develop branch.
+  development:
+    branch: develop
+    commands:
+      - ./kentprojects.sh circleci deployDevelop
+# Deploy the master branch.
+  production:
+    branch: master
+    commands:
+      - ./kentprojects.sh circleci deployMaster

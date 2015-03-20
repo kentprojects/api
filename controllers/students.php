@@ -26,6 +26,11 @@ final class Controller_Students extends Controller
 		 * Get students by a criteria.
 		 */
 
+		if ($this->request->query("fields") !== null)
+		{
+			Model_User::returnFields(explode(",", $this->request->query("fields")));
+		}
+
 		/**
 		 * SELECT `user_id` FROM `User`
 		 * WHERE `role` = 'student' AND `status` = 1
@@ -33,6 +38,50 @@ final class Controller_Students extends Controller
 		$query = new Query("user_id", "User");
 		$query->where(array("field" => "role", "value" => "student"));
 		$query->where(array("field" => "status", "value" => 1));
+
+		if ($this->request->query("group") !== null)
+		{
+			/**
+			 * JOIN `Group_Student_Map` USING (`user_id`)
+			 * WHERE `Group_Student_Map`.`group_id` = ?
+			 */
+			$query->join(array(
+				"table" => "Group_Student_Map",
+				"how" => Query::USING,
+				"field" => "user_id"
+			));
+			$query->where(array(
+				"table" => "Group_Student_Map",
+				"field" => "group_id",
+				"type" => "i",
+				"value" => $this->request->query("group")
+			));
+		}
+
+		if ($this->request->query("supervisor") !== null)
+		{
+			/**
+			 * JOIN `Group_Student_Map` USING (`user_id`)
+			 * JOIN `Project` USING (`group_id`)
+			 * WHERE `Project`.`supervisor_id` = ?
+			 */
+			$query->join(array(
+				"table" => "Group_Student_Map",
+				"how" => Query::USING,
+				"field" => "user_id"
+			));
+			$query->join(array(
+				"table" => "Project",
+				"how" => Query::USING,
+				"field" => "group_id"
+			));
+			$query->where(array(
+				"table" => "Project",
+				"field" => "supervisor_id",
+				"type" => "i",
+				"value" => $this->request->query("supervisor")
+			));
+		}
 
 		if ($this->request->query("year") !== null)
 		{
@@ -56,7 +105,9 @@ final class Controller_Students extends Controller
 		$users = $query->execute()->singlevals();
 		foreach ($users as $k => $user_id)
 		{
-			$users[$k] = Model_User::getById($user_id);
+			$user = Model_User::getById($user_id);
+			$user->getGroup();
+			$users[$k] = $user;
 		}
 
 		$this->response->status(200);

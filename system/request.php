@@ -4,7 +4,6 @@
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
  */
-
 abstract class Request
 {
 	/**
@@ -16,6 +15,7 @@ abstract class Request
 	const POST = "request:post";
 	const PUT = "request:put";
 	const DELETE = "request:delete";
+	const HEAD = "request:head";
 
 	/**
 	 * A list of allowed methods built using the constants above.
@@ -69,11 +69,13 @@ abstract class Request
 	 */
 	public static function stringToMethod($method)
 	{
-		$method  = strtoupper($method);
+		$method = strtoupper($method);
 		$methods = static::getMethods();
 
 		if (empty($methods[$method]))
+		{
 			throw new Exception("Unable to determine Request constant for '{$method}'.");
+		}
 
 		return $methods[$method];
 	}
@@ -238,6 +240,12 @@ abstract class Request
 		return $this;
 	}
 
+	public function setMethod($method)
+	{
+		$this->method = $method;
+		return $this;
+	}
+
 	/**
 	 * @param string|array
 	 * @return $this
@@ -290,7 +298,7 @@ class Request_External extends Request
 		/**
 		 * CURL requirements if we're doing fancy methods.
 		 */
-		switch($this->getMethod())
+		switch ($this->getMethod())
 		{
 			case Request::POST:
 				curl_setopt($ch, CURLOPT_POST, true);
@@ -339,7 +347,7 @@ class Request_External extends Request
 	private function getCurlHeaders()
 	{
 		$headers = array();
-		foreach($this->getHeaders() as $key => $value)
+		foreach ($this->getHeaders() as $key => $value)
 		{
 			$headers[] = "$key: $value";
 		}
@@ -353,8 +361,11 @@ class Request_Internal extends Request
 	 * Request parameter data from the router.
 	 * @var array
 	 */
-	private $param = array();
-	private $run = false;
+	protected $param = array();
+	/**
+	 * @var bool
+	 */
+	protected $run = false;
 
 	/**
 	 * Run the internal request!
@@ -375,6 +386,8 @@ class Request_Internal extends Request
 		}
 		$this->run = true;
 
+		Timing::start("request");
+		$response = new Response($this);
 		try
 		{
 			$this->param = Router::handle($this->getUrl());
@@ -397,9 +410,7 @@ class Request_Internal extends Request
 				throw new RequestException("Method $controller::$action was not found.");
 			}
 
-			// print_r($this); var_dump($controller, $action); exit();
-
-			$response = new Response($this);
+			// Log::error($this, $controller, $action);
 
 			// Run the Controller and the relevant Action
 			/** @var Controller $controller */
@@ -407,8 +418,6 @@ class Request_Internal extends Request
 			$controller->before();
 			$controller->$action();
 			$controller->after();
-
-			return $response;
 		}
 		catch (HTTPRedirectException $e)
 		{
@@ -418,9 +427,8 @@ class Request_Internal extends Request
 			$response = new Response($this);
 			$response->status($e->getCode());
 			$response->header("Location", $e->getLocation());
-			return $response;
 		}
-		catch(Exception $e)
+		catch (Exception $e)
 		{
 			$response = new Response($this);
 			$response->headers(array(
@@ -447,8 +455,10 @@ class Request_Internal extends Request
 				$response->body((string)$e);
 			}
 
-			return $response;
+			Log::error($e);
 		}
+		Timing::stop("request");
+		return $response;
 	}
 
 	/**
