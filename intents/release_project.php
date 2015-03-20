@@ -102,9 +102,7 @@ final class Intent_Release_Project extends Intent
 			)
 		);
 
-		$this->deduplicateClear("undertake_a_project", array(
-			"project_id" => $project->getId()
-		));
+		$this->deduplicateClear("undertake_a_project", array("project" => "project"));
 
 		$group->clearCaches();
 		$project->clearCaches();
