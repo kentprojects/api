@@ -367,6 +367,7 @@ class _Database_State
 /**
  * A simple check to ensure that the MySQLnd is installed.
  * Performance-wise, the native driver is such an improvement if you can use it you definitely should!
+ * If you don't have it, be prepared to rewrite this.
  */
 if (!method_exists("mysqli_stmt", "get_result"))
 {
