@@ -105,8 +105,6 @@ final class Intent_Submit_To_Cas extends Intent
 			);
 		}
 
-		$body[] = "\n\n----\n\nKind regards,\nThe KentProjects API";
-
 		if (config("environment") === "development")
 		{
 			$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
