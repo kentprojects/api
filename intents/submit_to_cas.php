@@ -11,6 +11,7 @@ final class Intent_Submit_To_Cas extends Intent
 {
 	/**
 	 * Can this particular user create an intent of this kind?
+	 * Specifically, is this user in a group that has a project assigned to it?
 	 *
 	 * @param Model_User $user
 	 * @return bool
@@ -37,7 +38,7 @@ final class Intent_Submit_To_Cas extends Intent
 	}
 
 	/**
-	 * This represents somebody who wishes to join a group.
+	 * This represents a group admin wanting to confirm the project acceptance with the CAS office.
 	 *
 	 * @param array $data
 	 * @param Model_User $actor
