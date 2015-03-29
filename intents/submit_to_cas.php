@@ -70,7 +70,7 @@ final class Intent_Submit_To_Cas extends Intent
 
 		$body = array(
 			"CO600 PROJECT ACCEPTANCE FORM 2014/2015\n\n----\n\n",
-			"I/We, the aforementioned:\n\n"
+			"The students listed below:\n\n"
 		);
 		foreach ($group->getStudents() as $student)
 		{
@@ -82,8 +82,8 @@ final class Intent_Submit_To_Cas extends Intent
 			"\n\nWish to register for the CO600 project entitled:\n\n",
 			$project->getName(),
 			"\n\n----\n\nSupervisor Name: " . $project->getSupervisor()->getName() . "\n\n",
-			"(1) I, the supervisor, have agreed to supervise the project for the students(s) named above and have made",
-			"sure that any special resourced will be available for the start of the project.\n"
+			"(1) The supervisor named above has agreed to supervise the project for the students(s) named above and",
+			"has made sure that any special resourced will be available for the start of the project.\n"
 		);
 
 		if ($additionalInformation)
