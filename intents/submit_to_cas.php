@@ -68,8 +68,8 @@ final class Intent_Submit_To_Cas extends Intent
 		$project = $group->getProject();
 
 		$body = array(
-			"CO600 PROJECT ACCEPTANCE FORM 2014/2015,\n\n",
-			"I/We, the aforementioned:\n"
+			"CO600 PROJECT ACCEPTANCE FORM 2014/2015\n\n----\n\n",
+			"I/We, the aforementioned:\n\n"
 		);
 		foreach ($group->getStudents() as $student)
 		{
@@ -78,9 +78,9 @@ final class Intent_Submit_To_Cas extends Intent
 		}
 		array_push(
 			$body,
-			"\nWish to register for the CO600 project entitled:\n\n",
+			"\n\nWish to register for the CO600 project entitled:\n\n",
 			$project->getName(),
-			"\n\nSupervisor Name: " . $project->getSupervisor()->getName() . "\n\n",
+			"\n\n----\n\nSupervisor Name: " . $project->getSupervisor()->getName() . "\n\n",
 			"(1) I, the supervisor, have agreed to supervise the project for the students(s) named above and have made",
 			"sure that any special resourced will be available for the start of the project.\n"
 		);
@@ -103,15 +103,10 @@ final class Intent_Submit_To_Cas extends Intent
 			);
 		}
 
-		$body[] = "\n\nKind regards,\nThe KentProjects API";
+		$body[] = "\n\n----\n\nKind regards,\nThe KentProjects API";
 
 		if (config("environment") === "development")
 		{
-			array_push(
-				$body,
-				"\n\n\nFor reference, here's the JSON export of the intent:\n",
-				json_encode($this, JSON_PRETTY_PRINT)
-			);
 			$mail->setTo("james.dryden@kentprojects.com", "James Dryden");
 			$mail->setTo("matt.house@kentprojects.com", "Matt House");
 		}
