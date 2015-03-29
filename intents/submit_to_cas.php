@@ -69,6 +69,9 @@ final class Intent_Submit_To_Cas extends Intent
 		$group = $user->getGroup();
 		$project = $group->getProject();
 
+		$project->setCasSubmission();
+		$project->save();
+
 		$body = array(
 			"CO600 PROJECT ACCEPTANCE FORM 2014/2015\n\n----\n\n",
 			"The students listed below:\n\n"

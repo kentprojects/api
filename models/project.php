@@ -250,6 +250,11 @@ class Model_Project extends Model
 		return $this->year;
 	}
 
+	public function hasBeenSubmittedToCAS()
+	{
+		return $this->metadata->hasCasSubmission === "true";
+	}
+
 	/**
 	 * @return bool
 	 */
@@ -290,6 +295,7 @@ class Model_Project extends Model
 				"description" => $this->getDescription(),
 				"creator" => $this->creator->render($request, $response, $acl, true),
 				"supervisor" => $this->supervisor->render($request, $response, $acl, true),
+				"hasCasSubmission" => $this->hasBeenSubmittedToCAS(),
 				"permissions" => $acl->get($this->getEntityName()),
 				"created" => $this->created,
 				"updated" => $this->updated
@@ -330,6 +336,15 @@ class Model_Project extends Model
 			$this->updated = Date::format(Date::TIMESTAMP, time());
 		}
 		parent::save();
+	}
+
+	/**
+	 * Set the CAS Submission status.
+	 * @return void
+	 */
+	public function setCasSubmission()
+	{
+		$this->metadata->hasCasSubmission = "true";
 	}
 
 	/**
