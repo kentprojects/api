@@ -61,6 +61,7 @@ final class Intent_Submit_To_Cas extends Intent
 		$this->mergeData(array_merge($data, array(
 			"additional" => $additionalInformation
 		)));
+		$this->state(Intent::STATE_ACCEPTED);
 		$this->save();
 
 		$user = $this->model->getUser();
