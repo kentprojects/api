@@ -79,7 +79,7 @@ final class Intent_Submit_To_Cas extends Intent
 		foreach ($group->getStudents() as $student)
 		{
 			/** @var Model_User $student */
-			$body[] = "- " . $student->getName() . " " . $student->getEmail();
+			$body[] = "- " . $student->getName() . " " . $student->getEmail() . "\n";
 		}
 		array_push(
 			$body,
