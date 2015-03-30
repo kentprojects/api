@@ -234,51 +234,7 @@ function getHttpStatusForCode($code)
 		502 => "Bad Gateway",
 		503 => "Service Unavailable",
 		504 => "Gateway Timeout",
-		505 => "HTTP Version Not Supported",
-
-		// 70X Inexcusable
-		701 => "Meh",
-		702 => "Emacs",
-		703 => "Explosion",
-
-		// 71X Novelty Implementations
-		710 => "PHP",
-		711 => "Convenience Store",
-		712 => "NoSQL",
-		719 => "I am not a teapot",
-
-		// 72X Edge Cases
-		720 => "Unpossible",
-		721 => "Known Unknowns",
-		722 => "Unknown Unknowns",
-		723 => "Tricky",
-		724 => "This line should be unreachable",
-		725 => "It works on my machine",
-		726 => "It's a feature, not a bug",
-		727 => "32 bits is plenty",
-
-		// 73X Fucking
-		731 => "Fucking Rubygems",
-		732 => "Fucking Unicode",
-		733 => "Fucking Deadlocks",
-		734 => "Fucking Deferreds",
-		735 => "Fucking IE",
-		736 => "Fucking Race Conditions",
-		737 => "FuckingThreadsing",
-		738 => "Fucking Bundler",
-		739 => "Fucking Windows",
-
-		// 74X Meme Driven
-		740 => "Computer says no",
-		741 => "Compiling",
-		742 => "A kitten dies",
-		743 => "I thought I knew regular expressions",
-		744 => "Y U NO write integration tests?",
-		745 => "I don't always test me code, but when I do I do it in production",
-		746 => "Missed Ballmer Peak",
-		747 => "Motherfucking Snakes on the Motherfucking Plane",
-		748 => "Confounded by ponies",
-		749 => "Reserved for Chuck Norris"
+		505 => "HTTP Version Not Supported"
 	);
 
 	return (isset($codes[$code])) ? $codes[$code] : "";
