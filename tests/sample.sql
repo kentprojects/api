@@ -6,7 +6,9 @@
 INSERT INTO `Application` (`application_id`, `key`, `secret`, `name`, `created`)
 VALUES
 	(1, '77bf0b0815ce058841d74298394643ab', '7ede1f827d744b39666214441122764c', 'Frontend', CURRENT_TIMESTAMP),
-	(2, 'ad7921ce757a74d8676c9140ec498003', 'be0855399d72ad351807f3eeecec5ade', 'PHPUnit', CURRENT_TIMESTAMP)
+	(2, 'ad7921ce757a74d8676c9140ec498003', 'be0855399d72ad351807f3eeecec5ade', 'PHPUnit', CURRENT_TIMESTAMP),
+	(3, '23f04b58abc5c2b58bf83134a618de88', 'fb26bb8f0af9d7304801589bf6d6d187', 'iOS App', CURRENT_TIMESTAMP),
+	(4, '523abe1f67a01107469520610cfc6870', '0117e33cb60ada60275d40e176a9805d', 'Android App', CURRENT_TIMESTAMP)
 ON DUPLICATE KEY UPDATE `application_id` = `application_id`, `key` = VALUES(`key`), `secret` = VALUES(`secret`),
 	`name` = VALUES(`name`), `created` = VALUES(`created`);
 
