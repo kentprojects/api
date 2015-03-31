@@ -3,10 +3,15 @@
  * @author: James Dryden <james.dryden@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Form
+ * This represents a form that holds inputs and such.
  */
 class Form extends HtmlElement
 {
 	/**
+	 * Creates a new Form.
+	 *
 	 * @param string $action
 	 * @param string $method
 	 * @param array $attributes

@@ -3,18 +3,27 @@
  * @author: James Dryden <james.dryden@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class View
+ * This represents anything that is Viewable.
  */
 abstract class View
 {
-	private $children = array();
-	private $pageTitle;
-
-	public function __construct()
-	{
-		$this->pageTitle = "KentProjects";
-	}
+	/**
+	 * The title of the current page.
+	 * @var string
+	 */
+	private static $pageTitle;
 
 	/**
+	 * A list of the children under this view.
+	 * @var array
+	 */
+	private $children = array();
+
+	/**
+	 * Translate the current view to a string.
+	 *
 	 * @throws Exception
 	 * @return string
 	 */
@@ -34,6 +43,8 @@ abstract class View
 	}
 
 	/**
+	 * Add a text child to this view.
+	 *
 	 * @param mixed $child
 	 * @return void
 	 */
@@ -43,6 +54,8 @@ abstract class View
 	}
 
 	/**
+	 * Add a child View object to this view.
+	 *
 	 * @param View $child
 	 * @return void
 	 */
@@ -52,6 +65,8 @@ abstract class View
 	}
 
 	/**
+	 * Returns the number of children this View has.
+	 *
 	 * @return int
 	 */
 	public function countChildren()
@@ -87,6 +102,10 @@ abstract class View
 		'<body>';
 	}
 
+	/**
+	 * Specifically render items in the <head /> tag of a view.
+	 * @return void
+	 */
 	public function renderHead()
 	{
 		echo
@@ -105,11 +124,22 @@ abstract class View
 		{
 			foreach ($this->children as $child)
 			{
-				echo $child;
+				if ($child instanceof View)
+				{
+					$child->render();
+				}
+				else
+				{
+					echo $child;
+				}
 			}
 		}
 	}
 
+	/**
+	 * Specifically render items where <script /> tags should be.
+	 * @return void
+	 */
 	public function renderScripts()
 	{
 		echo
@@ -128,8 +158,14 @@ abstract class View
 		echo '</body></html>';
 	}
 
+	/**
+	 * Set a new page title.
+	 *
+	 * @param string $title
+	 * @return void
+	 */
 	public function setTitle($title)
 	{
-		$this->pageTitle = $title . " &raquo; KentProjects";
+		static::$pageTitle = $title . " &raquo; KentProjects";
 	}
 }

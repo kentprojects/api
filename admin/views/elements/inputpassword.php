@@ -3,6 +3,9 @@
  * @author: James Dryden <james.dryden@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class InputPassword
+ * This represents an input that accepts a password.
  */
 class InputPassword extends Input
 {

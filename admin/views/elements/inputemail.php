@@ -3,6 +3,9 @@
  * @author: James Dryden <james.dryden@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class InputEmail
+ * This represents an input that accepts email input.
  */
 class InputEmail extends Input
 {
