@@ -54,10 +54,10 @@ INSERT INTO `User_Year_Map` (`year`, `user_id`)
 INSERT INTO `User_Year_Map` (`year`, `user_id`, `role_convener`, `role_supervisor`, `role_secondmarker`)
 VALUES
 	(2014, 1, TRUE, FALSE, FALSE),
-	(2014, 2, FALSE, TRUE, TRUE),
+	(2014, 2, FALSE, TRUE, FALSE),
 	(2014, 3, FALSE, FALSE, FALSE),
 	(2014, 4, FALSE, FALSE, FALSE),
-	(2014, 5, FALSE, TRUE, TRUE)
+	(2014, 5, FALSE, TRUE, FALSE)
 ON DUPLICATE KEY UPDATE `year` = `year`, `user_id` = `user_id`, `role_convener` = VALUES(`role_convener`),
 	`role_supervisor` = VALUES(`role_supervisor`), `role_secondmarker` = VALUES(`role_secondmarker`);
 
