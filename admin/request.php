@@ -3,17 +3,16 @@
  * @author: James Dryden <james.dryden@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Admin_Request
+ * This represents an internal request to an Admin controller.
  */
 class_exists("Request");
 class Admin_Request extends Request_Internal
 {
-	public function __construct($method, $url)
-	{
-		parent::__construct($method, $url);
-	}
-
 	/**
 	 * Run the internal request!
+	 *
 	 * @throws RequestException
 	 * @return Response
 	 */

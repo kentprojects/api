@@ -24,17 +24,12 @@ final class Controller_Year extends Controller
 			 * Used to create a new year!
 			 * Happy new year! ^_^
 			 */
-			/**
-			 * TODO: WRITE THIS.
-			 *
-			 * Is user a convener for this year?
-			 * Create a new academic year.
-			 * Set yourself as convener.
-			 *
-			 * SQL for when Future JD forgets:
-			 * INSERT INTO `Year` (`year`) VALUES (DEFAULT(`year`));
-			 */
-			throw new HttpStatusException(501, "Creating a new year is coming soon.");
+
+			$year = Model_Year::create($this->auth->getUser());
+
+			$this->response->status(201);
+			$this->response->body($year);
+			return;
 		}
 
 		if ($this->request->param("id") === null)

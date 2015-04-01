@@ -3,11 +3,14 @@
  * @author: James Dryden <james.dryden@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Admin_Response
+ * This represents an internal Response from an Admin controller.
  */
 class Admin_Response extends Response
 {
 	/**
-	 * Set the body with the contents of a view.
+	 * Set the response body with a rendered view.
 	 *
 	 * @param View $view
 	 * @throws Exception

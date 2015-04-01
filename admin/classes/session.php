@@ -3,6 +3,9 @@
  * @author: James Dryden <james.dryden@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Session
+ * Sessions hold data that is meant to surpass a single page.
  */
 class Session
 {
@@ -23,7 +26,7 @@ class Session
 
 	/**
 	 * Destroys the session.
-	 *
+	 * This action is irreversible. Are you sure you wish to continue? [Y/n]
 	 * @return void
 	 */
 	public static function destroy()
@@ -60,7 +63,7 @@ class Session
 	}
 
 	/**
-	 * Check to see if we have session data.
+	 * Check to see if we have session data under a certain key.
 	 *
 	 * @param string $key
 	 * @return boolean
@@ -71,7 +74,7 @@ class Session
 	}
 
 	/**
-	 * Set session data.
+	 * Set some session data.
 	 *
 	 * @param string $key
 	 * @param mixed $value

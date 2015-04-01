@@ -3,13 +3,28 @@
  * @author: James Dryden <james.dryden@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class HtmlElement
+ * This represents an individual HTML element.
+ * This is like a micro-bot from Big Hero Six - it's fairly minimal on it's own, but when it connects with other classes
+ *   like itself, it can build complex structures and, well, pretty much anything!
  */
 class HtmlElement extends View
 {
+	/**
+	 * A key-value list of attributes for this element.
+	 * @var array
+	 */
 	private $attributes = array();
+	/**
+	 * The tag name for this particular element.
+	 * @var string
+	 */
 	private $tag;
 
 	/**
+	 * Build a new HtmlElement.
+	 *
 	 * @param string $tag
 	 * @param array $attributes
 	 * @param string $content
@@ -23,6 +38,8 @@ class HtmlElement extends View
 	}
 
 	/**
+	 * Add more attributes to this HtmlElement.
+	 *
 	 * @param array $attributes
 	 * @return void
 	 */
@@ -32,6 +49,8 @@ class HtmlElement extends View
 	}
 
 	/**
+	 * Add a child element to this element.
+	 *
 	 * @param HtmlElement $content
 	 * @return void
 	 */
@@ -42,6 +61,7 @@ class HtmlElement extends View
 
 	/**
 	 * Render the HTML element.
+	 * @return void
 	 */
 	public function render()
 	{
@@ -53,6 +73,10 @@ class HtmlElement extends View
 		}
 	}
 
+	/**
+	 * Render the top of the HtmlElement.
+	 * @return void
+	 */
 	public function renderTop()
 	{
 		echo '<', $this->tag;
@@ -67,6 +91,10 @@ class HtmlElement extends View
 		echo($this->countChildren() === 0 ? ' ' : ''), '/>';
 	}
 
+	/**
+	 * Render the bottom of the HtmlElement.
+	 * @return void
+	 */
 	public function renderBottom()
 	{
 		echo '</', $this->tag, '>';

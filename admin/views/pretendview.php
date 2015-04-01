@@ -3,12 +3,13 @@
  * @author: James Dryden <james.dryden@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * This is a pretend view, to test the View class and Admin_Response::render method.
  */
 class PretendView extends View
 {
 	public function __construct()
 	{
-		parent::__construct();
 		$this->setTitle("Oh yes");
 	}
 

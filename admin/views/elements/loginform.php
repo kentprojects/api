@@ -3,6 +3,9 @@
  * @author: James Dryden <james.dryden@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class LoginForm
+ * This represents a form used to login.
  */
 class LoginForm extends Form
 {

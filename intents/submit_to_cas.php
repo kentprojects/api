@@ -48,7 +48,6 @@ final class Intent_Submit_To_Cas extends Intent
 	public function create(array $data, Model_User $actor)
 	{
 		parent::create($data, $actor);
-		$mail = new Postmark;
 
 		$additionalInformation = !empty($data["additional"]);
 
@@ -71,6 +70,11 @@ final class Intent_Submit_To_Cas extends Intent
 
 		$project->setCasSubmission();
 		$project->save();
+
+		if (!empty($_SERVER["CORPUS_ENV"]))
+		{
+			return;
+		}
 
 		$body = array(
 			"CO600 PROJECT ACCEPTANCE FORM 2014/2015\n\n----\n\n",
@@ -107,6 +111,8 @@ final class Intent_Submit_To_Cas extends Intent
 				"Research Ethics Procedures."
 			);
 		}
+
+		$mail = new Postmark;
 
 		if (config("environment") === "development")
 		{

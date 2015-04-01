@@ -3,6 +3,9 @@
  * @author: James Dryden <james.dryden@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Input
+ * This represents a simple Input tag.
  */
 class Input extends HtmlElement
 {

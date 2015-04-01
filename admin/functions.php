@@ -3,12 +3,14 @@
  * @author: James Dryden <james.dryden@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * A bootstrap file of sorts for the Admin area.
  */
 define("ADMIN_PATH", __DIR__);
 require_once ADMIN_PATH . "/exceptions.php";
 
 /**
- * Register the autoloader so we can call on classes when we feel like it!
+ * Add to the autoloader, so that we can get to our infamous classes!
  */
 spl_autoload_register(
 /**

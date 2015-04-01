@@ -17,6 +17,14 @@ final class Model_Year extends Model
 		/** @var _Database_State $result */
 		$result = Database::prepare("INSERT INTO `Year` (`year`) VALUES (DEFAULT(`year`));")->execute();
 		$year = static::getById($result->insert_id);
+
+		$yearUserMap = new UserYearMap($user);
+		$yearUserMap->add($year, array(
+			"role_convener" => 1
+		));
+		$yearUserMap->save();
+
+		return $year;
 	}
 
 	/**
