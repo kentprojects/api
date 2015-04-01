@@ -374,6 +374,15 @@ class Model_Project extends Model
 	}
 
 	/**
+	 * Unset the CAS Submission status.
+	 * @return void
+	 */
+	public function unsetCasSubmission()
+	{
+		unset($this->metadata["hasCasSubmission"]);
+	}
+
+	/**
 	 * @param array $data
 	 * @throws InvalidArgumentException
 	 * @return void
