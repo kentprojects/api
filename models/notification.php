@@ -87,7 +87,7 @@ final class Model_Notification extends Model
 			"supervisor" => "You rejected GROUP_NAME to do PROJECT_NAME."
 		),
 		"group_released_project" => array(
-			"default" => "GROUP_NAME is no longer doing PROJECT_NAME.",
+			"default" => "GROUP_NAME are no longer doing PROJECT_NAME.",
 			"group_member" => "Your group is no longer doing PROJECT_NAME."
 		),
 		"new_comment_for_group" => array(
