@@ -3,6 +3,8 @@
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * These collection of classes represent operations with the database.
  */
 abstract class Database
 {

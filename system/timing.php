@@ -3,6 +3,9 @@
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Timing
+ * Allows individual sections of code to be timed for debugging processes.
  */
 class Timing
 {
