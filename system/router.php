@@ -3,10 +3,34 @@
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Router
+ * This represents routing a URL to a correct controller with a valid actions and parameters.
  */
 final class Router
 {
 	/**
+	 * "Parse" the path given (to a degree) and return array of valid parameters.
+	 *
+	 * E.g. /user/22
+	 *  =>    array(
+	 *            "controller" => "user",
+	 *            "action" => "index",
+	 *            "id" => 22
+	 *        )
+	 * E.g. /project/12/comment/45
+	 *  =>    array(
+	 *            "controller" => "project",
+	 *            "action" => "comment",
+	 *            "id" => 12,
+	 *            "id2" => "45"
+	 *        )
+	 * E.g. /comment/thread
+	 *  =>    array(
+	 *            "controller" => "comment",
+	 *            "action" => "thread"
+	 *        )
+	 *
 	 * @param string $url
 	 * @return array
 	 */

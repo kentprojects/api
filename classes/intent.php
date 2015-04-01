@@ -3,6 +3,9 @@
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Intent
+ * This represents an action looking to be undertaken by a user.
  */
 abstract class Intent
 {
@@ -11,6 +14,8 @@ abstract class Intent
 	const STATE_REJECTED = "intent:state:rejected";
 
 	/**
+	 * Get a particular Intent by it's ID.
+	 *
 	 * @param int $id
 	 * @return Intent
 	 */
@@ -28,6 +33,8 @@ abstract class Intent
 	}
 
 	/**
+	 * Get the relevant class name for a particular handler.
+	 *
 	 * @param string $handler
 	 * @return string
 	 */
@@ -52,6 +59,8 @@ abstract class Intent
 	}
 
 	/**
+	 * Get open intents by their actors.
+	 *
 	 * @param Model_User $user
 	 * @return array
 	 */
@@ -69,6 +78,8 @@ abstract class Intent
 	}
 
 	/**
+	 * A simple function to format a handler into something more manageable.
+	 *
 	 * @param string $handler
 	 * @return string
 	 */
@@ -88,6 +99,9 @@ abstract class Intent
 	 */
 	protected $model;
 
+	/**
+	 * @param Model_Intent $model
+	 */
 	public function __construct(Model_Intent $model)
 	{
 		$this->model = $model;
@@ -111,6 +125,12 @@ abstract class Intent
 		return true;
 	}
 
+	/**
+	 * Can this particular user delete this intent?
+	 *
+	 * @param Model_User $user
+	 * @return bool
+	 */
 	public function canDelete(Model_User $user)
 	{
 		return false;
@@ -158,10 +178,11 @@ abstract class Intent
 	}
 
 	/**
+	 * Clear items matching this selection.
+	 *
 	 * @param string $handler
 	 * @param array $data
-	 * @throws HttpStatusException
-	 * @return string
+	 * @return void
 	 */
 	public final function deduplicateClear($handler, array $data)
 	{
@@ -169,9 +190,11 @@ abstract class Intent
 	}
 
 	/**
+	 * Final similar items with this selection.
+	 *
 	 * @param array $data
 	 * @throws HttpStatusException
-	 * @return string
+	 * @return void
 	 */
 	public final function deduplicate(array $data)
 	{
@@ -185,6 +208,8 @@ abstract class Intent
 	}
 
 	/**
+	 * Delete this specific intent.
+	 *
 	 * @param array $data
 	 * @param Model_User $actor
 	 * @return void
@@ -195,6 +220,7 @@ abstract class Intent
 	}
 
 	/**
+	 * Get the relevant handler name for this specific intent.
 	 * @return string
 	 */
 	protected final function getHandlerName()
@@ -203,6 +229,7 @@ abstract class Intent
 	}
 
 	/**
+	 * Get the specific hash for this intent.
 	 * @return string
 	 */
 	public final function getHash()
@@ -211,6 +238,7 @@ abstract class Intent
 	}
 
 	/**
+	 * Get the specific ID for this intent.
 	 * @return int
 	 */
 	public final function getId()
@@ -219,6 +247,8 @@ abstract class Intent
 	}
 
 	/**
+	 * Merge an array of data with this specifics intent's data.
+	 *
 	 * @param array $data
 	 * @throws InvalidArgumentException
 	 * @return void
@@ -248,6 +278,8 @@ abstract class Intent
 	}
 
 	/**
+	 * Render this specific intent.
+	 *
 	 * @param Request_Internal $request
 	 * @param Response $response
 	 * @param ACL $acl
@@ -273,6 +305,7 @@ abstract class Intent
 	}
 
 	/**
+	 * Save this intent.
 	 * @return void
 	 */
 	public function save()
@@ -282,6 +315,8 @@ abstract class Intent
 	}
 
 	/**
+	 * Get or set the state of this intent.
+	 *
 	 * @param string|null $state
 	 * @return null|string
 	 */
@@ -302,9 +337,12 @@ abstract class Intent
 	}
 
 	/**
+	 * Update this specific intent.
+	 *
 	 * @param array $data
 	 * @param Model_User $actor
 	 * @throws IntentException
+	 * @return void
 	 */
 	public function update(array $data, Model_User $actor)
 	{

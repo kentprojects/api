@@ -28,6 +28,8 @@ abstract class Date
 	const TIMESTAMP = "Y-m-d H:i:s";
 
 	/**
+	 * Allows a Date to be formatted.
+	 *
 	 * @param string $style
 	 * @param int $timestamp (defaults to now)
 	 * @return string

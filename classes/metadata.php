@@ -3,12 +3,28 @@
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Metadata
+ * This class allows any class to store any form of non-indexed data in the database.
  */
 final class Metadata implements ArrayAccess, Countable
 {
+	/**
+	 * The data being stored.
+	 * @var array
+	 */
 	protected $data = array();
+	/**
+	 * The root by which the data above is stored by.
+	 * @var string
+	 */
 	protected $root;
 
+	/**
+	 * Build a new Metadata object.
+	 *
+	 * @param string $root
+	 */
 	public function __construct($root = null)
 	{
 		if ($root == null)
@@ -28,6 +44,8 @@ final class Metadata implements ArrayAccess, Countable
 	}
 
 	/**
+	 * Get a single value from the metadata.
+	 *
 	 * @param string $key
 	 * @return mixed
 	 */
@@ -39,6 +57,8 @@ final class Metadata implements ArrayAccess, Countable
 	}
 
 	/**
+	 * Do we even have a single value from the metadata.
+	 *
 	 * @param string $key
 	 * @return bool
 	 */
@@ -48,6 +68,8 @@ final class Metadata implements ArrayAccess, Countable
 	}
 
 	/**
+	 * Set an individual value to the metadata, overwriting any existing data if necessary.
+	 *
 	 * @param string $key
 	 * @param mixed $value
 	 * @return void
@@ -57,21 +79,43 @@ final class Metadata implements ArrayAccess, Countable
 		$this->data[$key] = array($value);
 	}
 
+	/**
+	 * Count the number of metadata objects.
+	 * @return int
+	 */
 	public function count()
 	{
 		return count($this->data);
 	}
 
+	/**
+	 * Count the number of values listed under one key.
+	 *
+	 * @param string $key
+	 * @return int
+	 */
 	public function offsetCount($key)
 	{
 		return count($this->data[$key]);
 	}
 
+	/**
+	 * Do we even have a value listed under the metadata with that key?
+	 *
+	 * @param string $key
+	 * @return bool
+	 */
 	public function offsetExists($key)
 	{
 		return isset($this->data[$key]);
 	}
 
+	/**
+	 * Get the values listed under a specific key.
+	 *
+	 * @param string $key
+	 * @return array
+	 */
 	public function offsetGet($key)
 	{
 		return $this->offsetExists($key)
@@ -79,6 +123,13 @@ final class Metadata implements ArrayAccess, Countable
 			: array();
 	}
 
+	/**
+	 * Set an individual value to the metadata, appending to any existing data if necessary.
+	 *
+	 * @param string $key
+	 * @param mixed $value
+	 * @return void
+	 */
 	public function offsetSet($key, $value)
 	{
 		if (!$this->offsetExists($key))
@@ -96,6 +147,12 @@ final class Metadata implements ArrayAccess, Countable
 		$this->data[$key][] = $value;
 	}
 
+	/**
+	 * Delete an item from the metadata.
+	 *
+	 * @param string $key
+	 * @return void
+	 */
 	public function offsetUnset($key)
 	{
 		if ($this->offsetExists($key))
@@ -105,30 +162,37 @@ final class Metadata implements ArrayAccess, Countable
 	}
 
 	/**
+	 * Render the complete list of the metadata object.
 	 * @return array|stdClass
 	 */
 	function render()
 	{
 		$data = new stdClass;
-		if (count($this->data))
+
+		if (count($this->data) > 0)
 		{
-			return $data;
+			foreach ($this->data as $key => $value)
+			{
+				if (is_array($value) && (count($value) === 1))
+				{
+					$data->$key = array_shift($value);
+				}
+				else
+				{
+					$data->$key = $value;
+				}
+			}
 		}
 
-		foreach ($this->data as $key => $value)
-		{
-			if (is_array($value) && (count($value) === 1))
-			{
-				$data->$key = array_shift($value);
-			}
-			else
-			{
-				$data->$key = $value;
-			}
-		}
 		return $data;
 	}
 
+	/**
+	 * Save the metadata information.
+	 *
+	 * @param null $root
+	 * @return void
+	 */
 	public function save($root = null)
 	{
 		if (!empty($root))

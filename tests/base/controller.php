@@ -3,6 +3,9 @@
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class KentProjects_Controller_TestBase
+ * This is a base test class for all KentProjects tests on controllers.
  */
 abstract class KentProjects_Controller_TestBase extends KentProjects_TestBase
 {

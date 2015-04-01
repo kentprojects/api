@@ -3,62 +3,20 @@
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Model
+ * A model is any class that interacts directly with the database.
  */
 abstract class Model
 {
 	/**
 	 * An array of the allowed fields.
-	 *
 	 * @var array
 	 */
 	private static $limitFields = array();
 
 	/**
-	 * Builds a new model like the Database does.
-	 *
-	 * @param array|stdClass $data
-	 * @param string $idField
-	 * @throws InvalidArgumentException
-	 * @return Model
-	 */
-	public static function build($data, $idField)
-	{
-		if (config("environment") !== "testing")
-		{
-			throw new InvalidArgumentException("Only the testing environment can call this!");
-		}
-
-		if (is_object($data))
-		{
-			if (get_class($data) !== "stdClass")
-			{
-				throw new InvalidArgumentException("Data is an object not of stdClass.");
-			}
-		}
-
-		$class = get_called_class();
-
-		/** @var Model $object */
-		$object = new $class;
-
-		foreach ($data as $key => $value)
-		{
-			if ($key === $idField)
-			{
-				$object->id = $value;
-			}
-			else
-			{
-				$object->$key = $value;
-			}
-		}
-
-		$object->__construct();
-
-		return $object;
-	}
-
-	/**
+	 * Return the standard Cache name for this model.
 	 * @return string
 	 */
 	protected static function cacheName()
@@ -67,6 +25,7 @@ abstract class Model
 	}
 
 	/**
+	 * Return the standard class name for this model.
 	 * @return string
 	 */
 	protected static function className()
@@ -78,7 +37,6 @@ abstract class Model
 	 * Get the relevant Model by it's ID.
 	 *
 	 * @param mixed $id
-	 * @throws CacheException
 	 * @return mixed|null
 	 */
 	public static function getById($id)
@@ -87,6 +45,8 @@ abstract class Model
 	}
 
 	/**
+	 * Set specific fields for this model to return.
+	 *
 	 * @param array $fields
 	 * @return void
 	 */
@@ -96,12 +56,14 @@ abstract class Model
 	}
 
 	/**
+	 * The model's metadata.
 	 * @var Metadata
 	 */
 	protected $metadata;
 
 	/**
-	 * Build a new Model
+	 * Build a new Model.
+	 * Always remember to call this, otherwise you'll lose access to the precious Metadata class.
 	 */
 	public function __construct()
 	{
@@ -109,7 +71,7 @@ abstract class Model
 	}
 
 	/**
-	 * @throws CacheException
+	 * Clear the caches for this entity.
 	 * @return void
 	 */
 	public final function clearCaches()
@@ -118,6 +80,7 @@ abstract class Model
 	}
 
 	/**
+	 * Return a list of keys to send to Cache::delete when clearCaches() is called.
 	 * @return array
 	 */
 	public function clearCacheStrings()
@@ -128,6 +91,8 @@ abstract class Model
 	}
 
 	/**
+	 * Get the Cache name for the current model, optionally appending some more text.
+	 *
 	 * @param string $append
 	 * @return string
 	 */
@@ -137,6 +102,7 @@ abstract class Model
 	}
 
 	/**
+	 * Get the class name for the current model.
 	 * @return string
 	 */
 	public function getClassName()
@@ -145,6 +111,7 @@ abstract class Model
 	}
 
 	/**
+	 * Get the entity name for the current model.
 	 * @return string
 	 */
 	public function getEntityName()
@@ -154,7 +121,6 @@ abstract class Model
 
 	/**
 	 * Get the ID of a Model.
-	 *
 	 * @return int|string
 	 */
 	public abstract function getId();
@@ -199,8 +165,6 @@ abstract class Model
 
 	/**
 	 * Save the Model.
-	 *
-	 * @throws InvalidArgumentException
 	 * @return void
 	 */
 	public function save()

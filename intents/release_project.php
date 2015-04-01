@@ -88,6 +88,7 @@ final class Intent_Release_Project extends Intent
 		}
 
 		$project->removeGroup();
+		$project->unsetCasSubmission();
 		$project->save();
 
 		Notification::queue(

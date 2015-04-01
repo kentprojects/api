@@ -3,10 +3,14 @@
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Query
+ * Represents a query being built.
  */
 final class Query
 {
-	const AAND = "query:where:and";
+	const /** @noinspection SpellCheckingInspection */
+		AAND = "query:where:and";
 	const EQ = "query:where:equals";
 	const IN = "query:where:in";
 	const ON = "query:join:on";
@@ -31,6 +35,8 @@ final class Query
 	private $where = array();
 
 	/**
+	 * Build a new query.
+	 *
 	 * @param array|string $field
 	 * @param string $table
 	 */
@@ -41,6 +47,9 @@ final class Query
 	}
 
 	/**
+	 * Execute the query, or return the query if we're just testing this class.
+	 *
+	 * @param boolean $returnResults
 	 * @return _Database_Result|_Database_State|_QueryStub
 	 */
 	public function execute($returnResults = false)
@@ -128,6 +137,8 @@ final class Query
 	}
 
 	/**
+	 * Add a new join.
+	 *
 	 * @param array $join
 	 * @throws InvalidArgumentException
 	 */
@@ -170,6 +181,8 @@ final class Query
 	}
 
 	/**
+	 * Add a new where clause.
+	 *
 	 * @param array $where
 	 * @throws InvalidArgumentException
 	 */

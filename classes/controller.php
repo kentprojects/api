@@ -3,6 +3,9 @@
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Controller
+ * This represents a basic controller that takes requests in and returns responses out.
  */
 abstract class Controller
 {
@@ -53,6 +56,7 @@ abstract class Controller
 
 	/**
 	 * To be run BEFORE the main action.
+	 * @return void
 	 */
 	public function before()
 	{
@@ -61,6 +65,7 @@ abstract class Controller
 
 	/**
 	 * To be run AFTER the main action.
+	 * @return void
 	 */
 	public function after()
 	{
@@ -77,6 +82,9 @@ abstract class Controller
 	}
 
 	/**
+	 * This is our custom render function that goes through each result, ensuring it's in a format that JSON-encode
+	 * will accept.
+	 *
 	 * @param mixed $body
 	 * @return mixed
 	 */

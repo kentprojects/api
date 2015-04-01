@@ -3,10 +3,15 @@
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Notification
+ * Represents a notification looking to be queued.
  */
 final class Notification
 {
 	/**
+	 * Queue a notification.
+	 *
 	 * @param string $type
 	 * @param Model_User $actor
 	 * @param array $references
@@ -74,6 +79,8 @@ final class Notification
 	}
 
 	/**
+	 * Validate that this notification is acceptable to enter the API.
+	 *
 	 * @param $type
 	 * @param Model_User $actor
 	 * @param array $references

@@ -6,19 +6,50 @@
  *
  * Class ModelMap
  * This class is designed to bring two objects together by way of a map table.
+ * It's based off one model connected to many other models of a certain type.
  */
 abstract class ModelMap implements Countable, IteratorAggregate
 {
+	/**
+	 * The cache name that the model map will be cached under.
+	 * @var string
+	 */
 	protected $cacheName;
+	/**
+	 * The Models connected to this model map.
+	 * @var array
+	 */
 	protected $data = array();
+	/**
+	 * The class name of the Models within $this->data.
+	 * @var string
+	 */
 	protected $foreignClass;
+	/**
+	 * The Model acting as the source for this model map.
+	 * @var Model
+	 */
 	protected $source;
 
+	/**
+	 * The SQL that will clear the model map.
+	 * @var string
+	 */
 	protected $clearSQL;
+	/**
+	 * The SQL that will get the data for the model map.
+	 * @var string
+	 */
 	protected $getSQL;
+	/**
+	 * The SQL that will set the data for the model map.
+	 * @var null|string
+	 */
 	protected $saveSQL;
 
 	/**
+	 * Build a new Model map.
+	 *
 	 * @param Model $sourceObject
 	 * @param string $foreignClass
 	 * @param string $cacheName
@@ -48,6 +79,9 @@ abstract class ModelMap implements Countable, IteratorAggregate
 			$this->saveSQL = $saveSQL;
 		}
 
+		/**
+		 * If we have been given a valid source, then go fetch the data for the model map.
+		 */
 		if ($this->source->getId() !== null)
 		{
 			$this->fetch();
@@ -55,6 +89,9 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	}
 
 	/**
+	 * Add a new Model to this model map.
+	 * This does does not save the model map, as this is something you will need to do yourself.
+	 *
 	 * @param Model $model
 	 * @throws InvalidArgumentException
 	 * @return void
@@ -75,7 +112,7 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	}
 
 	/**
-	 * @throws InvalidArgumentException
+	 * Clear the model map.
 	 * @return void
 	 */
 	public function clear()
@@ -84,7 +121,7 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	}
 
 	/**
-	 * @throws CacheException
+	 * Clear the caches for each Model in the Model Map.
 	 * @return void
 	 */
 	public function clearCaches()
@@ -93,6 +130,7 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	}
 
 	/**
+	 * Get all the cache strings from the Models in the Model Map.
 	 * @return array
 	 */
 	public function clearCacheStrings()
@@ -107,6 +145,7 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	}
 
 	/**
+	 * Count the number of entries in the Model Map.
 	 * @return int
 	 */
 	public function count()
@@ -115,6 +154,8 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	}
 
 	/**
+	 * Get the entries for this Model Map.
+	 *
 	 * @throws InvalidArgumentException
 	 * @return void
 	 */
@@ -147,6 +188,8 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	}
 
 	/**
+	 * Get a specific Model.
+	 *
 	 * @param int $modelId
 	 * @return Model
 	 */
@@ -156,6 +199,7 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	}
 
 	/**
+	 * Get a list of the IDs from this Model Map.
 	 * @return array
 	 */
 	public function getIds()
@@ -165,7 +209,6 @@ abstract class ModelMap implements Countable, IteratorAggregate
 
 	/**
 	 * Useful so the ModelMap can partake in a foreach loop.
-	 *
 	 * @return ArrayIterator
 	 */
 	public function getIterator()
@@ -174,6 +217,8 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	}
 
 	/**
+	 * Remove a specific Model from the map.
+	 *
 	 * @param Model $model
 	 * @return void
 	 */
@@ -196,14 +241,12 @@ abstract class ModelMap implements Countable, IteratorAggregate
 	 */
 	public function render(Request_Internal $request, Response &$response, ACL $acl, $internal = false)
 	{
-		return array_values(
-			array_map(
-				function (Model $model) use ($request, &$response, $acl, $internal)
-				{
-					return $model->render($request, $response, $acl, $internal);
-				},
-				$this->data
-			)
+		return array_map(
+			function (Model $model) use ($request, &$response, $acl, $internal)
+			{
+				return $model->render($request, $response, $acl, $internal);
+			},
+			array_values($this->data)
 		);
 	}
 
