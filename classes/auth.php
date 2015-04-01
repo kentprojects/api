@@ -3,6 +3,9 @@
  * @author: KentProjects <developer@kentprojects.com>
  * @license: Copyright KentProjects
  * @link: http://kentprojects.com
+ *
+ * Class Auth
+ * Handles the API authentication.
  */
 final class Auth
 {
@@ -45,6 +48,10 @@ final class Auth
 
 		if ($this->level !== self::NONE)
 		{
+			/**
+			 * This code runs when authentication is required.
+			 * If something seems wrong, then the API will reject the request.
+			 */
 			if ($this->request->query("key", null) === null)
 			{
 				throw new HttpStatusException(400, "Missing application key.");
@@ -116,6 +123,10 @@ final class Auth
 		}
 		else
 		{
+			/**
+			 * If this endpoint does not require authentication, and we have the relevant query string values, then we
+			 * may as well authenticate the request.
+			 */
 			if ($this->request->query("key", null) !== null)
 			{
 				$this->application = Model_Application::getByKey($this->request->query("key"));
